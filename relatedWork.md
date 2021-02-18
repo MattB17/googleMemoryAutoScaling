@@ -29,3 +29,23 @@ In [this work](https://www.microsoft.com/en-us/research/wp-content/uploads/2015/
 * it performs horizontal scaling - adjusting the number of machines assigned to a job
 * also performs vertical scaling - adjusting CPU and memory limits in existing machines
 * this scaling is done in both directions - scaling up when more resources are needed and scaling down when the job is consuming less
+* they accept the occasional OOM error, especially in early stages while learning the resources that a task needs
+* two types of jobs: serving and batch
+* serving jobs generally have SLOs and are the primary driver of capacity while batch jobs generally fill the remaining or temporarily-unused capacity
+* it considers jobs separately - there is no cross job learning
+* one method computes job limits based on a statistic over the aggregated signal using a moving window (statistic could be max usage, average usage, or a certain percentile)
+* also use ML recommenders - a recommender composed of many small interpretable models
+  * the recommender periodically chooses the best performing model according to a cost function
+* Autopilot solves a different problem - deciding when to autoscale to conserve resources or increase resources to meet demand
+* the methods are still useful to predict resource needs of high-priority foreground tasks
+* with these predictions, decisions can then be made about how to assign batch jobs to machines to limit the number of tasks that are killed
+
+[This work](https://dl.acm.org/doi/pdf/10.1145/2670979.2670999) focuses on improving the availability SLOs of reclaimed resources
+* they want to accurately predict the amount of excess resources which can be reclaimed
+* they do this using time-series based forecasting, predicting confidence intervals, and using prediction cycles
+* time-series forecasting is done to estimate the available slack (difference between used and available) for a future time period - this is done using ARIMA and Exponential Smoothing
+* then they build confidence intervals around the prediction and choose the lowest value in that confidence interval (minimum slack) as the true prediction
+* prediction is done in cycles - that is the prediction is made for a window of time and at the end of that time period a new prediction is made
+* this overlaps quite closely with our usage in that in this work they are trying to predict usage of foreground jobs
+* however these estimates are overly conservative and only focus on minimum availability over a time period
+* we instead want to pack batch jobs onto existing servers so it could be the case that a batch job uses more than the minimum slack, but at the same time the foreground job is using less than its maximum and they still use less than the total available resources on the machine
