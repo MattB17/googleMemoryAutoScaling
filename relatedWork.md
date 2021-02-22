@@ -49,3 +49,16 @@ In [this work](https://www.microsoft.com/en-us/research/wp-content/uploads/2015/
 * this overlaps quite closely with our usage in that in this work they are trying to predict usage of foreground jobs
 * however these estimates are overly conservative and only focus on minimum availability over a time period
 * we instead want to pack batch jobs onto existing servers so it could be the case that a batch job uses more than the minimum slack, but at the same time the foreground job is using less than its maximum and they still use less than the total available resources on the machine
+
+[This work](https://dl-acm-org.myaccess.library.utoronto.ca/doi/pdf/10.1145/2287036.2287050) focuses on predicting disk usage patterns.
+* disk space usage, I/O bandwidth, and the age of stored data are measured for distributed filesystems in a cloud environment
+* the method starts by analyzing a large quantity of traces
+* then usage patterns are aggregated by region and user
+* for the users that use high quantities of data and for which their usage patterns are typically hard to predict, these users are required to fill out a quota which is to be incorporated in the forecasts
+* next, an ensemble forecasting methodology is used
+  * a series of individual forecasts are averaged into one global forecast
+  * the forecasting methods used are linear regression, exponential regression, autoregressive integrate moving average (ARIMA), and Bayesian structural time series models
+* the method are evaluated on the 3 usage scenarios mentioned above
+  * it performs well on short time horizons but requires a buffer for longer horizons
+* this bears some similarities to our work, however they are forecasting all jobs
+* we are only interested in accurate forecasts of primary jobs and then packing batch jobs onto those existing servers
