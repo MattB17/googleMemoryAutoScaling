@@ -62,3 +62,16 @@ In [this work](https://www.microsoft.com/en-us/research/wp-content/uploads/2015/
   * it performs well on short time horizons but requires a buffer for longer horizons
 * this bears some similarities to our work, however they are forecasting all jobs
 * we are only interested in accurate forecasts of primary jobs and then packing batch jobs onto those existing servers
+
+[PRESS (PRedictive Elastic reSource Scaling)](https://ieeexplore-ieee-org.myaccess.library.utoronto.ca/stamp/stamp.jsp?tp=&arnumber=5691343) focuses on predicting resource patterns and then performing automatic scaling
+* goal is to avoid SLO violations and minimize wasted resources
+* more weight is attributed to SLO violations as opposed to wasted resources as SLO violations are more costly
+* it has a 2 step approach
+  * first uses signal processing to identify repeating patterns
+  * if no pattern is discovered it uses a statistical state-driven approach to capture near-term resource usage patterns and then uses a discrete-time Markov chain to predict demand in the near future
+* for signal processing FFT is first applied to find the longest dominating frequency and then sequences of time windows for the same trace are compared to determine if there are correlations between different time windows that identify a pattern
+* the markov chain is meant to predict short-term demand by discretizing usage into equal size buckets and then determining the probability of transitioning from one usage bucket to another for every pair of buckets
+* the prediction is then padded with a small buffer to guard against SLO violations
+* this has some overlap with our work as it looks to predict the resource needs of jobs
+* however, we propose to use a larger collection of methods and to do so only for primary jobs
+* batch jobs will then be "packed" onto machines
