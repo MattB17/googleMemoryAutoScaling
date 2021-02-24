@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: MemoryAutoScaling
+Version: 0.1.0
+Summary: Prediction Methods for Memory Auto Scaling
+Home-page: https://github.com/MattB17/googleMemoryAutoScaling/MemoryAutoScaling
+Author: Matt Buckley
+Author-email: matt.buckley1755@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python

@@ -121,10 +121,11 @@ class TraceGenerator:
         traces = [None for _ in range(trace_count)]
         for idx in range(trace_count):
             noise_var = (self._noise_amp ** 2) * abs(amp_factor[idx])
-            offset = random.randint(0, period_lengths[idx] - 1)
+            period = round(max(1, abs(period_lengths[idx])))
+            offset = random.randint(0, period - 1)
             period_comp = np.array([
-                spikes[idx] if (pos - offset) % period_lengths[idx] == 0
-                else 0 for pos in range(self._trace_length)])
+                spikes[idx] if (pos - offset) % period == 0 else 0
+                for pos in range(self._trace_length)])
             traces[idx] = constants[idx] + period_comp + np.random.normal(
                 0, noise_var, self._trace_length)
         return traces

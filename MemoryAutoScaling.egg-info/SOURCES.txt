@@ -1,0 +1,9 @@
+README.md
+setup.cfg
+setup.py
+MemoryAutoScaling/TraceGenerator.py
+MemoryAutoScaling/__init__.py
+MemoryAutoScaling.egg-info/PKG-INFO
+MemoryAutoScaling.egg-info/SOURCES.txt
+MemoryAutoScaling.egg-info/dependency_links.txt
+MemoryAutoScaling.egg-info/top_level.txt
