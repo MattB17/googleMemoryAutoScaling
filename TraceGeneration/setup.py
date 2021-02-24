@@ -7,7 +7,7 @@ current_dir = path.abspath(path.dirname(__file__))
 
 # the setup
 setup(
-    name="TraceGenerator",
+    name="TraceGeneration",
     version="0.1.0",
     description="Trace Generation for Memory Auto Scaling",
     author="Matt Buckley",
