@@ -1,2 +1,4 @@
 .DS_Store
 ideas.md
+*.pyc
+__pycache__/
