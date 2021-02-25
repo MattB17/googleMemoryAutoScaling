@@ -129,3 +129,59 @@ class TraceGenerator:
             traces[idx] = constants[idx] + period_comp + np.random.normal(
                 0, noise_var, self._trace_length)
         return traces
+
+    def generate_unpredictable_traces(self, trace_count, mu2,
+                                      sigma2, mu3, sigma3):
+        """Generates `trace_count` unpredictable traces.
+
+        Unpredictable traces are traces that have no apparent pattern. To
+        simulate this we generate 3 Gaussian traces for each trace. The
+        distributions are `N(_mu, _sigma^2)`, `N(mu2, sigma2^2)` and
+        `N(mu3,  sigma3^2)`. Then for each time point, there are 3 trace
+        values according to the 3 distributions. These 3 values are sampled
+        3 times with replacement and multiplied together to get the trace
+        value for that time point. Lastly, for each time point, a small bit
+        of noise is added from a `N(0, _amp^2)` random variable.
+
+        Parameters
+        ----------
+        trace_count: int
+            The number of unpredictable traces being generated.
+        mu2: float
+            The average for the 2nd Gaussian distribution.
+        sigma2: float
+            The standard deviation for the 2nd Gaussian distribution.
+        mu2: float
+            The average for the 3rd Gaussian distribution.
+        sigma2: float
+            The standard deviation for the 3rd Gaussian distribution.
+
+        Returns
+        -------
+        list
+            A list of numpy arrays representing unpredictable traces. The
+            list has `trace_count` traces.
+
+        """
+        amp_factor = np.random.normal(1, 1, trace_count)
+        traces = [None for _ in range(trace_count)]
+        avgs = [self._mu, mu2, mu3]
+        sigmas = [self._sigma, sigma2, sigma3]
+        for idx in range(trace_count):
+            processes = [
+                np.random.normal(avgs[i], sigmas[i], self._trace_length)
+                for i in range(3)]
+            curr_trace = np.array([0 for _ in range(self._trace_length)])
+            for pos in range(self._trace_length):
+                trace_vals = [processes[i][pos] for i in range(3)]
+                trace_vals = np.random.choice(trace_vals, 3, replace=True)
+                val = trace_vals[0] * trace_vals[1] * trace_vals[2]
+                if val >= 0:
+                    val = val**(1.0/3)
+                else:
+                    val = -((-val)**(1.0/3))
+                curr_trace[pos] = val
+            noise_var = (self._noise_amp ** 2) * abs(amp_factor[idx])
+            traces[idx] = curr_trace + np.random.normal(
+                0, noise_var, self._trace_length)
+        return traces
