@@ -1,1 +1,2 @@
 from MemoryAutoScaling.TraceGenerator import TraceGenerator
+from MemoryAutoScaling.TraceAnalyzer import TraceAnalyzer
