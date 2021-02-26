@@ -3,8 +3,10 @@ analysis on a trace.
 
 """
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from MemoryAutoScaling import utils
 
 
 class TraceAnalyzer:
@@ -123,30 +125,6 @@ class TraceAnalyzer:
         """
         self._analysis_title = new_title
 
-    def _plot_trace(self, trace, title):
-        """Plots the data trace `trace` over time.
-
-        Parameters
-        ----------
-        trace: np.array
-            A numpy array representing the data trace to be plotted.
-        title: str
-            The title used in the plot.
-
-        Returns
-        -------
-        None
-
-        """
-        time_points = len(trace)
-        tick_labels = ["t{}".format(pos) if pos % self._tick_interval == 0
-                       else "" for pos in range(time_points)]
-        plt.plot(trace, color=self._plot_color, linewidth=3)
-        plt.xticks(range(time_points), tick_labels)
-        plt.xlabel("Time")
-        plt.title(title)
-        plt.show()
-
     def plot_trace(self, data_trace):
         """Plots `data_trace` across time.
 
@@ -161,7 +139,9 @@ class TraceAnalyzer:
 
         """
         plt.figure(figsize=(20, 5))
-        self._plot_trace(data_trace, "{} Trace".format(self._analysis_title))
+        plt.plot(data_trace, color=self._plot_color, linewidth=3)
+        utils.setup_trace_plot(len(data_trace), self._tick_interval,
+                               "{} Trace".format(self._analysis_title))
 
     def plot_deviations_from_average(self, data_trace):
         """Plots the deviations of `data_trace` from its average across time.
@@ -183,6 +163,30 @@ class TraceAnalyzer:
         """
         plt.figure(figsize=(20, 5))
         plt.plot(np.zeros(len(data_trace)), color="red", linewidth=1)
-        self._plot_trace(data_trace - np.mean(data_trace),
-                         "{} Trace - Deviations from Average".format(
-                            self._analysis_title))
+        plt.plot(data_trace - np.mean(data_trace),
+                 color=self._plot_color, linewidth=3)
+        utils.setup_trace_plot(len(data_trace), self._tick_interval,
+                               "{} Trace - Deviations From Average".format(
+                                    self._analysis_title))
+
+    def calculate_statistics(self, data_trace):
+        """Calculates statistics for `data_trace`.
+
+        Parameters
+        ----------
+        data_trace: np.array
+            A numpy array representing a data trace.
+
+        Returns
+        -------
+        pd.Series
+            A pandas Series containing the statistics for `data_trace`.
+
+        """
+        stats = utils.get_trace_stats(data_trace)
+        trace_stats = {"std": stats["std"],
+                       "range": stats["max"] - stats["min"],
+                       "IQR": stats["p75"] - stats["p25"],
+                       "median": stats["median"],
+                       "avg": stats["avg"]}
+        return pd.Series(trace_stats)
