@@ -54,8 +54,9 @@ class MovingAverageModel:
         """Calculates all moving average prediction traces for `data_trace`.
 
         For each time point in `data_trace`, the moving average prediction
-        is calculated. For the first time point, the prediction is 0 as there
-        is no data on which the prediction can be based.
+        is calculated. For the first time point, the prediction is
+        `_start_pred` as there is no data on which the prediction can
+        be based.
 
         Parameters
         ----------

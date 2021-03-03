@@ -1,3 +1,4 @@
 from MemoryAutoScaling.TraceGenerator import TraceGenerator
 from MemoryAutoScaling.TraceAnalyzer import TraceAnalyzer
 from MemoryAutoScaling.MovingAverageModel import MovingAverageModel
+from MemoryAutoScaling.ExponentialSmoothingModel import ExponentialSmoothingModel
