@@ -7,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from MemoryAutoScaling import utils
+import statsmodels.tsa.api as smt
 
 
 class TraceAnalyzer:
@@ -168,6 +169,33 @@ class TraceAnalyzer:
         utils.setup_trace_plot(len(data_trace), self._tick_interval,
                                "{} Trace - Deviations From Average".format(
                                     self._analysis_title))
+
+    def plot_auto_correlations(self, data_trace, lags):
+        """Plots auto correlations for `data_trace`.
+
+        The auto correlations and partial auto correlations are plotted
+        for `data_trace` with a lag of `lags`.
+
+        Parameters
+        ----------
+        data_trace: np.array
+            A numpy array representing the data trace for which auto
+            correlations are plotted.
+        lags: int
+            The number of lags to include in the auto correlation plots.
+
+        Returns
+        -------
+        None
+
+        """
+        plt.figure(figsize=(20, 5))
+        layout = (1, 2)
+        acf_axis = plt.subplot2grid(layout, (0, 0))
+        pacf_axis = plt.subplot2grid(layout, (0, 1))
+        smt.graphics.plot_acf(data_trace, lags=lags)
+        smt.graphics.plot_pacf(data_trace, lags=lags)
+        plt.show()
 
     def calculate_statistics(self, data_trace):
         """Calculates statistics for `data_trace`.
