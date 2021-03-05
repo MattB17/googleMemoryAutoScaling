@@ -3,6 +3,7 @@
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
 
 
 def setup_trace_plot(time_points, tick_interval, title):
@@ -55,3 +56,46 @@ def get_trace_stats(data_trace):
             "min": np.min(data_trace),
             "p25": np.percentile(data_trace, 25),
             "p75": np.percentile(data_trace, 75)}
+
+def perform_coin_toss(prob):
+    """Performs a coin toss with probability `prob` of heads.
+
+    Parameters
+    ----------
+    prob: float
+        A number between 0 and 1 representing the probability of heads.
+
+    Returns
+    -------
+    int
+        Either 0 or 1 where 0 represents tails and 1 represents heads.
+
+    """
+    return np.random.binomial(1, prob)
+
+def get_cumulative_sum_of_trace(data_trace):
+    """Computes the cumulative sum of `data_trace`.
+
+    That is, a new data trace is generated that is the same length as
+    `data_trace` and for which at each time point the observation of the
+    trace is equal to the cumulative sum of `data_trace` up to that time
+    point.
+
+    Parameters
+    ----------
+    data_trace: np.array
+        A numpy array representing the data trace from which the cumulative
+        sum is computed.
+
+    Returns
+    -------
+    np.array
+        A numpy array having the same length as `data_trace` and for which
+        the observation at each time point is the cumulative sum of the
+        observations of `data_trace` up to that time point.
+
+    """
+    avg = np.mean(data_trace)
+    cumsum_trace = data_trace - avg
+    cumsum_trace[0] = 0
+    return np.cumsum(cumsum_trace) + avg

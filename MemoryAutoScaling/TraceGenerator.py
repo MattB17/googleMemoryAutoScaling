@@ -4,6 +4,7 @@ corresponding to different usage patterns.
 
 """
 import numpy as np
+from MemoryAutoScaling import utils
 import random
 
 
@@ -51,7 +52,8 @@ class TraceGenerator:
         replicating it for the length of the trace. Then for each time point,
         a small bit of noise is added from a `N(0, _noise_amp^2)` random
         variable. The random constant is sampled from a `N(_mu, _sigma^2)`
-        random variable.
+        random variable. Lastly, we toss a fair coin and if it lands heads
+        we take the cumulative sum of each time point as the true observation.
 
         Parameters
         ----------
@@ -72,6 +74,8 @@ class TraceGenerator:
             noise_var = (self._noise_amp ** 2) * abs(amp_factor[idx])
             traces[idx] = constants[idx] + np.random.normal(
                 0, noise_var, self._trace_length)
+            if utils.perform_coin_toss(0.5):
+                traces[idx] = utils.get_cumulative_sum_of_trace(traces[idx])
         return traces
 
     def generate_periodic_traces(self, trace_count, period_avg,
@@ -84,7 +88,9 @@ class TraceGenerator:
         `N(spike_avg, spike_std^2)` random variable and the period of the
         spike is sampled according to a `N(period_avg, period_std^2)` random
         variable. Lastly, for each time point, a small bit of noise is added
-        from a `N(0, _amp^2)` random variable.
+        from a `N(0, _amp^2)` random variable. Lastly, we toss a fair coin and
+        if it lands heads we take the cumulative sum of each time point as
+        the true observation.
 
         Parameters
         ----------
@@ -128,6 +134,8 @@ class TraceGenerator:
                 for pos in range(self._trace_length)])
             traces[idx] = constants[idx] + period_comp + np.random.normal(
                 0, noise_var, self._trace_length)
+            if utils.perform_coin_toss(0.5):
+                traces[idx] = utils.get_cumulative_sum_of_trace(traces[idx])
         return traces
 
     def generate_unpredictable_traces(self, trace_count, mu2,
@@ -141,7 +149,9 @@ class TraceGenerator:
         values according to the 3 distributions. These 3 values are sampled
         3 times with replacement and multiplied together to get the trace
         value for that time point. Lastly, for each time point, a small bit
-        of noise is added from a `N(0, _amp^2)` random variable.
+        of noise is added from a `N(0, _amp^2)` random variable. Lastly, we
+        take the cumulative sum of observations as the actual data value at
+        each data point.
 
         Parameters
         ----------
@@ -184,4 +194,5 @@ class TraceGenerator:
             noise_var = (self._noise_amp ** 2) * abs(amp_factor[idx])
             traces[idx] = curr_trace + np.random.normal(
                 0, noise_var, self._trace_length)
+            traces[idx] = utils.get_cumulative_sum_of_trace(traces[idx])
         return traces
