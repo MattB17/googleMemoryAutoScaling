@@ -3,6 +3,7 @@
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import statsmodels.tsa.api as smt
 import copy
 
 
@@ -31,6 +32,38 @@ def setup_trace_plot(time_points, tick_interval, title):
     plt.title(title)
     plt.show()
 
+
+def plot_autocorrelations_for_data(trace, trace_ax, acf_ax,
+                                   pacf_ax, lags, color):
+    """Plots the autocorrelations for `trace`.
+
+    The raw time series `trace` is plotted as well as its autocorrelation
+    and partial autocorrelation based on `lags`.
+
+    Parameters
+    ----------
+    trace: np.array
+        The numpy array representing the data trace.
+    trace_ax: plt.axis
+        The axis on which the raw time series is plotted.
+    acf_ax: plt.axis
+        The axis on which the autocorrelations are plotted.
+    pacf_ax: plt.axis
+        The axis on which the partial autocorrelations are plotted.
+    lags: int
+        An integer representing the number of lags in the autocorrelation
+        plots.
+    color: str
+        A string representing a color for the plot.
+
+    Returns
+    -------
+    None
+
+    """
+    trace_ax.plot(trace, color=color, linewidth=3)
+    smt.graphics.plot_acf(trace, lags=lags, ax=acf_ax)
+    smt.graphics.plot_pacf(trace, lags=lags, ax=pacf_ax)
 
 def get_trace_stats(data_trace):
     """Calculates high-level summary statistics for `data_trace`.
