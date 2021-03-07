@@ -1,3 +1,4 @@
+from MemoryAutoScaling.TraceHandler import TraceHandler
 from MemoryAutoScaling.TraceGenerator import TraceGenerator
 from MemoryAutoScaling.TraceAnalyzer import TraceAnalyzer
 from MemoryAutoScaling.MovingAverageModel import MovingAverageModel
