@@ -132,3 +132,23 @@ def get_cumulative_sum_of_trace(data_trace):
     cumsum_trace = data_trace - avg
     cumsum_trace[0] = 0
     return np.cumsum(cumsum_trace) + avg
+
+def extract_time_series_from_trace(trace_data, series_name):
+    """Extracts the time series for `series_name` from `trace_data`.
+
+    Parameters
+    ----------
+    trace_data: pd.DataFrame
+        A DataFrame representing the data for the trace.
+    series_name: str
+        A string representing the name of the data representing the time
+        series.
+
+    Returns
+    -------
+    np.array
+        A numpy array representing the time series for `series_name` extracted
+        from `trace_data`.
+
+    """
+    return trace_data[series_name].to_numpy()

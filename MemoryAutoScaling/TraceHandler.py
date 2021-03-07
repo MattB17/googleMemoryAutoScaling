@@ -5,6 +5,14 @@ generated from the raw google data.
 import pandas as pd
 
 
+MAX_MEM_COL = 'maximum_usage.memory'
+AVG_MEM_COL = 'average_usage.memory'
+TRACE_COLS = ['start_time', 'end_time', 'instance_index',
+              'alloc_instance_index', 'collection_type', 'assigned_memory',
+              'page_cache_memory', 'cycles_per_instruction',
+              'memory_accesses_per_instruction', AVG_MEM_COL, MAX_MEM_COL]
+
+
 class TraceHandler:
     """Used to process traces from the raw google data.
 
@@ -55,3 +63,26 @@ class TraceHandler:
         match_str = r".*{}.*\.csv".format(self._file_identifier)
         return [file_name for file_name in os.listdir(self._dir_path)
                 if re.match(match_str, file_name)]
+
+    def process_trace_file(self, trace_file):
+        """Performs the processing pipeline on `trace_file`.
+
+        Parameters
+        ----------
+        trace_file: str
+            A string representing the name of the file to be processed.
+
+        Returns
+        -------
+        None
+
+        """
+        trace_df = pd.read_csv(trace_file)
+        trace_df = trace_df[TRACE_COLS]
+        order = trace_df['start_time'].sort_values().index
+        trace_df = trace_df.loc[order]
+        self._max_mem_traces.append(utils.extract_time_series_from_trace(
+            trace_df, MAX_MEM_COL))
+        self._avg_mem_traces.append(utils.extract_time_series_from_trace(
+            trace_df, AVG_MEM_COL))
+        trace_df.to_csv(trace_file, sep=',', index=False)
