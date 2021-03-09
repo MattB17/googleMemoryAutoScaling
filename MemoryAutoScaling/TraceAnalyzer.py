@@ -232,7 +232,7 @@ class TraceAnalyzer:
         utils.plot_autocorrelations_for_data(
             data_trace, ts_axis, acf_axis, pacf_axis, lags, self._plot_color)
 
-        diffs = np.diff(data_trace, n=1)
+        diffs = utils.get_differenced_trace(data_trace, 1)
         utils.plot_autocorrelations_for_data(
             diffs, diff_axis, diff_acf_axis, diff_pacf_axis, lags, "red")
 
@@ -259,10 +259,10 @@ class TraceAnalyzer:
 
         """
         plt.figure(figsize=(12, 8))
-        plt.plot(
-            data_trace, color=self._plot_color, linewidth=3, label="Raw")
-        plt.plot(np.diff(
-            data_trace, n=1), color="red", linewidth=3, label="Differenced")
+        plt.plot(data_trace, color=self._plot_color,
+                 linewidth=3, label="Raw")
+        plt.plot(utils.get_differenced_trace(data_trace, 1),
+                 color="red", linewidth=3, label="Differenced")
         plt.legend()
         utils.setup_trace_plot(
             len(data_trace), self._tick_interval,

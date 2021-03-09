@@ -133,6 +133,50 @@ def get_cumulative_sum_of_trace(data_trace):
     cumsum_trace[0] = 0
     return np.cumsum(cumsum_trace) + avg
 
+def impute_for_time_series(time_series, impute_val):
+    """Performs imputation on `time_series` using `impute_val`.
+
+    All NaN values in `time_series` are replaced by `impute_val`.
+
+    Parameters
+    ----------
+    time_series: np.array
+        A numpy array representing the time series for which imputation
+        is performed.
+    impute_val: float
+        The value used for imputation.
+
+    Returns
+    -------
+    np.array
+        The numpy array obtained from `time_series` after replacing each NaN
+        value with `impute_val`.
+
+    """
+    time_series[np.isnan(time_series)] = impute_val
+    return time_series
+
+def get_differenced_trace(data_trace, diff_level):
+    """Computes the result of differencing `data_trace` `diff_level` times.
+
+    Parameters
+    ----------
+    data_trace: np.array
+        A numpy array representing the trace to be differenced.
+    diff_level: int
+        An integer representing the degree of differencing applied to
+        `data_trace`.
+
+    Returns
+    -------
+    np.array
+        The numpy array obtained from `data_trace` after applying differencing
+        at a degree of `diff_level`
+
+    """
+    diff_ts = np.diff(data_trace, diff_level)
+    return impute_for_time_series(diff_ts, 0)
+
 def extract_time_series_from_trace(trace_data, series_name):
     """Extracts the time series for `series_name` from `trace_data`.
 
@@ -154,8 +198,7 @@ def extract_time_series_from_trace(trace_data, series_name):
 
     """
     data_trace = trace_data[series_name].to_numpy()
-    data_trace[np.isnan(data_trace)] = 0
-    return data_trace
+    return impute_for_time_series(data_trace, 0)
 
 def output_time_series_list_to_file(time_series_list, output_file):
     """Writes `time_series_list` to `output_file`.
