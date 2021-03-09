@@ -2,7 +2,9 @@
 generated from the raw google data.
 
 """
+import os
 import pandas as pd
+from MemoryAutoScaling import utils
 
 
 MAX_MEM_COL = 'maximum_usage.memory'
@@ -86,3 +88,21 @@ class TraceHandler:
         self._avg_mem_traces.append(utils.extract_time_series_from_trace(
             trace_df, AVG_MEM_COL))
         trace_df.to_csv(trace_file, sep=',', index=False)
+
+    def output_trace_data(self):
+        """Outputs the all time series for the processed traces.
+
+        Two sets of time series are output: the time series for average memory
+        usage and the time series for maximum memory usage.
+
+        Returns
+        -------
+        None
+
+        """
+        max_mem_path = os.path.join(self._dir_path, "max_mem_usage.txt")
+        avg_mem_path = os.path.join(self._dir_path, "avg_mem_usage.txt")
+        utils.output_time_series_list_to_file(
+            self._max_mem_traces, max_mem_path)
+        utils.output_time_series_list_to_file(
+            self._avg_mem_traces, avg_mem_path)

@@ -152,3 +152,33 @@ def extract_time_series_from_trace(trace_data, series_name):
 
     """
     return trace_data[series_name].to_numpy()
+
+def output_time_series_list_to_file(time_series_list, output_file):
+    """Writes `time_series_list` to `output_file`.
+
+    The time series in `time_series_list` are written to `output_file` with
+    one line per list element. Each line is a comma separated list of values
+    corresponding to the observations for the time series.
+
+    Parameters
+    ----------
+    time_series_list: list
+        A list of numpy arrays corresponding to the time series being written.
+    output_file: str
+        A string representing the name of the file being written to.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    The contents of `time_series_list` are written to `output_file`. If the
+    file already exists it is overwritten. Otherwise, the file is created.
+
+    """
+    with open(output_file, "w") as ts_file:
+        f.write("start_usage, ..., end_usage\n")
+        for time_series in time_series_list:
+            ts_file.write(",".join(time_series))
+            ts_file.write("\n")
