@@ -196,7 +196,7 @@ class TraceAnalyzer:
         pacf_axis = plt.subplot2grid(layout, (1, 1))
         utils.plot_autocorrelations_for_data(
             data_trace, ts_axis, acf_axis, pacf_axis, lags, self._plot_color)
-        plt.title("{} Trace".format(self._analysis_title))
+        plt.suptitle("{} Trace".format(self._analysis_title))
         plt.show()
 
     def plot_differenced_auto_correlations(self, data_trace, lags):
@@ -236,7 +236,8 @@ class TraceAnalyzer:
         utils.plot_autocorrelations_for_data(
             diffs, diff_axis, diff_acf_axis, diff_pacf_axis, lags, "red")
 
-        plt.title("{} Trace vs Differenced Trace".format(self._analysis_title))
+        plt.suptitle(
+            "{} Trace vs Differenced Trace".format(self._analysis_title))
         plt.show()
 
     def plot_differenced_time_series(self, data_trace):

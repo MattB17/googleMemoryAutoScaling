@@ -136,6 +136,8 @@ def get_cumulative_sum_of_trace(data_trace):
 def extract_time_series_from_trace(trace_data, series_name):
     """Extracts the time series for `series_name` from `trace_data`.
 
+    Any NaN values in the time series are converted to 0.
+
     Parameters
     ----------
     trace_data: pd.DataFrame
@@ -151,7 +153,9 @@ def extract_time_series_from_trace(trace_data, series_name):
         from `trace_data`.
 
     """
-    return trace_data[series_name].to_numpy()
+    data_trace = trace_data[series_name].to_numpy()
+    data_trace[np.isnan(data_trace)] = 0
+    return data_trace
 
 def output_time_series_list_to_file(time_series_list, output_file):
     """Writes `time_series_list` to `output_file`.
