@@ -4,3 +4,4 @@ ideas.md
 __pycache__/
 *.egg-info/
 data/
+.ipynb_checkpoints/
