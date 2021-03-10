@@ -8,10 +8,10 @@ predictions at times `t` and `t-1` respectively.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import TimeSeriesModel
 
 
-class ExponentialSmoothingModel:
+class ExponentialSmoothingModel(TimeSeriesModel):
     """Builds an Exponential Smoothing Model.
 
     Parameters
@@ -19,23 +19,23 @@ class ExponentialSmoothingModel:
     alpha: float
         The alpha value for the model. It is a number between 0 and 1
         representing the weight of new observations versus past predictions.
-    start_pred: float
-        A float representing the starting prediction. This is used as the
+    initial_pred: float
+        A float representing the initial prediction. This is used as the
         prediction for a new trace before seeing any data for that trace.
 
     Attributes
     ----------
     _alpha: float
         The alpha value for the model.
-    _start_pred: float
-        The starting prediction for a new, unseen trace.
+    _initial_pred: float
+        The initial prediction for a new, unseen trace.
 
     """
-    def __init__(self, alpha, start_pred):
+    def __init__(self, alpha, initial_pred):
         self._alpha = alpha
-        self._start_pred = start_pred
+        super().__init__(initial_pred)
 
-    def calculate_curr_pred(self, past_obs, past_pred):
+    def get_next_prediction(self, past_obs, past_pred):
         """Calculates the current exponential smoothing model prediction.
 
         Parameters
@@ -100,10 +100,6 @@ class ExponentialSmoothingModel:
         None
 
         """
-        plt.figure(figsize=(20, 5))
-        plt.plot(data_trace, color="blue", linewidth=3)
-        plt.plot(self.get_all_predictions(data_trace),
-                 color="red", linewidth=2)
         title = "Trace vs {} Exponential Smoothing Prediction".format(
             self._alpha)
-        utils.setup_trace_plot(len(data_trace), 10, title)
+        super()._plot_trace_and_prediction(data_trace, title)
