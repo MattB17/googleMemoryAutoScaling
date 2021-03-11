@@ -54,7 +54,7 @@ class TraceHandler:
         return [file_name for file_name in os.listdir(self._dir_path)
                 if re.match(match_str, file_name)]
 
-    def process_trace_file(self, trace_file):
+    def process_raw_trace_file(self, trace_file):
         """Performs the processing pipeline on `trace_file`.
 
         Parameters
@@ -71,6 +71,27 @@ class TraceHandler:
         order = trace_df[specs.START_INTERVAL_COL].sort_values().index
         trace_df = trace_df.loc[order]
         self._traces.append(Trace.from_raw_trace_data(trace_df))
+
+    def load_trace_from_time_series_file(self, ts_file):
+        """Loads a data trace from a time series file.
+
+        Parameters
+        ----------
+        ts_file: str
+            A string to a time series file. This file only contains the
+            time series data corresponding to the trace.
+
+        Returns
+        -------
+        None
+
+        """
+        file_name_comps = ts_file.split("/")[-1].split(".")[0].split("_")
+        trace_id = file_name_comps[2]
+        start_time = file_name_comps[3]
+        end_time = file_name_comps[4]
+        ts_data = pd.read_csv(ts_file)
+        self._traces.append(Trace(trace_id, start_time, end_time, ts_data))
 
     def output_data_traces(self, output_dir):
         """Outputs each trace to its own csv file
