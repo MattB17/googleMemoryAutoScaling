@@ -8,7 +8,7 @@ predictions at times `t` and `t-1` respectively.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from MemoryAutoScaling import TimeSeriesModel
+from MemoryAutoScaling.Models import TimeSeriesModel
 
 
 class ExponentialSmoothingModel(TimeSeriesModel):

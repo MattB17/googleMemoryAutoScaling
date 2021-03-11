@@ -5,14 +5,8 @@ generated from the raw google data.
 import os
 import pandas as pd
 from MemoryAutoScaling import utils
-
-
-MAX_MEM_COL = 'maximum_usage.memory'
-AVG_MEM_COL = 'average_usage.memory'
-TRACE_COLS = ['start_time', 'end_time', 'instance_index',
-              'alloc_instance_index', 'collection_type', 'assigned_memory',
-              'page_cache_memory', 'cycles_per_instruction',
-              'memory_accesses_per_instruction', AVG_MEM_COL, MAX_MEM_COL]
+from MemoryAutoScaling import specs
+from MemoryAutoScaling.DataHandling.Trace import Trace
 
 
 class TraceHandler:
@@ -36,21 +30,15 @@ class TraceHandler:
         The path to the directory containing the raw data.
     _file_identifier: str
         Identifies the files in `_dir_path` to be processed.
-    _max_mem_traces: list
-        A list containing the traces representing max memory usage
-        for each processed trace. That is, for each time point, the trace
-        records the max memory usage in that time interval.
-    _avg_mem_traces: list
-        A list containing the traces representing average memory usage
-        for each processed trace. That is, for each time point, the trace
-        records the average memory usage in that time interval.
+    _traces: list
+        A list of `Trace` objects representing the traces that have been
+        processed by the handler.
 
     """
     def __init__(self, dir_path, file_identifier):
         self._dir_path = dir_path
         self._file_identifier = file_identifier
-        self._max_mem_traces = []
-        self._avg_mem_traces = []
+        self._traces = []
 
     def get_trace_files(self):
         """Retrieves all trace files for processing.
@@ -80,29 +68,23 @@ class TraceHandler:
 
         """
         trace_df = pd.read_csv(trace_file)
-        trace_df = trace_df[TRACE_COLS]
-        order = trace_df['start_time'].sort_values().index
+        order = trace_df[specs.START_INTERVAL_COL].sort_values().index
         trace_df = trace_df.loc[order]
-        self._max_mem_traces.append(utils.extract_time_series_from_trace(
-            trace_df, MAX_MEM_COL))
-        self._avg_mem_traces.append(utils.extract_time_series_from_trace(
-            trace_df, AVG_MEM_COL))
-        trace_df.to_csv(trace_file, sep=',', index=False)
+        self._traces.append(Trace.from_raw_trace_data(trace_df))
 
-    def output_trace_data(self):
-        """Outputs the all time series for the processed traces.
+    def output_data_traces(self, output_dir):
+        """Outputs each trace to its own csv file
 
-        Two sets of time series are output: the time series for average memory
-        usage and the time series for maximum memory usage.
+        A file is created for each file in `_traces` in `output_dir`
 
         Returns
         -------
         None
 
+        Side Effect
+        -----------
+        Writes one file for each data trace to `output_dir`.
+
         """
-        max_mem_path = os.path.join(self._dir_path, "max_mem_usage.txt")
-        avg_mem_path = os.path.join(self._dir_path, "avg_mem_usage.txt")
-        utils.output_time_series_list_to_file(
-            self._max_mem_traces, max_mem_path)
-        utils.output_time_series_list_to_file(
-            self._avg_mem_traces, avg_mem_path)
+        for trace in self._traces:
+            trace.output_trace(output_dir)

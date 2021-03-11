@@ -4,7 +4,7 @@ based on a moving average.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from MemoryAutoScaling import TimeSeriesModel
+from MemoryAutoScaling.Models import TimeSeriesModel
 
 
 class MovingAverageModel(TimeSeriesModel):
