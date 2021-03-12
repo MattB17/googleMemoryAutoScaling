@@ -3,5 +3,6 @@ ideas.md
 *.pyc
 __pycache__/
 *.egg-info/
-data/
+input_data/
+output_data/
 .ipynb_checkpoints/

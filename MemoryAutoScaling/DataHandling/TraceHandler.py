@@ -54,6 +54,20 @@ class TraceHandler:
         return [file_name for file_name in os.listdir(self._dir_path)
                 if re.match(match_str, file_name)]
 
+    def process_all_trace_files(self):
+        """Performs the processing pipeline on all trace files.
+
+        All trace files in the input directory are retrieved and processed
+        to turn them into `Trace` objects.
+
+        Returns
+        -------
+        None
+
+        """
+        for trace_file in self.get_trace_files():
+            self.process_raw_trace_file(trace_file)
+
     def process_raw_trace_file(self, trace_file):
         """Performs the processing pipeline on `trace_file`.
 
@@ -71,6 +85,17 @@ class TraceHandler:
         order = trace_df[specs.START_INTERVAL_COL].sort_values().index
         trace_df = trace_df.loc[order]
         self._traces.append(Trace.from_raw_trace_data(trace_df))
+
+    def load_all_traces_from_time_series_files(self):
+        """Loads all data traces from the time series files.
+
+        Returns
+        -------
+        None
+
+        """
+        for ts_file in self.get_trace_files():
+            self.load_trace_from_time_series_file(ts_file) 
 
     def load_trace_from_time_series_file(self, ts_file):
         """Loads a data trace from a time series file.
