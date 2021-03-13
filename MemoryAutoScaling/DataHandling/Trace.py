@@ -44,13 +44,13 @@ class Trace:
         self._start_time = start_time
         self._end_time = end_time
         self._avg_mem_ts = utils.extract_time_series_from_trace(
-            trace_df, specs.AVG_MEM_COL)
+            ts_df, specs.AVG_MEM_COL)
         self._max_mem_ts = utils.extract_time_series_from_trace(
-            trace_df, specs.MAX_MEM_COL)
+            ts_df, specs.MAX_MEM_COL)
         self._avg_cpu_ts = utils.extract_time_series_from_trace(
-            trace_df, specs.AVG_CPU_COL)
+            ts_df, specs.AVG_CPU_COL)
         self._max_cpu_ts = utils.extract_time_series_from_trace(
-            trace_df, specs.MAX_CPU_COL)
+            ts_df, specs.MAX_CPU_COL)
 
     @classmethod
     def from_raw_trace_data(cls, trace_df):
@@ -66,9 +66,9 @@ class Trace:
         Trace
             The `Trace` represented by trace_df
         """
-        trace_id = int(trace_df[specs.TRACE_ID_COL][0])
-        start_time = int(trace_df[specs.START_INTERVAL_COL][0])
-        end_time = int(trace_df[specs.END_INTERVAL_COL][-1])
+        trace_id = int(trace_df[specs.TRACE_ID_COL].to_numpy()[0])
+        start_time = int(trace_df[specs.START_INTERVAL_COL].to_numpy()[0])
+        end_time = int(trace_df[specs.END_INTERVAL_COL].to_numpy()[-1])
         ts_df = trace_df[[specs.AVG_MEM_COL, specs.MAX_MEM_COL,
                           specs.AVG_CPU_COL, specs.MAX_CPU_COL]]
         return cls(trace_id, start_time, end_time, ts_df)
@@ -154,6 +154,18 @@ class Trace:
         """
         return self._max_cpu_ts
 
+    def get_number_of_observations(self):
+        """The number of observations of the trace.
+
+        Returns
+        -------
+        int
+            An integer representing the number of observations present
+            in the trace.
+
+        """
+        return len(self._max_mem_ts)
+
     def output_trace(self, output_dir):
         """Outputs the trace to a csv file.
 
@@ -180,3 +192,16 @@ class Trace:
                                  specs.MAX_CPU_COL: self._max_cpu_ts})
         trace_df.to_csv(
             os.path.join(output_dir, file_name), sep=",", index=False)
+
+    def __str__(self):
+        """Computes a string representation of the trace.
+
+        Returns
+        -------
+        str
+            A string representing the trace.
+
+        """
+        return "Trace {0} - {1} Observations from {2} to {3}".format(
+            self._trace_id, self.get_number_of_observations(),
+            self._start_time, self._end_time)

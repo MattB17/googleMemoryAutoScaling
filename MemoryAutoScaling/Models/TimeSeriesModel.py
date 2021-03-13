@@ -5,6 +5,7 @@ by all time series models.
 """
 from abc import ABC, abstractmethod
 from MemoryAutoScaling import utils
+import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 class TimeSeriesModel(ABC):
@@ -117,4 +118,5 @@ class TimeSeriesModel(ABC):
         plt.plot(data_trace, color="blue", linewidth=3)
         plt.plot(self.get_all_predictions(data_trace),
                  color="red", linewidth=3)
-        utils.setup_trace_plot(len(data_trace), 10, title)
+        tick_interval = len(data_trace) // 30
+        utils.setup_trace_plot(len(data_trace), tick_interval, title)

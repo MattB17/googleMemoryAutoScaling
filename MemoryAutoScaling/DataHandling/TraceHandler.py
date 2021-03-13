@@ -3,6 +3,7 @@ generated from the raw google data.
 
 """
 import os
+import re
 import pandas as pd
 from MemoryAutoScaling import utils
 from MemoryAutoScaling import specs
@@ -40,6 +41,79 @@ class TraceHandler:
         self._file_identifier = file_identifier
         self._traces = []
 
+    def get_directory_path(self):
+        """The directory from which trace files are read.
+
+        Returns
+        -------
+        str
+            A string representing the directory from which trace files
+            are read.
+
+        """
+        return self._dir_path
+
+    def update_directory_path(self, new_dir_path):
+        """Updates the read directory to `new_dir_path`.
+
+        That is, `new_dir_path` is now the directory from which trace files
+        are read.
+
+        Parameters
+        ----------
+        new_dir_path: str
+            A string representing the path of the new read directory.
+
+        Returns
+        -------
+        None
+
+        """
+        self._dir_path = new_dir_path
+
+    def get_file_identifier(self):
+        """The identifier used to denote the trace files to be processed.
+
+        The file identifier only refers to trace files in the read directory.
+
+        Returns
+        -------
+        str
+            A string used to identify the trace files for processing.
+
+        """
+        return self._file_identifier
+
+    def update_file_identifier(self, new_identifier):
+        """Updates the file identifier to `new_identifier`.
+
+        That is, `new_identifier` is now used to denote the trace files to be
+        processed by the handler.
+
+        Parameters
+        ----------
+        new_identifier: str
+            A string representing the new identifier for trace files.
+
+        Returns
+        -------
+        None
+
+        """
+        self._file_identifier = new_identifier
+
+    def get_traces(self):
+        """Retrieves the traces processed by the handler.
+
+        Returns
+        -------
+        list
+            A list of `Trace` objects representing the traces that were
+            processed by the handler.
+
+        """
+        return self._traces
+
     def get_trace_files(self):
         """Retrieves all trace files for processing.
 
@@ -66,7 +140,8 @@ class TraceHandler:
 
         """
         for trace_file in self.get_trace_files():
-            self.process_raw_trace_file(trace_file)
+            trace_path = os.path.join(self._dir_path, trace_file)
+            self.process_raw_trace_file(trace_path)
 
     def process_raw_trace_file(self, trace_file):
         """Performs the processing pipeline on `trace_file`.
@@ -95,7 +170,8 @@ class TraceHandler:
 
         """
         for ts_file in self.get_trace_files():
-            self.load_trace_from_time_series_file(ts_file) 
+            ts_path = os.path.join(self._dir_path, ts_file)
+            self.load_trace_from_time_series_file(ts_path)
 
     def load_trace_from_time_series_file(self, ts_file):
         """Loads a data trace from a time series file.

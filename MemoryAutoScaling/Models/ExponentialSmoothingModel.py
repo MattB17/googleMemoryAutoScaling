@@ -78,11 +78,11 @@ class ExponentialSmoothingModel(TimeSeriesModel):
 
         """
         time_points = len(data_trace)
-        preds = np.array([self._start_pred for _ in range(time_points)])
+        preds = np.array([self._initial_pred for _ in range(time_points)])
         if time_points >= 2:
             preds[1] = data_trace[0]
             for idx in range(2, time_points):
-                preds[idx] = self.calculate_curr_pred(
+                preds[idx] = self.get_next_prediction(
                     data_trace[idx - 1], preds[idx - 1])
         return preds
 
