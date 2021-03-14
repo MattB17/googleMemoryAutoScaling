@@ -22,6 +22,9 @@ class ExponentialSmoothingModel(TimeSeriesModel):
     initial_pred: float
         A float representing the initial prediction. This is used as the
         prediction for a new trace before seeing any data for that trace.
+    train_prop: float
+        A float in the range [0, 1], representing the proportion of data
+        in the training set. The default is 0.7.
 
     Attributes
     ----------
@@ -29,11 +32,13 @@ class ExponentialSmoothingModel(TimeSeriesModel):
         The alpha value for the model.
     _initial_pred: float
         The initial prediction for a new, unseen trace.
+    _train_prop: float
+        The proportion of data in the training set.
 
     """
-    def __init__(self, alpha, initial_pred):
+    def __init__(self, alpha, initial_pred, train_prop=0.7):
         self._alpha = alpha
-        super().__init__(initial_pred)
+        super().__init__(initial_pred, train_prop)
 
     def get_next_prediction(self, past_obs, past_pred):
         """Calculates the current exponential smoothing model prediction.

@@ -18,6 +18,9 @@ class MovingAverageModel(TimeSeriesModel):
     initial_pred: float
         A float representing the initial prediction. This is used as the
         prediction for a new trace before seeing any data for that trace.
+    train_prop: float
+        A float in the range [0, 1], representing the proportion of data
+        in the training set. The default is 0.7.
 
     Attributes
     ----------
@@ -25,11 +28,13 @@ class MovingAverageModel(TimeSeriesModel):
         The window length used in the moving average calculation.
     _initial_pred: float
         The initial prediction for a new, unseen trace
+    _train_prop: float
+        The proportion of data in the training set.
 
     """
-    def __init__(self, window_length, initial_pred):
+    def __init__(self, window_length, initial_pred, train_prop=0.7):
         self._window_length = window_length
-        super().__init__(initial_pred)
+        super().__init__(initial_pred, train_prop)
 
     def get_next_prediction(self, data_trace):
         """Calculates the next prediction for `data_trace`.
