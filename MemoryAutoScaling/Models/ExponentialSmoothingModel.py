@@ -86,8 +86,8 @@ class ExponentialSmoothingModel(TimeSeriesModel):
                     data_trace[idx - 1], preds[idx - 1])
         return preds
 
-    def plot_trace_and_prediction(self, data_trace):
-        """Plots `data_trace` and its exponential smoothing prediction.
+    def plot_train_trace_and_prediction(self, data_trace):
+        """Plots `data_trace` and its prediction for the training set.
 
         Parameters
         ----------
@@ -100,6 +100,24 @@ class ExponentialSmoothingModel(TimeSeriesModel):
         None
 
         """
-        title = "Trace vs {} Exponential Smoothing Prediction".format(
+        title = "Trace vs {} Exponential Smoothing Prediction - Train".format(
             self._alpha)
-        super()._plot_trace_and_prediction(data_trace, title)
+        super()._plot_train_trace_and_prediction(data_trace, title)
+
+    def plot_test_trace_and_prediction(self, data_trace):
+        """Plots `data_trace` and its prediction for the testing set.
+
+        Parameters
+        ----------
+        data_trace: np.array
+            A numpy array representing the data trace being plotted and for
+            which the predictions are calculated.
+
+        Returns
+        -------
+        None
+
+        """
+        title = "Trace vs {} Exponential Smoothing Prediction - Test".format(
+            self._alpha)
+        super()._plot_test_trace_and_prediction(data_trace, title)

@@ -32,6 +32,57 @@ def setup_trace_plot(time_points, tick_interval, title):
     plt.title(title)
     plt.show()
 
+def plot_trace_and_prediction(actual, preds, title):
+    """Plots `actual` and its predictions given by `preds`.
+
+    `actual` represents a real trace and `preds` represent a set of
+    predictions for the trace. The two are plotted on the same axis
+    to see the accuracy of the predictions.
+
+    Parameters
+    ----------
+    actual: np.array
+        A numpy array representing the data trace being plotted.
+    preds: np.array
+        A numpy array representing the predictions being plotted
+    title: str
+        A string representing the title for the plot being produced.
+
+    Returns
+    -------
+    None
+
+    """
+    plt.figure(figsize=(20, 8))
+    plt.plot(actual, color="blue", linewidth=3, label="Actual")
+    plt.plot(preds, color="red", linewidth=3, label="Predicted")
+    plt.legend()
+    tick_interval = len(actual) // 30
+    setup_trace_plot(len(actual), tick_interval, title)
+
+def get_train_cutoff(data_trace, train_prop):
+    """Calculates the index identifying the end of the training set.
+
+    That is, an index of `data_trace` is calculated based on `train_prop`
+    which identifies the training dataset of `data_trace`.
+
+    Paraneters
+    ----------
+    data_trace: np.array
+        A numpy array representing the data trace.
+    train_prop: float
+        A float in the range [0, 1] representing the proportion of data
+        in the training set.
+
+    Returns
+    -------
+    int
+        An integer representing the index of `data_trace` at which to cutoff for
+        the training set.
+
+    """
+    return int(len(data_trace) * train_prop)
+
 
 def plot_autocorrelations_for_data(trace, trace_ax, acf_ax,
                                    pacf_ax, lags, color):

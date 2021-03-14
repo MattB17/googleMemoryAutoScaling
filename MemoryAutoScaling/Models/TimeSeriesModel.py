@@ -15,15 +15,21 @@ class TimeSeriesModel(ABC):
     ----------
     initial_pred: float
         A float representing an initial prediction used for a new time series.
+    train_prop: float
+        A float in the range [0, 1] representing the proportion of
+        observations in the training set. The default value is 0.7.
 
     Attributes
     ----------
     _initial_pred: float
         Represents the initial prediction used for a new time series.
+    _train_prop: float
+        Represents the percent of data in the training set.
 
     """
-    def __init__(self, initial_pred):
+    def __init__(self, initial_pred, train_prop=0.7):
         self._initial_pred = initial_pred
+        self._train_prop = train_prop
 
     @abstractmethod
     def get_next_prediction(self, data_trace):
@@ -65,8 +71,8 @@ class TimeSeriesModel(ABC):
         pass
 
     @abstractmethod
-    def plot_trace_and_prediction(self, data_trace):
-        """Plots `data_trace` and its prediction based on the model.
+    def plot_train_trace_and_prediction(self, data_trace):
+        """Plots `data_trace` and its prediction based for the training set.
 
         Parameters
         ----------
@@ -80,7 +86,23 @@ class TimeSeriesModel(ABC):
         """
         pass
 
-    def calculate_mse_for_trace(self, data_trace):
+    @abstractmethod
+    def plot_test_trace_and_prediction(self, data_trace):
+        """Plots `data_trace` and its prediction for the testing set.
+
+        Parameters
+        ----------
+        data_trace: np.array
+            A numpy array representing the data trace being plotted.
+
+        Returns
+        -------
+        None
+
+        """
+        pass
+
+    def calculate_train_and_test_mse(self, data_trace):
         """Calculates the MSE for `data_trace` based on the model.
 
         Parameters
@@ -96,27 +118,50 @@ class TimeSeriesModel(ABC):
             and its prediction based on the model.
 
         """
-        return mean_squared_error(
-            data_trace, self.get_all_predictions(data_trace))
+        preds = self.get_all_predictions(data_trace)
+        train_cutoff = utils.get_train_cutoff(data_trace, self._train_prop)
+        mse_train = mean_squared_error(
+            data_trace[:train_cutoff], preds[:train_cutoff])
+        mse_test = mean_squared_error(
+            data_trace[train_cutoff:], preds[train_cutoff:])
+        return mse_train, mse_test
 
-    def _plot_trace_and_prediction(self, data_trace, title):
-        """Plots `data_trace` and its prediction.
+    def _plot_train_trace_and_prediction(self, data_trace, title):
+        """Plots the trace and its model prediction for the training set.
 
         Parameters
         ----------
         data_trace: np.array
-            A numpy array representing the data trace being plotted.
+            A numpy array representing the actual data trace.
         title: str
-            A string representing the title for the plot being produced.
+            A string representing the title for the plot.
 
         Returns
         -------
         None
 
         """
-        plt.figure(figsize=(20, 8))
-        plt.plot(data_trace, color="blue", linewidth=3)
-        plt.plot(self.get_all_predictions(data_trace),
-                 color="red", linewidth=3)
-        tick_interval = len(data_trace) // 30
-        utils.setup_trace_plot(len(data_trace), tick_interval, title)
+        preds = self.get_all_predictions(data_trace)
+        train_cutoff = utils.get_train_cutoff(data_trace, self._train_prop)
+        utils.plot_trace_and_prediction(
+            data_trace[:train_cutoff], preds[:train_cutoff], title)
+
+    def _plot_test_trace_and_prediction(self, data_trace, title):
+        """Plots the trace and its model prediction for the testing set.
+
+        Parameters
+        ----------
+        data_trace: np.array
+            A numpy array representing the actual data trace.
+        title: str
+            A string representing the title for the plot
+
+        Returns
+        -------
+        None
+
+        """
+        preds = self.get_all_predictions(data_trace)
+        test_start = utils.get_train_cutoff(data_trace, self._train_prop)
+        utils.plot_trace_and_prediction(
+            data_trace[test_start:], preds[test_start:], title)
