@@ -8,6 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from MemoryAutoScaling import utils
 import statsmodels.tsa.api as smt
+from statsmodels.tsa.stattools import adfuller, grangercausalitytests
 
 
 class TraceAnalyzer:
@@ -290,3 +291,59 @@ class TraceAnalyzer:
                        "median": stats["median"],
                        "avg": stats["avg"]}
         return pd.Series(trace_stats)
+
+    def test_for_stationarity(self, data_trace):
+        """Tests for stationarity in the `data_trace` time series.
+
+        The augmented Dickey-Fuller statistic is used to test for
+        stationarity.
+
+        Parameters
+        ----------
+        data_trace: np.array
+            A numpy array representing the time series being tested for
+            stationarity.
+
+        Returns
+        -------
+        float
+            A float representing the p-value of the augmented Dickey-Fuller
+            test for stationarity applied to `data_trace`.
+
+        """
+        return adfuller(data_trace)[1]
+
+    def test_for_causality(self, trace_data, col_names, lags):
+        """Tests for causality in `trace_data` between `col_names`.
+
+        The Granger causality test is applied to test whether the time series
+        indicated by the second element of `col_names` is useful in
+        forecasting the time series indicated by the first element of
+        `col_names` based on the data in `trace_data`. The tests are applied
+        at the lags indicated by `lags`.
+
+        Parameters
+        ----------
+        trace_data: pd.DataFrame
+            A pandas DataFrame containing time series associated with a data
+            trace. There is one time series per column.
+        col_names: list
+            A list of the columns used in the test. It is a two element list
+            where the first element represents the name of the target time
+            series and the second element represents the name of the time
+            series being tested for whether it is useful in forecasting the
+            target time series.
+        lags: list
+            A list of integers representing the lags used in the causality
+            test. For each lag of `lags`, the time series indicated by the
+            second element of `col_names` will be tested at that lag to see
+            if it causes a change in the target time series.
+
+        Returns
+        -------
+        dict
+            A dictionary indicating the results of the Granger test for
+            causality for the data in `trace_data` indicated by `col_names`.
+
+        """
+        return grangercausalitytests(trace_data[col_names], lags)

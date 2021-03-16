@@ -166,6 +166,21 @@ class Trace:
         """
         return len(self._max_mem_ts)
 
+    def get_trace_df(self):
+        """A dataframe for the trace.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing the time series for the trace with
+            one column per series.
+
+        """
+        return pd.DataFrame({specs.AVG_MEM_COL: self._avg_mem_ts,
+                             specs.AVG_CPU_COL: self._avg_cpu_ts,
+                             specs.MAX_MEM_COL: self._max_mem_ts,
+                             specs.MAX_CPU_COL: self._max_cpu_ts})
+
     def output_trace(self, output_dir):
         """Outputs the trace to a csv file.
 
@@ -186,12 +201,38 @@ class Trace:
         """
         file_name = "trace_df_{0}_{1}_{2}.csv".format(
             self._trace_id, self._start_time, self._end_time)
-        trace_df = pd.DataFrame({specs.AVG_MEM_COL: self._avg_mem_ts,
-                                 specs.AVG_CPU_COL: self._avg_cpu_ts,
-                                 specs.MAX_MEM_COL: self._max_mem_ts,
-                                 specs.MAX_CPU_COL: self._max_cpu_ts})
+        trace_df = self.get_trace_df()
         trace_df.to_csv(
             os.path.join(output_dir, file_name), sep=",", index=False)
+
+    def get_lagged_df(self, lag):
+        """Gets the lagged dataframe for the trace at a lag of `lag`.
+
+        The lagged dataframe consists of the original columns plus these
+        same columns after lagging them at a period of `lag`.
+
+        Parameters
+        ----------
+        lag: int
+            The lag used to generate the dataframe.
+
+        Returns
+        -------
+        pd.DataFrame
+            The lagged DataFrame with a lag of `lag`.
+
+        """
+        trace_df = self.get_trace_df()
+        lagged_data = trace_df[:-lag]
+        target_data = trace_df[lag:]
+
+        lag_col_names = ["{0}_lag".format(col_name)
+                         for col_name in lagged_data.columns]
+        lagged_data.columns = lag_col_names
+        lagged_data = lagged_data.reset_index(drop=True)
+        target_data = target_data.reset_index(drop=True)
+
+        return pd.concat([lagged_data, target_data], axis=1)
 
     def __str__(self):
         """Computes a string representation of the trace.
