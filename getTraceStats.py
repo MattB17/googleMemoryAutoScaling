@@ -21,11 +21,15 @@ def run_trace_stats(traces, results_lst, causal_lags):
         corr_series = trace_df.corr()[specs.MAX_MEM_COL]
         trace_stats = [trace.get_trace_id(), p_val] + list(corr_series)
         for causal_col in CAUSAL_COLS:
-            granger = analyzer.test_for_causality(
-                trace_df, [specs.MAX_MEM_COL, causal_col], causal_lags)
-            for lag in causal_lags:
+            try:
+                granger = analyzer.test_for_causality(
+                    trace_df, [specs.MAX_MEM_COL, causal_col], causal_lags)
+                for lag in causal_lags:
+                    trace_stats.extend(
+                        utils.get_granger_pvalues_at_lag(granger, lag))
+            except:
                 trace_stats.extend(
-                    utils.get_granger_pvalues_at_lag(granger, lag))
+                    [np.nan for _ in range(len(causal_lags) * 4)])
         results_lst.append(trace_stats)
 
 

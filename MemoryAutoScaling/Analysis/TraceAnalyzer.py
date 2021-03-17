@@ -311,7 +311,10 @@ class TraceAnalyzer:
             test for stationarity applied to `data_trace`.
 
         """
-        return adfuller(data_trace)[1]
+        try:
+            return adfuller(data_trace)[1]
+        except:
+            return np.nan
 
     def test_for_causality(self, trace_data, col_names, lags):
         """Tests for causality in `trace_data` between `col_names`.
