@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.tsa.api as smt
 import copy
+from itertools import product
 
 
 def setup_trace_plot(time_points, tick_interval, title):
@@ -280,3 +281,72 @@ def output_time_series_list_to_file(time_series_list, output_file):
         for time_series in time_series_list:
             ts_file.write(",".join(time_series))
             ts_file.write("\n")
+
+def get_granger_pvalues_at_lag(granger_dict, lag):
+    """Retrieves the pvalues from `granger_dict` at `lag`.
+
+    Parameters
+    ----------
+    granger_dict: dict
+        A dictionarity containing the results of a Granger test for causality.
+    lag: int
+        An integer representing the lag used for the causality test.
+
+    Returns
+    -------
+    list
+        A list of pvalues from the granger causality test recorded in
+        `granger_dict` at the lag `lag`.
+
+    """
+    granger_dict = granger_dict[lag][0]
+    return [granger_dict['ssr_ftest'][1],
+            granger_dict['ssr_chi2test'][1],
+            granger_dict['lrtest'][1],
+            granger_dict['params_ftest'][1]]
+
+def get_granger_col_names_for_lag(lag):
+    """The set of granger column names for `lag`.
+
+    Parameters
+    ----------
+    lag: int
+        An integer representing the time lag of interest.
+
+    Returns
+    -------
+    list
+        A list of strings representing the column names for the granger
+        causality test at a lag of `lag`.
+
+    """
+    test_names = ['ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest']
+    return ["{0}_{1}".format(test_name, lag) for test_name in test_names]
+
+def get_all_granger_col_names(causal_cols, causal_lags):
+    """Gets all granger column names for `causal_cols` and `causal_lags`.
+
+    That is there is a column for each combination of `causal_cols`,
+    `causal_lags`, and each statistical test.
+
+    Parameters
+    ----------
+    causal_cols: list
+        A list of strings representing the columns for which a test was
+        carried out to determine if the given column is causally related
+        to the target variable.
+    causal_lags: list
+        A list of integers representing the lags tested for causality.
+
+    Returns
+    -------
+    list
+        A list of strings representing all granger column names for
+        `causal_cols` and `causal_lags`.
+
+    """
+    causal_lst = [get_granger_col_names_for_lag(lag) for lag in causal_lags]
+    causal_lst = [col_name for lag_list in causal_lst
+                  for col_name in lag_list]
+    return ["causal_{0}_{1}".format(causal_tup[0], causal_tup[1])
+            for causal_tup in product(causal_cols, causal_lst)]
