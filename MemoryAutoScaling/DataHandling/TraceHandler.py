@@ -24,6 +24,9 @@ class TraceHandler:
     file_identifier: str
         A string representing an identifier for each file in `dir_path` that
         corresponds to a trace file to be processed.
+    min_length: int
+        An integer representing the minimum length of a time series for a
+        trace to be considered.
 
     Attributes
     ----------
@@ -36,9 +39,10 @@ class TraceHandler:
         processed by the handler.
 
     """
-    def __init__(self, dir_path, file_identifier):
+    def __init__(self, dir_path, file_identifier, min_length):
         self._dir_path = dir_path
         self._file_identifier = file_identifier
+        self._min_length = min_length
         self._traces = []
 
     def get_directory_path(self):
@@ -159,7 +163,8 @@ class TraceHandler:
         trace_df = pd.read_csv(trace_file)
         order = trace_df[specs.START_INTERVAL_COL].sort_values().index
         trace_df = trace_df.loc[order]
-        self._traces.append(Trace.from_raw_trace_data(trace_df))
+        if len(trace_df) >= self._min_length:
+            self._traces.append(Trace.from_raw_trace_data(trace_df))
 
     def load_all_traces_from_time_series_files(self):
         """Loads all data traces from the time series files.
@@ -192,7 +197,9 @@ class TraceHandler:
         start_time = file_name_comps[3]
         end_time = file_name_comps[4]
         ts_data = pd.read_csv(ts_file)
-        self._traces.append(Trace(trace_id, start_time, end_time, ts_data))
+        if len(ts_data) >= self._min_length:
+            self._traces.append(
+                Trace(trace_id, start_time, end_time, ts_data))
 
     def output_data_traces(self, output_dir):
         """Outputs each trace to its own csv file

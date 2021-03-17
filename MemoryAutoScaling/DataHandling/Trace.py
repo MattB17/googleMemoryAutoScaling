@@ -51,6 +51,7 @@ class Trace:
             ts_df, specs.AVG_CPU_COL)
         self._max_cpu_ts = utils.extract_time_series_from_trace(
             ts_df, specs.MAX_CPU_COL)
+        print("Trace {} created".format(trace_id))
 
     @classmethod
     def from_raw_trace_data(cls, trace_df):

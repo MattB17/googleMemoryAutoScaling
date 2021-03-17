@@ -34,11 +34,16 @@ if __name__ == "__main__":
     output_dir = sys.argv[2]
     file_id = sys.argv[3]
     causal_lags = [lag+1 for lag in range(int(sys.argv[4]))]
+    min_trace_length = int(sys.argv[5])
 
     analyzer = TraceAnalyzer("whitegrid", "seaborn-dark", 10, "blue", "Raw Data")
 
-    handler = TraceHandler(input_dir, file_id)
+    handler = TraceHandler(input_dir, file_id, min_trace_length)
+    print("Processing Traces")
+    print("-----------------")
     handler.process_all_trace_files()
+    print("Processing Complete")
+    print()
     traces = handler.get_traces()
     stat_results = mp.Manager().list()
     core_count = min(len(traces), mp.cpu_count() - 1)
