@@ -181,6 +181,18 @@ class Trace:
                              specs.MAX_MEM_COL: self._max_mem_ts,
                              specs.MAX_CPU_COL: self._max_cpu_ts})
 
+    def get_trace_df_columns(self):
+        """The columns in the trace dataframe.
+
+        Returns
+        -------
+        list
+            A list of strings representing the names of the columns in the
+            trace DataFrame, in the order they occur in the trace DataFrame.
+
+        """
+        return self.get_trace_df().columns
+
     def output_trace(self, output_dir):
         """Outputs the trace to a csv file.
 
