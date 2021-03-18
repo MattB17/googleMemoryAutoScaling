@@ -17,9 +17,13 @@ def run_trace_stats(traces, results_lst, causal_lags):
     for trace in traces:
         p_val = analyzer.test_for_stationarity(
             trace.get_maximum_memory_time_series())
+        p_val_diff = analyzer.test_for_stationarity(
+            utils.get_differenced_trace(
+                trace.get_maximum_memory_time_series(), 1))
         trace_df = trace.get_trace_df()
         corr_series = trace_df.corr()[specs.MAX_MEM_COL]
-        trace_stats = [trace.get_trace_id(), p_val] + list(corr_series)
+        trace_stats = ([trace.get_trace_id(), p_val, p_val_diff]
+                        + list(corr_series))
         for causal_col in CAUSAL_COLS:
             try:
                 granger = analyzer.test_for_causality(
@@ -66,7 +70,7 @@ if __name__ == "__main__":
         proc.join()
 
     stat_df = pd.DataFrame(list(stat_results))
-    stat_cols = ["id", "adf_p_val"] + [
+    stat_cols = ["id", "adf_p_val", "adf_p_val_diff"] + [
         "corr_{}".format(col_name)
         for col_name in traces[0].get_trace_df_columns()]
     stat_cols += utils.get_all_granger_col_names(CAUSAL_COLS, causal_lags)
