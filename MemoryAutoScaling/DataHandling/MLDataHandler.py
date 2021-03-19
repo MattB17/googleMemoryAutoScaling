@@ -3,6 +3,7 @@ can be used for a machine learning model. It is specifically built for
 handling time series data.
 
 """
+from MemoryAutoScaling import utils
 
 
 class MLDataHandler:

@@ -84,7 +84,7 @@ class MLModel(ABC):
             DataFrame and Series represent the same split for the testing set.
 
         """
-        return self._data_handler.perform_data_split()
+        return self._data_handler.perform_data_split(data)
 
     def fit(self, train_features, train_target):
         """Fits the model based on `train_features` and `train_target`.
@@ -158,3 +158,31 @@ class MLModel(ABC):
             train_target, self.get_predictions(train_features))
         test_mse = mean_squared_error(test_target, preds)
         return preds, train_mse, test_mse
+
+    def run_model_pipeline_on_raw_data(self, raw_data, **kwargs):
+        """Runs the model pipeline on `raw_data`.
+
+        `raw_data` is first split into features and target for both the
+        training and test sets. Then the model pipeline is run on the
+        resulting data, with the model being initialized by parameters
+        specified in **kwargs.
+
+        Parameters
+        ----------
+        raw_data: pd.DataFrame
+            A pandas DataFrame representing the raw_data to be fed into the
+            pipeline.
+        kwargs: dict
+            Arbitrary keyword arguments used to initialize the model.
+
+        Returns
+        -------
+        pd.Series, float, float
+            A pandas Series representing the predictions for the testing set
+            and the MSEs for the model predictions versus the training and
+            testing sets.
+
+        """
+        X_train, y_train, X_test, y_test = self.split_data(raw_data)
+        return self.run_model_pipeline(
+            X_train, y_train, X_test, y_test, **kwargs)

@@ -182,18 +182,6 @@ class Trace:
                              specs.MAX_MEM_COL: self._max_mem_ts,
                              specs.MAX_CPU_COL: self._max_cpu_ts})
 
-    def get_trace_df_columns(self):
-        """The columns in the trace dataframe.
-
-        Returns
-        -------
-        list
-            A list of strings representing the names of the columns in the
-            trace DataFrame, in the order they occur in the trace DataFrame.
-
-        """
-        return self.get_trace_df().columns
-
     def output_trace(self, output_dir):
         """Outputs the trace to a csv file.
 
@@ -238,10 +226,7 @@ class Trace:
         trace_df = self.get_trace_df()
         lagged_data = trace_df[:-lag]
         target_data = trace_df[lag:]
-
-        lag_col_names = ["{0}_lag".format(col_name)
-                         for col_name in lagged_data.columns]
-        lagged_data.columns = lag_col_names
+        lagged_data.columns = utils.get_lagged_trace_columns()
         lagged_data = lagged_data.reset_index(drop=True)
         target_data = target_data.reset_index(drop=True)
 

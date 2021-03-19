@@ -29,7 +29,7 @@ class TimeSeriesRegression(MLModel):
     def __init__(self, data_handler):
         super().__init__("TimeSeriesRegression", data_handler)
 
-    def initialize(**kwargs):
+    def initialize(self, **kwargs):
         """Initializes the linear regression model.
 
         Parameters

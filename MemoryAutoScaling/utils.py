@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import statsmodels.tsa.api as smt
 import copy
 from itertools import product
+from MemoryAutoScaling import specs
 
 
 def setup_trace_plot(time_points, tick_interval, title):
@@ -281,6 +282,31 @@ def output_time_series_list_to_file(time_series_list, output_file):
         for time_series in time_series_list:
             ts_file.write(",".join(time_series))
             ts_file.write("\n")
+
+def get_trace_columns():
+    """The columns in a trace dataframe.
+
+    Returns
+    -------
+    list
+        A list of strings representing the names of the columns in a
+        trace dataframe.
+
+    """
+    return [specs.AVG_MEM_COL, specs.AVG_CPU_COL,
+            specs.MAX_MEM_COL, specs.MAX_CPU_COL]
+
+def get_lagged_trace_columns():
+    """The column names for lagged data in a trace dataframe.
+
+    Parameters
+    ----------
+    list
+        A list of strings representing the names of the lagged columns in a
+        trace dataframe.
+
+    """
+    return ["{}_lag".format(col_name) for col_name in get_trace_columns()]
 
 def get_granger_pvalues_at_lag(granger_dict, lag):
     """Retrieves the pvalues from `granger_dict` at `lag`.
