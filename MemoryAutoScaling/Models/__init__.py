@@ -1,3 +1,4 @@
 from MemoryAutoScaling.Models.TimeSeriesModel import TimeSeriesModel
 from MemoryAutoScaling.Models.MovingAverageModel import MovingAverageModel
 from MemoryAutoScaling.Models.ExponentialSmoothingModel import ExponentialSmoothingModel
+from MemoryAutoScaling.Models.MLModel import MLModel
