@@ -1,11 +1,12 @@
 """A set of utility functions used throughout the memory auto scaling code.
 
 """
+import copy
 import numpy as np
+import multiprocessing as mp
+from itertools import product
 import matplotlib.pyplot as plt
 import statsmodels.tsa.api as smt
-import copy
-from itertools import product
 from MemoryAutoScaling import specs
 
 
@@ -376,3 +377,98 @@ def get_all_granger_col_names(causal_cols, causal_lags):
                   for col_name in lag_list]
     return ["causal_{0}_{1}".format(causal_tup[0], causal_tup[1])
             for causal_tup in product(causal_cols, causal_lst)]
+
+def get_cores_and_traces_per_core(trace_count):
+    """Gets the number of cores to use and the number of traces per core.
+
+    The number of cores to use is determined based on the system and
+    `trace_count`. Then, given the number of cores, the number of
+    traces to be processed on each core is calculated based on `trace_count`.
+
+    Parameters
+    ----------
+    trace_count: int
+        An integer representing the number of total traces to be processed.
+
+    Returns
+    -------
+    int, int
+        Two integers representing the number of cores to use and the number
+        of traces to be handled by each core, respectively.
+
+    """
+    core_count = min(trace_count, mp.cpu_count() - 1)
+    traces_per_core = int(np.ceil(trace_count / core_count))
+    return core_count, traces_per_core
+
+def get_traces_for_core(traces, traces_per_core, core_num):
+    """Gets the traces from `traces` for the core specified by `core_num`.
+
+    Subsets `traces` to a list of length `traces_per_core` to get a list of
+    traces to be processed on the core specified by `core_num`.
+
+    Parameters
+    ----------
+    traces: list
+        A list of `Trace` objects.
+    traces_per_core: int
+        An integer specifying the number of traces to be processed by
+        each core.
+    core_num: int
+        An integer representing the specific core processing the subsetted
+        traces.
+
+    Returns
+    -------
+    list
+        A list representing the subset of `Trace` objects in `traces` that
+        will be processed on the core specified by `core_num`.
+
+    """
+    start = traces_per_core * core_num
+    end = min(len(traces), traces_per_core * (core_num + 1))
+    return traces[start:end]
+
+def initialize_and_join_processes(procs):
+    """Initializes and joins all the processes in `procs`.
+
+    Parameters
+    ----------
+    procs: list
+        A list of `mp.Process` objects representing the processes
+        to be initialized and joined.
+
+    Returns
+    -------
+    None
+
+    """
+    for proc in procs:
+        proc.start()
+    for proc in procs:
+        proc.join()
+
+
+def build_models_from_params_list(time_series_model, params_lst):
+    """Builds `time_series_model` objects from the params in `params_lst`.
+
+    A separate `time_series_model` object is built for each set of params
+    in `params_lst`.
+
+    Parameters
+    ----------
+    time_series_model: TimeSeriesModel.class
+        A reference to a `TimeSeriesModel` class representing the models being
+        created.
+    params_lst: list
+        A list of dictionaries in which each dictionary represents the set of
+        named parameters used to initialize a `time_series_model`.
+
+    Returns
+    -------
+    list
+        A list of `time_series_model` objects instantiated from the parameters
+        in `params_lst`.
+
+    """
+    return [time_series_model(**params) for params in params_lst]

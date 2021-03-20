@@ -4,6 +4,8 @@ generated from the raw google data.
 """
 import os
 import re
+import sys
+import io
 import pandas as pd
 from MemoryAutoScaling import utils
 from MemoryAutoScaling import specs
@@ -165,6 +167,55 @@ class TraceHandler:
         trace_df = trace_df.loc[order]
         if len(trace_df) >= self._min_length:
             self._traces.append(Trace.from_raw_trace_data(trace_df))
+
+    def run_processing_pipeline(self, verbose=True):
+        """Runs the processing pipeline.
+
+        The processing pipeline is run with status updates printed to the
+        screen if the `verbose` flag is set to True. Otherwise, these are
+        suppressed.
+
+        Parameters
+        ----------
+        verbose: bool
+            A boolean indicating whether progress should be printed. The
+            default value is True.
+
+        Returns
+        -------
+        list
+            A list of `Trace` objects representing the traces processed in
+            the pipeline.
+
+        """
+        if not verbose:
+            old_stdout = sys.stdout
+            consumed_output = io.StringIO()
+            sys.stdout = consumed_output
+        traces = self._run_processing_pipeline()
+        if not verbose:
+            sys.stdout = old_stdout
+        return traces
+
+    def _run_processing_pipeline(self):
+        """Runs the processing pipeline and prints progress.
+
+        The processing pipeline reads and processes all trace files from
+        the input directory and outputs a list of these `Trace` objects.
+
+        Returns
+        -------
+        list
+            A list of `Trace` objects representing the traces processed in
+            the pipeline.
+
+        """
+        print("Processing Traces")
+        print("-----------------")
+        self.process_all_trace_files()
+        print("Processing Complete")
+        print()
+        return self.get_traces()
 
     def load_all_traces_from_time_series_files(self):
         """Loads all data traces from the time series files.

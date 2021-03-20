@@ -30,27 +30,18 @@ if __name__ == "__main__":
     train_prop = float(sys.argv[5])
 
     trace_handler = TraceHandler(input_dir, file_id, min_trace_length)
-    print("Processing Traces")
-    print("-----------------")
-    trace_handler.process_all_trace_files()
-    print("Processing Complete")
-    print()
-    traces = trace_handler.get_traces()
+    traces = trace_handler.run_processing_pipeline()
     reg_results = mp.Manager().list()
-    core_count = min(len(traces), mp.cpu_count() - 1)
-    traces_per_proc = np.ceil(len(traces) / core_count)
     procs = []
+    cores, traces_per_core = utils.get_cores_and_traces_per_core(len(traces))
 
-    for core_num in range(core_count):
-        start = int(traces_per_proc * core_num)
-        end = int(min(len(traces), traces_per_proc * (core_num + 1)))
-        proc = mp.Process(target=build_reg_models_for_traces,
-                          args=(traces[start:end], reg_results, train_prop))
-        procs.append(proc)
-    for proc in procs:
-        proc.start()
-    for proc in procs:
-        proc.join()
+    for core_num in range(cores):
+        core_traces = utils.get_traces_for_core(
+            traces, traces_per_core, core_num)
+        procs.append(mp.Process(target=build_reg_models_for_traces,
+                                args=(core_traces, reg_results, train_prop)))
+    utils.initialize_and_join_processes(procs)
+
 
     reg_df = pd.DataFrame(list(reg_results))
     reg_df.columns = ["id", "train_mse", "test_mse"]
