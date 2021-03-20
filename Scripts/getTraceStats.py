@@ -3,8 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
-from MemoryAutoScaling import specs
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import specs, utils, analysis
 from MemoryAutoScaling.Analysis import TraceAnalyzer
 from MemoryAutoScaling.DataHandling import Trace, TraceHandler
 
@@ -33,7 +32,7 @@ def run_trace_stats(traces, results_lst, causal_lags):
                     trace_df, [specs.MAX_MEM_COL, causal_col], causal_lags)
                 for lag in causal_lags:
                     trace_stats.extend(
-                        utils.get_granger_pvalues_at_lag(granger, lag))
+                        analysis.get_granger_pvalues_at_lag(granger, lag))
             except:
                 trace_stats.extend(
                     [np.nan for _ in range(len(causal_lags) * 4)])
@@ -47,26 +46,25 @@ if __name__ == "__main__":
     causal_lags = [lag+1 for lag in range(int(sys.argv[4]))]
     min_trace_length = int(sys.argv[5])
 
-    analyzer = TraceAnalyzer("whitegrid", "seaborn-dark", 10, "blue", "Raw Data")
-
     handler = TraceHandler(input_dir, file_id, min_trace_length)
     traces = handler.run_processing_pipeline()
     stat_results = mp.Manager().list()
     procs = []
-    cores, traces_per_core = utils.get_cores_and_traces_per_core(len(traces))
+    cores, traces_per_core = analysis.get_cores_and_traces_per_core(
+        len(traces))
 
     for core_num in range(cores):
-        core_traces = utils.get_traces_for_core(
+        core_traces = analysis.get_traces_for_core(
             traces, traces_per_core, core_num)
         procs.append(mp.Process(target=run_trace_stats,
                                 args=(core_traces, stat_results, causal_lags)))
-    utils.initialize_and_join_processes(procs)
+    analysis.initialize_and_join_processes(procs)
 
     stat_df = pd.DataFrame(list(stat_results))
     stat_cols = ["id", "adf_p_val", "adf_p_val_diff", "adf_p_val_diff2"] + [
         "corr_{}".format(col_name)
-        for col_name in traces[0].get_trace_df_columns()]
-    stat_cols += utils.get_all_granger_col_names(CAUSAL_COLS, causal_lags)
+        for col_name in utils.get_trace_columns()]
+    stat_cols += analysis.get_all_granger_col_names(CAUSAL_COLS, causal_lags)
     stat_df.columns = stat_cols
     stat_df.to_csv(
         os.path.join(output_dir, "trace_stats.csv"), sep=",", index=False)

@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import utils, analysis
 from MemoryAutoScaling.Models import ExponentialSmoothingModel
 from MemoryAutoScaling.DataHandling import TraceHandler
 
@@ -23,35 +23,18 @@ def build_es_models_for_traces(trace_lst, results_lst, train_prop):
                       'initial_pred': 0,
                       'train_prop': train_prop}
                      for alpha_val in ALPHAS]
-    es_models = utils.build_models_from_params_list(
+    es_models = analysis.build_models_from_params_list(
         ExponentialSmoothingModel, es_params_lst)
     for trace in trace_lst:
-        results_lst.append(utils.get_model_stats_for_trace(trace, es_models))
+        results_lst.append(
+            analysis.get_model_stats_for_trace(trace, es_models))
 
 
 if __name__ == "__main__":
-    input_dir = sys.argv[1]
-    output_dir = sys.argv[2]
-    file_id = sys.argv[3]
-    min_trace_length = int(sys.argv[4])
-    train_prop = float(sys.argv[5])
-
-    trace_handler = TraceHandler(input_dir, file_id, min_trace_length)
-    traces = trace_handler.run_processing_pipeline()
-    es_results = mp.Manager().list()
-    procs = []
-    cores, traces_per_core = utils.get_cores_and_traces_per_core(len(traces))
-
-    for core_num in range(cores):
-        core_traces = utils.get_traces_for_core(
-            traces, traces_per_core, core_num)
-        procs.append(mp.Process(target=build_es_models_for_traces,
-                                args=(core_traces, es_results, train_prop)))
-    utils.initialize_and_join_processes(procs)
-
-    es_df = pd.DataFrame(list(es_results))
-    es_df.columns = ["id"] + [
-        "{0}_mse_es_{1}".format(mse_name, alpha_val) for alpha_val, mse_name
-        in product(ALPHAS, ["train", "test"])]
-    es_df.to_csv(
-        os.path.join(output_dir, "es_results.csv"), sep=",", index=False)
+    traces, output_dir, train_prop = analysis.get_model_build_input_params()
+    es_results = analysis.perform_trace_modelling(
+        traces, build_es_models_for_traces, train_prop)
+    es_cols = ["{0}_mse_es_{1}".format(mse_name, alpha_val)
+               for alpha_val, mse_name in product(ALPHAS, ["train", "test"])]
+    analysis.output_model_results(
+        es_results, ["id"] + es_cols, output_dir, "es_results")
