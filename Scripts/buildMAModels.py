@@ -1,3 +1,10 @@
+"""Builds a separate moving average model for each trace and evaluates its
+performance on the training and testing sets. Several types of moving average
+models are built based on the different window lengths specified in
+`MA_WINDOWS`
+
+"""
+
 import os
 import sys
 import numpy as np
@@ -20,7 +27,7 @@ def build_ma_models_for_traces(trace_lst, results_lst, train_prop):
     ma_models = utils.build_models_from_params_list(
         MovingAverageModel, ma_params_lst)
     for trace in trace_lst:
-        results_lst.append(utils.get_model_stats_for_trace(trace, models))
+        results_lst.append(utils.get_model_stats_for_trace(trace, ma_models))
 
 
 if __name__ == "__main__":

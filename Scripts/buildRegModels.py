@@ -1,3 +1,7 @@
+"""Builds a separate Linear Regression model for each trace and evaluates its
+performance on the training and testing sets.
+
+"""
 import os
 import sys
 import numpy as np

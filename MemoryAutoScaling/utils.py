@@ -499,5 +499,5 @@ def get_model_stats_for_trace(data_trace, models):
     for model in models:
         train_mse, test_mse = model.calculate_train_and_test_mse(
             data_trace.get_maximum_memory_time_series())
-        trace_stats.extend(train_mse, test_mse)
+        trace_stats.extend([train_mse, test_mse])
     return trace_stats
