@@ -472,3 +472,32 @@ def build_models_from_params_list(time_series_model, params_lst):
 
     """
     return [time_series_model(**params) for params in params_lst]
+
+def get_model_stats_for_trace(data_trace, models):
+    """Gets statistics from `models` for `data_trace`.
+
+    For each model in `models`, the model is fit to `data_trace` and
+    the mean squared error on the test set is computed.
+
+    Parameters
+    ----------
+    data_trace: Trace
+        A `Trace` representing the data trace from which the statistics
+        will be calculated.
+    models: list
+        A list of `TimeSeriesModel` objects that will be fit to `data_trace`.
+
+    Returns
+    -------
+    list
+        A list containing the ID of `data_trace` followed by the mean squared
+        error on the training and test set, respectively, for each model in
+        `models`.
+
+    """
+    trace_stats = [data_trace.get_trace_id()]
+    for model in models:
+        train_mse, test_mse = model.calculate_train_and_test_mse(
+            data_trace.get_maximum_memory_time_series())
+        trace_stats.extend(train_mse, test_mse)
+    return trace_stats

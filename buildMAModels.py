@@ -20,12 +20,7 @@ def build_ma_models_for_traces(trace_lst, results_lst, train_prop):
     ma_models = utils.build_models_from_params_list(
         MovingAverageModel, ma_params_lst)
     for trace in trace_lst:
-        trace_stats = [trace.get_trace_id()]
-        for ma_model in ma_models:
-            train_mse, test_mse = ma_model.calculate_train_and_test_mse(
-                trace.get_maximum_memory_time_series())
-            trace_stats.extend([train_mse, test_mse])
-        results_lst.append(trace_stats)
+        results_lst.append(utils.get_model_stats_for_trace(trace, models))
 
 
 if __name__ == "__main__":
