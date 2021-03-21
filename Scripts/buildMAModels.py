@@ -24,18 +24,14 @@ def build_ma_models_for_traces(trace_lst, results_lst, train_prop):
                       'initial_pred': 0.0,
                       'train_prop': train_prop}
                      for ma_win in MA_WINDOWS]
-    ma_models = analysis.build_models_from_params_list(
-        MovingAverageModel, ma_params_lst)
-    for trace in trace_lst:
-        results_lst.append(
-            analysis.get_model_stats_for_trace(trace, ma_models))
+    analysis.model_traces_and_evaluate(
+        MovingAverageModel, ma_params_lst, trace_lst, results_lst)
 
 
 if __name__ == "__main__":
     traces, output_dir, train_prop = analysis.get_model_build_input_params()
     ma_results = analysis.perform_trace_modelling(
         traces, build_ma_models_for_traces, train_prop)
-    ma_cols = ["{0}_mse_ma_{1}".format(mse_name, ma_win)
-               for ma_win, mse_name in product(MA_WINDOWS, ["train", "test"])]
+    ma_cols = analysis.get_col_list_for_params(MA_WINDOWS, "ma")
     analysis.output_model_results(
         ma_results, ["id"] + ma_cols, output_dir, "ma_results")

@@ -317,3 +317,54 @@ def output_model_results(results, col_list, output_dir, file_name):
     results_df.columns = col_list
     output_path = os.path.join(output_dir, "{}.csv".format(file_name))
     results_df.to_csv(output_path, sep=",", index=False)
+
+
+def get_col_list_for_params(params, model_name):
+    """Gets a list of columns based on `params`.
+
+    Parameters
+    ----------
+    params: list
+        A list of model parameters used to generate the column names.
+    model_name: str
+        A string representing the name of the model.
+
+    Returns
+    -------
+    list
+        A list consisting of column names generated from `params`.
+
+    """
+    return ["{0}_mse_{1}_{2}".format(mse_name, model_name, param)
+            for param, mse_name in product(params, ["train", "test"])]
+
+
+def model_traces_and_evaluate(model, model_params, traces, results_lst):
+    """Fits `model` to `traces` and evaluates the performance.
+
+    A separate `model` is built for each parameter set in `model_params` and
+    fit to the `Trace` objects in `traces`. The models are then evaluated, and
+    the results are saved in `results_lst`.
+
+    Parameters
+    ----------
+    model: TimeSeriesModel.class
+        A `TimeSeriesModel` class reference specifying the type of model to
+        be built.
+    model_params: list
+        A list of dictionaries where each dictionary corresponds to the set
+        of parameters to build a model of type `model`.
+    traces: list
+        A list of `Trace` objects specifying the traces to be modelled.
+    results_lst: mp.Manager.list
+        A multiprocessor list representing the list to which model results are
+        saved.
+
+    Returns
+    -------
+    None
+
+    """
+    models = build_models_from_params_list(model, model_params)
+    for trace in traces:
+        results_lst.append(get_model_stats_for_trace(trace, models))

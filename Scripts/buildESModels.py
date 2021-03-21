@@ -23,18 +23,14 @@ def build_es_models_for_traces(trace_lst, results_lst, train_prop):
                       'initial_pred': 0,
                       'train_prop': train_prop}
                      for alpha_val in ALPHAS]
-    es_models = analysis.build_models_from_params_list(
-        ExponentialSmoothingModel, es_params_lst)
-    for trace in trace_lst:
-        results_lst.append(
-            analysis.get_model_stats_for_trace(trace, es_models))
+    analysis.model_traces_and_evaluate(
+        ExponentialSmoothingModel, es_params_lst, trace_lst, results_lst)
 
 
 if __name__ == "__main__":
     traces, output_dir, train_prop = analysis.get_model_build_input_params()
     es_results = analysis.perform_trace_modelling(
         traces, build_es_models_for_traces, train_prop)
-    es_cols = ["{0}_mse_es_{1}".format(mse_name, alpha_val)
-               for alpha_val, mse_name in product(ALPHAS, ["train", "test"])]
+    es_cols = analysis.get_col_list_for_params(ALPHAS, "es")
     analysis.output_model_results(
         es_results, ["id"] + es_cols, output_dir, "es_results")
