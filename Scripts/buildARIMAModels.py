@@ -24,8 +24,11 @@ def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
         best5_results = [trace.get_trace_id()]
         for arima_model in arima_models:
             model_count = (len(best5_results) - 1) // 3
-            _, train_mse, test_mse = arima_model.run_model_pipeline_for_trace(
-                trace.get_maximum_memory_time_series())
+            try:
+                _, train_mse, test_mse = arima_model.run_model_pipeline_for_trace(
+                    trace.get_maximum_memory_time_series())
+            except:
+                continue
             if (model_count < 5) or (test_mse < best5_results[-1]):
                 if model_count == 0:
                     best5_results.extend([
@@ -40,6 +43,8 @@ def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
                             break
             if len(best5_results) > 16:
                 best5_results = best5_results[:16]
+        if len(best5_results) < 16:
+            best5_results += [np.nan for _ in range(16 - len(best5_results))]
         results_lst.append(best5_results)
 
 
