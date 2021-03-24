@@ -1,13 +1,14 @@
-The `ARIMAModel` class is used to construct a predictive model based on ARIMA.
-ARIMA models have 3 terms: `p`, `d`, and `q`. `p` indicates the auto
+"""The `ARIMAModel` class is used to construct a predictive model based on
+ARIMA. ARIMA models have 3 terms: `p`, `d`, and `q`. `p` indicates the auto
 regressive component, that is the number of previous values used to predict
 the current value. `d` refers to the number of differencing rounds that must
 be applied to make the time series stationary. `q` is the moving average
 component, refering to the number of lagged forecast errors used in the model.
 
 """
-from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error
+from MemoryAutoScaling import utils
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 
 class ARIMAModel:
@@ -48,6 +49,22 @@ class ARIMAModel:
         self._d = d
         self._q = q
 
+    def get_order(self):
+        """Returns the order for the ARIMA model.
+
+        The order is the three element tuple `(p, d, q)` representing
+        the autoregressive component, the degree of differencing, and the
+        moving average component respectively.
+
+        Returns
+        -------
+        tuple
+            A three element tuple of integers representing the order of the
+            ARIMA model.
+
+        """
+        return self._p, self._d, self._q
+
     def split_data(self, data_trace):
         """Splits `data_trace` into training and testing time series.
 
@@ -81,9 +98,9 @@ class ARIMAModel:
 
         """
         order = (self._p, self._d, self._q)
-        self._model = SARIMAX(
+        model = SARIMAX(
             train_trace, order=order, simple_differencing=False)
-        self._model.fit(disp=False)
+        self._model = model.fit(disp=False)
 
     def get_predictions(self, test_trace):
         """Retrieves model predictions for `test_trace`.
@@ -102,7 +119,7 @@ class ARIMAModel:
         """
         forecast_len = len(test_trace)
         return self._model.get_prediction(
-            end=self._model.nobs + forecast_len)
+            end=self._model.nobs + forecast_len - 1)
 
     def run_model_pipeline(self, train_trace, test_trace):
         """Runs the model pipeline on `train_trace` and `test_trace`.
