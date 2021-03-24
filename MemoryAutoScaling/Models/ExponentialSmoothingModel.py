@@ -1,5 +1,5 @@
-"""The `ExponentialSmoothingModel` class is used to construct a prediction
-model based on exponential smoothing. For exponential smoothing. The
+"""The `ExponentialSmoothingModel` class is used to construct a predictive
+model based on exponential smoothing. For exponential smoothing, the
 prediction at time `t` is `p_t = alpha * x_t-1 + (1 - alpha) * p_t-1` where
 `alpha` is a configurable weight constant between 0 and 1, `x_t-1` is the
 actual data observation at time `t-1` and `p_t` and `p_t-1` are the
