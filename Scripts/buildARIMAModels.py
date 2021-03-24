@@ -26,8 +26,6 @@ def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
             model_count = (len(best5_results) - 1) // 3
             _, train_mse, test_mse = arima_model.run_model_pipeline_for_trace(
                 trace.get_maximum_memory_time_series())
-            print(train_mse)
-            print(test_mse)
             if (model_count < 5) or (test_mse < best5_results[-1]):
                 if model_count == 0:
                     best5_results.extend([

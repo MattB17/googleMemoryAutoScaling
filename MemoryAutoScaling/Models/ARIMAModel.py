@@ -149,10 +149,11 @@ class ARIMAModel:
         self.fit(train_trace)
         preds = self.get_predictions(test_trace)
         n_forecast = len(test_trace)
+        mean_preds = utils.impute_for_time_series(preds.predicted_mean, 0)
         train_mse = mean_squared_error(
-            train_trace, preds.predicted_mean[:-n_forecast])
+            train_trace, mean_preds[:-n_forecast])
         test_mse = mean_squared_error(
-            test_trace, preds.predicted_mean[-n_forecast:])
+            test_trace, mean_preds[-n_forecast:])
         return preds, train_mse, test_mse
 
     def run_model_pipeline_for_trace(self, data_trace):
