@@ -52,22 +52,26 @@ class TimeSeriesRegression(MLModel):
         super().initialize()
         self._model = LinearRegression(**kwargs)
 
-    def get_modelling_data_from_trace(self, trace):
-        """Preprocesses `trace` to retrieve the data used for modelling.
-
-        `trace` is processed to retrieve a DataFrame containing the target
-        variable as well as the lagged values of all feature variables at a
-        lag of `lag`.
+    def get_train_and_test_predictions(self, train_features, test_features):
+        """Retrieves predictions for the training and testing sets.
 
         Parameters
         ----------
-        trace: Trace
-            The `Trace` object from which the modelling data is retrieved.
+        train_features: pd.DataFrame
+            A pandas DataFrame representing the values for the features of the
+            training set.
+        test_features: pd.DataFrame
+            A pandas DataFrame representing the values for the features of the
+            testing set.
 
         Returns
         -------
-        pd.DataFrame
-            A pandas DataFrame containing the data to be modelled.
+        np.array, np.array
+            Two numpy arrays representing the predictions for the training and
+            testing sets respectively.
+
 
         """
-        return trace.get_lagged_df(self._lag)
+        train_preds = self.get_predictions(train_features)
+        test_preds = self.get_predictions(test_features)
+        return train_preds, test_preds

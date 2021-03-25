@@ -4,3 +4,4 @@ from MemoryAutoScaling.Models.ExponentialSmoothingModel import ExponentialSmooth
 from MemoryAutoScaling.Models.MLModel import MLModel
 from MemoryAutoScaling.Models.TimeSeriesRegression import TimeSeriesRegression
 from MemoryAutoScaling.Models.ARIMAModel import ARIMAModel
+from MemoryAutoScaling.Models.ARIMAXModel import ARIMAXModel

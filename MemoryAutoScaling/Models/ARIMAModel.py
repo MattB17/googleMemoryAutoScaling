@@ -54,7 +54,7 @@ class ARIMAModel:
 
         The order is the three element tuple `(p, d, q)` representing
         the autoregressive component, the degree of differencing, and the
-        moving average component respectively.
+        moving average component, respectively.
 
         Returns
         -------
@@ -97,9 +97,8 @@ class ARIMAModel:
         None
 
         """
-        order = (self._p, self._d, self._q)
         model = SARIMAX(
-            train_trace, order=order, simple_differencing=False)
+            train_trace, order=self.get_order(), simple_differencing=False)
         self._model = model.fit(disp=False)
 
     def get_predictions(self, test_trace):

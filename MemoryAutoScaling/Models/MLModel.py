@@ -58,7 +58,6 @@ class MLModel(ABC):
         """
         return self._model is not None
 
-    @abstractmethod
     def initialize(self, **kwargs):
         """Initializes the model.
 
@@ -129,7 +128,6 @@ class MLModel(ABC):
         if self._is_fit:
             return self._model.predict(test_features)
 
-    @abstractmethod
     def get_modelling_data_from_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
 
@@ -143,6 +141,29 @@ class MLModel(ABC):
         pd.DataFrame
             A pandas DataFrame containing the data from `trace` that will be
             used in the modelling process.
+
+        """
+        return trace.get_lagged_df(self._lag)
+
+    @abstractmethod
+    def get_train_and_test_predictions(self, train_features, test_features):
+        """Retrieves predictions for the training and testing sets.
+
+        Parameters
+        ----------
+        train_features: pd.DataFrame
+            A pandas DataFrame representing the values for the features of the
+            training set.
+        test_features: pd.DataFrame
+            A pandas DataFrame representing the values for the features of the
+            testing set.
+
+        Returns
+        -------
+        np.array, np.array
+            Two numpy arrays representing the predictions for the training and
+            testing sets respectively.
+
 
         """
         pass
@@ -179,11 +200,11 @@ class MLModel(ABC):
         """
         self.initialize(**kwargs)
         self.fit(train_features, train_target)
-        preds = self.get_predictions(test_features)
-        train_mse = mean_squared_error(
-            train_target, self.get_predictions(train_features))
-        test_mse = mean_squared_error(test_target, preds)
-        return preds, train_mse, test_mse
+        train_preds, test_preds = self.get_train_and_test_predictions(
+            train_features, test_features)
+        train_mse = mean_squared_error(train_target, train_preds)
+        test_mse = mean_squared_error(test_target, test_preds)
+        return test_preds, train_mse, test_mse
 
     def run_model_pipeline_on_trace(self, trace, **kwargs):
         """Runs the model pipeline on `trace`.
