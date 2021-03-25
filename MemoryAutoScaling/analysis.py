@@ -472,3 +472,185 @@ def update_with_model_results(results_lst, model_params, train_mse,
                 results_lst, model_params, train_mse, test_mse, idx)
     return extend_model_results_up_to_cutoff(
         results_lst, model_params, train_mse, test_mse, cutoff)
+
+
+def truncate_list(lst, cutoff):
+    """Truncates `lst` if it is longer than `cutoff`.
+
+    The size of `lst` is reduced to `cutoff` if it is longer than `cutoff`.
+    Otherwise, it is unchanged.
+
+    Parameters
+    ----------
+    lst: list
+        The list being truncated.
+    cutoff: int
+        An integer representing the maximum length for `lst`.
+
+    Returns
+    -------
+    list
+        The list resulting from truncating `lst` with `cutoff`.
+
+    """
+    if len(lst) > cutoff:
+        return lst[:cutoff]
+    return lst
+
+
+def handle_stats_for_model(trace, model, trace_results, cutoff):
+    """Handles the stats for `model` built on `trace`.
+
+    `trace` is modeled using `model` and the results are added to
+    `trace_results` if it has fewer than `cutoff` entries or if the results
+    for the model are better than the results of at least one model contained
+    in `trace_results`.
+
+    Parameters
+    ----------
+    trace: Trace
+        The `Trace` object being modeled.
+    model: TimeSeriesModel
+        A `TimeSeriesModel` to be fit to `trace`.
+    trace_results: list
+        A list containing results for modelling done on the trace.
+    cutoff: int
+        An integer representing the maximum length of `trace_results`.
+
+    Returns
+    -------
+    list
+        A list obtained from `trace_results` after handling the results of
+        modeling `trace` with `model`.
+
+    """
+    _, train_mse, test_mse = model.run_model_pipeline_for_trace(trace)
+    trace_results = update_with_model_results(
+        trace_results, model.get_order(), train_mse, test_mse, cutoff)
+    return truncate_list(trace_results, cutoff)
+
+
+def update_model_stats_for_trace(trace, model, model_results, cutoff):
+    """Updates the stats for `model` built on `trace`.
+
+    `trace` is modeled using `model` and the results are added to
+    `trace_results` if it has fewer than `cutoff` entries or if the results
+    for the model are better than the results of at least one model contained
+    in `trace_results`.
+
+    Parameters
+    ----------
+    model: TimeSeriesModel
+        A `TimeSeriesModel` to be fit to `trace`.
+    trace: Trace
+        The `Trace` object being modeled.
+    trace_results: list
+        A list containing results for modelling done on the trace.
+    cutoff: int
+        An integer representing the maximum length of `trace_results`.
+
+    Returns
+    -------
+    list
+        A list obtained from `trace_results` after handling the results of
+        modeling `trace` with `model`.
+
+    """
+    try:
+        return handle_stats_for_model(trace, model, model_results, cutoff)
+    except:
+        return model_results
+
+
+def pad_list(lst, pad_val, pad_len):
+    """Pads `lst` with `pad_val` to length `pad_len`.
+
+    If the length of `lst` is already greater or equal to `pad_len` then
+    `lst` is not modified.
+
+    Parameters
+    ----------
+    lst: list
+        The list being padded.
+    pad_val: float
+        The value used to pad `lst`.
+    pad_len: int
+        An integer representing the length to which `lst` should be padded.
+
+    Returns
+    -------
+    list
+        The list obtained from `lst` after padding with `pad_val` up to length
+        `pad_len`.
+
+    """
+    if len(lst) < pad_len:
+        lst += [pad_val for _ in range(pad_len - len(lst))]
+    return lst
+
+
+def get_best_models_for_trace(trace, models, models_count):
+    """Gets statistics for the best models in `models` for `trace`.
+
+    The best models in `models` are the `models_count` models with the lowest
+    test MSE when built on `trace`.
+
+    Parameters
+    ----------
+    trace: Trace
+        The `Trace` object being modeled.
+    models: list
+        A list of `TimeSeriesModel` objects representing the models being fit
+        to `trace` and from which the best models are chosen.
+    models_count: int
+        An integer representing the number of models to include in the results.
+
+    Returns
+    -------
+    list
+        A list consisting of the ID of `trace` followed by the results for the
+        `models_count` best models from `models` fit to `trace`.
+
+    """
+    best_results = [trace.get_trace_id()]
+    cutoff = (3 * models_count) + 1
+    for model in models:
+        best_results = update_model_stats_for_trace(
+            trace, model, best_results, cutoff)
+    return pad_list(best_results, np.nan, cutoff)
+
+def get_best_model_results_for_traces(model, model_params,
+                                      traces, result_lst, models_count):
+    """Gets the `models_count` best model results for the traces of `traces`.
+
+    For each trace in `traces` a `model` object is built for each set of model
+    parameters in `model_params` and the results of the best `models_count`
+    models are saved in `result_lst`. If fewer than `models_count` models are
+    fitted to the trace, then the result is padded with `np.nan`.
+
+    Parameters
+    ----------
+    model: TimeSeriesModel.class
+        A `TimeSeriesModel` class specifying the model to be built.
+    model_params: list
+        A list of dictionaries specifying the model parameters for each model
+        to be built.
+    traces: list
+        A list of `Trace` objects specifying the traces to which models are
+        fit.
+    result_lst: list
+        The list to which the model results for each trace are saved.
+    models_count: int
+        An integer representing the number of model results to save. The
+        results for the `models_count` best models for each trace will be
+        saved.
+
+    Returns
+    -------
+    None
+
+    """
+    models = build_models_from_params_list(model, model_params)
+    for trace in traces:
+        result_lst.append(
+            get_best_models_for_trace(trace, models, models_count))

@@ -18,25 +18,8 @@ def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
     arima_params_lst = [{'train_prop': train_prop,
                         'p': p, 'd': d, 'q': q}
                         for p, d, q in product(ARIMA_p, ARIMA_d, ARIMA_q)]
-    arima_models = analysis.build_models_from_params_list(
-        ARIMAModel, arima_params_lst)
-    for trace in traces_lst:
-        best5_results = [trace.get_trace_id()]
-        for arima_model in arima_models:
-            model_count = (len(best5_results) - 1) // 3
-            try:
-                _, train_mse, test_mse = arima_model.run_model_pipeline_for_trace(
-                    trace.get_maximum_memory_time_series())
-            except:
-                continue
-            best5_results = analysis.update_with_model_results(
-                best5_results, arima_model.get_order(),
-                train_mse, test_mse, 16)
-            if len(best5_results) > 16:
-                best5_results = best5_results[:16]
-        if len(best5_results) < 16:
-            best5_results += [np.nan for _ in range(16 - len(best5_results))]
-        results_lst.append(best5_results)
+    analysis.get_best_model_results_for_traces(
+        ARIMAModel, arima_params_lst, traces_lst, results_lst, 5)
 
 
 if __name__ == "__main__":

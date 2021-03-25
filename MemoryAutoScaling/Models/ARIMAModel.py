@@ -164,8 +164,8 @@ class ARIMAModel:
 
         Parameters
         ----------
-        data_trace: np.array
-            A numpy array representing the time series being modelled.
+        data_trace: Trace
+            A `Trace` object representing the time series being modelled.
 
         Returns
         -------
@@ -176,5 +176,6 @@ class ARIMAModel:
             training and testing sets respectively.
 
         """
-        train_trace, test_trace = self.split_data(data_trace)
+        trace_ts = data_trace.get_maximum_memory_time_series()
+        train_trace, test_trace = self.split_data(trace_ts)
         return self.run_model_pipeline(train_trace, test_trace)
