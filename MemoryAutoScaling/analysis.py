@@ -368,3 +368,107 @@ def model_traces_and_evaluate(model, model_params, traces, results_lst):
     models = build_models_from_params_list(model, model_params)
     for trace in traces:
         results_lst.append(get_model_stats_for_trace(trace, models))
+
+def insert_model_results_at_index(results_lst, model_params,
+                                  train_mse, test_mse, idx):
+    """Inserts model results into `results_lst` based on `idx`.
+
+    `model_params`, `train_mse`, and `test_mse` are inserted into
+    `results_lst` at positions `3 * idx + 1`, `3 * idx + 2` and
+    `3 * idx + 3`, respectively.
+
+    Parameters
+    ----------
+    results_lst: list
+        A list of results for which the model results are inserted.
+    model_params: tuple
+        A tuple containing model parameters for the results being inserted.
+    train_mse: float
+        A float representing the training MSE for the model.
+    test_mse: float
+        A float representing the test MSE for the model.
+    idx: int
+        An integer used to mark where the model results will be inserted.
+
+    Returns
+    -------
+    list
+        The list obtained from `results_lst` after inserting the model results.
+
+    """
+    results_lst.insert((3 * idx) + 1, model_params)
+    results_lst.insert((3 * idx) + 2, train_mse)
+    results_lst.insert((3 * idx) + 3, test_mse)
+    return results_lst
+
+def extend_model_results_up_to_cutoff(results_lst, model_params, train_mse,
+                                      test_mse, cutoff):
+    """Extends `results_lst` with the model results up to `cutoff`.
+
+    If `results_lst` has less than `cutoff` elements then it is extended with
+    the model results given by `model_params`, `train_mse` and `test_mse`.
+
+    Parameters
+    ----------
+    results_lst: list
+        The list containing model results that is being extended.
+    model_params: tuple
+        A tuple containing the model params for the model.
+    train_mse: float
+        A float representing the training MSE for the model.
+    test_mse: float
+        A float representing the testing MSE for the model.
+    cutoff: int
+        An integer used to decide if `results_lst` should be extended. If the
+        length of `results_lst` is below `cutoff` then it is extended with the
+        model results.
+
+    Returns
+    -------
+    list
+        The list obtained `results_lst` after possibly extending with the
+        model results.
+
+    """
+    if len(results_lst) < cutoff:
+        results_lst.extend([model_params, train_mse, test_mse])
+    return results_lst
+
+
+def update_with_model_results(results_lst, model_params, train_mse,
+                              test_mse, cutoff):
+    """Updates `results_lst` with the model results.
+
+    If `results_lst` has fewer than `cutoff` entries or `test_mse` is lower
+    than the test MSE of a model already contained in `results_lst`, then
+    the model results are inserted into `results_lst`.
+
+    Parameters
+    ----------
+    results_lst: list
+        The list containing model results that is being updated.
+    model_params: tuple
+        A tuple containing the model params for the model.
+    train_mse: float
+        A float representing the training MSE for the model.
+    test_mse: float
+        A float representing the testing MSE for the model.
+    cutoff: int
+        An integer used to decide if `results_lst` should be extended. If the
+        length of `results_lst` is below `cutoff` then it is extended with the
+        model results.
+
+    Returns
+    -------
+    list
+        The list obtained `results_lst` after possibly extending or inserting
+        the model results.
+
+    """
+    model_count = (len(results_lst) - 1) // 3
+    for idx in range(model_count):
+        if test_mse < results_lst[3 * (idx + 1)]:
+            return insert_model_results_at_index(
+                results_lst, model_params, train_mse, test_mse, idx)
+    return extend_model_results_up_to_cutoff(
+        results_lst, model_params, train_mse, test_mse, cutoff)

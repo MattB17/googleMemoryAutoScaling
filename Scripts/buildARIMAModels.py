@@ -29,18 +29,9 @@ def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
                     trace.get_maximum_memory_time_series())
             except:
                 continue
-            if (model_count < 5) or (test_mse < best5_results[-1]):
-                if model_count == 0:
-                    best5_results.extend([
-                        arima_model.get_order(), train_mse, test_mse])
-                else:
-                    for idx in range(model_count):
-                        if test_mse < best5_results[3 * (idx + 1)]:
-                            best5_results.insert(
-                                (3 * idx) + 1, arima_model.get_order())
-                            best5_results.insert((3 * idx) + 2, train_mse)
-                            best5_results.insert((3 * idx) + 3, test_mse)
-                            break
+            best5_results = analysis.update_with_model_results(
+                best5_results, arima_model.get_order(),
+                train_mse, test_mse, 16)
             if len(best5_results) > 16:
                 best5_results = best5_results[:16]
         if len(best5_results) < 16:
