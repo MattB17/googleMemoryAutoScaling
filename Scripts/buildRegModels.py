@@ -2,12 +2,7 @@
 performance on the training and testing sets.
 
 """
-import os
-import sys
-import numpy as np
-import pandas as pd
-import multiprocessing as mp
-from MemoryAutoScaling import specs, utils, analysis
+from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models import TimeSeriesRegression
 from MemoryAutoScaling.DataHandling import MLDataHandler, TraceHandler
 

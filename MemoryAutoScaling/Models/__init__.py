@@ -3,5 +3,6 @@ from MemoryAutoScaling.Models.MovingAverageModel import MovingAverageModel
 from MemoryAutoScaling.Models.ExponentialSmoothingModel import ExponentialSmoothingModel
 from MemoryAutoScaling.Models.MLModel import MLModel
 from MemoryAutoScaling.Models.TimeSeriesRegression import TimeSeriesRegression
+from MemoryAutoScaling.Models.TimeSeriesSVM import TimeSeriesSVM
 from MemoryAutoScaling.Models.ARIMAModel import ARIMAModel
 from MemoryAutoScaling.Models.ARIMAXModel import ARIMAXModel

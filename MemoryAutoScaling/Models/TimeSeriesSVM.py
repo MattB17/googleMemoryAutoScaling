@@ -1,13 +1,13 @@
-"""The `TimeSeriesRegression` class builds a linear regression model to
-predict future time points for a time series.
+"""The `TimeSeriesSVM` class builds a Support Vector Machine model to predict
+future time points for a time series.
 
 """
 from MemoryAutoScaling.Models import MLModel
-from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
 
 
-class TimeSeriesRegression(MLModel):
-    """A Linear Regression model for time series data.
+class TimeSeriesSVM(MLModel):
+    """A Support Vector Machine model for time series data.
 
     Parameters
     ----------
@@ -34,10 +34,10 @@ class TimeSeriesRegression(MLModel):
 
     """
     def __init__(self, data_handler, lag):
-        super().__init__("TimeSeriesRegression", data_handler, lag)
+        super().__init__("TimeSeriesSVM", data_handler, lag)
 
     def initialize(self, **kwargs):
-        """Initializes the linear regression model.
+        """Initializes the support vector machine model.
 
         Parameters
         ----------
@@ -50,7 +50,7 @@ class TimeSeriesRegression(MLModel):
 
         """
         super().initialize()
-        self._model = LinearRegression(**kwargs)
+        self._model = SVR(**kwargs)
 
     def get_train_and_test_predictions(self, train_features, test_features):
         """Retrieves predictions for the training and testing sets.
@@ -67,9 +67,8 @@ class TimeSeriesRegression(MLModel):
         Returns
         -------
         np.array, np.array
-            Two numpy arrays representing the predictions for the training and
+            Two numpy arrays representing the predictions fo the training and
             testing sets respectively.
-
 
         """
         train_preds = self.get_predictions(train_features)
