@@ -20,6 +20,11 @@ class MLModel(ABC):
         A string representing the name of the machine learning model.
     data_handler: MLDataHandler
         An `MLDataHandler` used to pre-process data for the model.
+    lag: int
+        An integer representing the lag to use for time series features to
+        the model. That is, for any time series used as a feature to the
+        model, the model will use the value of the time series lagged by
+        `lag` when predicting for the target variable.
 
     Attributes
     ----------
@@ -31,11 +36,14 @@ class MLModel(ABC):
         The underlying machine learning model being fit.
     _is_fit: bool
         Indicates if the model has been fitted to training data.
+    _lag: int
+        The lag used for time series features to the model.
 
     """
-    def __init__(self, model_name, data_handler):
+    def __init__(self, model_name, data_handler, lag):
         self._model_name = model_name
         self._data_handler = data_handler
+        self._lag = lag
         self._model = None
         self._is_fit = False
 
@@ -121,6 +129,24 @@ class MLModel(ABC):
         if self._is_fit:
             return self._model.predict(test_features)
 
+    @abstractmethod
+    def get_modelling_data_from_trace(self, trace):
+        """Preprocesses `trace` to retrieve the data used for modelling.
+
+        Parameters
+        ----------
+        trace: Trace
+            A `Trace` object containing the data to be modelled.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing the data from `trace` that will be
+            used in the modelling process.
+
+        """
+        pass
+
     def run_model_pipeline(self, train_features, train_target,
                            test_features, test_target, **kwargs):
         """Runs the model pipeline on the training and testing data.
@@ -159,19 +185,19 @@ class MLModel(ABC):
         test_mse = mean_squared_error(test_target, preds)
         return preds, train_mse, test_mse
 
-    def run_model_pipeline_on_raw_data(self, raw_data, **kwargs):
-        """Runs the model pipeline on `raw_data`.
+    def run_model_pipeline_on_trace(self, trace, **kwargs):
+        """Runs the model pipeline on `trace`.
 
-        `raw_data` is first split into features and target for both the
-        training and test sets. Then the model pipeline is run on the
+        The dataframe containing the data for modeling is obtained from
+        `trace`. Then this data is split into features and target for both the
+        training and test sets. Next, the model pipeline is run on the
         resulting data, with the model being initialized by parameters
         specified in **kwargs.
 
         Parameters
         ----------
-        raw_data: pd.DataFrame
-            A pandas DataFrame representing the raw_data to be fed into the
-            pipeline.
+        trace: Trace
+            A `Trace` object containing the data being modelled.
         kwargs: dict
             Arbitrary keyword arguments used to initialize the model.
 
@@ -183,6 +209,7 @@ class MLModel(ABC):
             testing sets.
 
         """
+        raw_data = self.get_modelling_data_from_trace(trace)
         X_train, y_train, X_test, y_test = self.split_data(raw_data)
         return self.run_model_pipeline(
             X_train, y_train, X_test, y_test, **kwargs)

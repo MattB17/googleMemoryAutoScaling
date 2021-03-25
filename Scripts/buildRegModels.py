@@ -18,10 +18,10 @@ TARGET_COL = specs.MAX_MEM_COL
 
 def build_reg_models_for_traces(trace_lst, results_lst, train_prop):
     data_handler = MLDataHandler(train_prop, FEATURE_COLS, TARGET_COL)
-    reg_model = TimeSeriesRegression(data_handler)
+    reg_model = TimeSeriesRegression(data_handler, 2)
     for trace in trace_lst:
-        _, train_mse, test_mse = reg_model.run_model_pipeline_on_raw_data(
-            trace.get_lagged_df(1))
+        _, train_mse, test_mse = reg_model.run_model_pipeline_on_trace(
+            trace)
         results_lst.append([trace.get_trace_id(), train_mse, test_mse])
 
 
