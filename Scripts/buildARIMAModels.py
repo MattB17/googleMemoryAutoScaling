@@ -1,7 +1,7 @@
-"""Builds a separate ARIMA model for each trace and evaluates its performance
+"""Builds separate ARIMA models for each trace and evaluates its performance
 on the training and testing sets. Several types of ARIMA models are built
 based on the different values of `p`, `d`, and `q` specified in `ARIMA_p`,
-`ARIMA_d`, and `ARIMA_q` respectively.
+`ARIMA_d`, and `ARIMA_q`, respectively.
 
 """
 from itertools import product
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     traces, output_dir, train_prop = analysis.get_model_build_input_params()
     arima_results = analysis.perform_trace_modelling(
         traces, build_arima_models_for_traces, train_prop)
-    arima_cols = ["{0}_arima_{1}".format(col, rank) for rank, col
-                  in product(range(1, 6), ["order", "train_mse", "test_mse"])]
+    arima_cols = analysis.get_col_list_for_params(
+        range(1, 6), "arima", ["order", "train_mse", "test_mse"])
     analysis.output_model_results(
         arima_results, ["id"] + arima_cols, output_dir, "arima_results")

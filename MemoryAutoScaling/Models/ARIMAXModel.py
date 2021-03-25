@@ -3,7 +3,7 @@ the ARIMAX model. ARIMAX models are the combination of an ARIMA model and
 a regression model on explanatory features.
 
 """
-from statsmodels.tsa.statespace import SARIMAX
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 from MemoryAutoScaling.Models import MLModel
 
 

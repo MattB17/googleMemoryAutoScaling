@@ -31,6 +31,7 @@ if __name__ == "__main__":
     traces, output_dir, train_prop = analysis.get_model_build_input_params()
     es_results = analysis.perform_trace_modelling(
         traces, build_es_models_for_traces, train_prop)
-    es_cols = analysis.get_col_list_for_params(ALPHAS, "es")
+    es_cols = analysis.get_col_list_for_params(
+        ALPHAS, "es", ["train_mse", "test_mse"])
     analysis.output_model_results(
         es_results, ["id"] + es_cols, output_dir, "es_results")

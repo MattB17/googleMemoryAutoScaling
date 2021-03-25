@@ -206,7 +206,7 @@ class MLModel(ABC):
         test_mse = mean_squared_error(test_target, test_preds)
         return test_preds, train_mse, test_mse
 
-    def run_model_pipeline_on_trace(self, trace, **kwargs):
+    def run_model_pipeline_for_trace(self, trace, **kwargs):
         """Runs the model pipeline on `trace`.
 
         The dataframe containing the data for modeling is obtained from

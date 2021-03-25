@@ -319,8 +319,8 @@ def output_model_results(results, col_list, output_dir, file_name):
     results_df.to_csv(output_path, sep=",", index=False)
 
 
-def get_col_list_for_params(params, model_name):
-    """Gets a list of columns based on `params`.
+def get_col_list_for_params(params, model_name, model_cols):
+    """Gets a list of columns based on `params` and `model_cols`.
 
     Parameters
     ----------
@@ -328,15 +328,18 @@ def get_col_list_for_params(params, model_name):
         A list of model parameters used to generate the column names.
     model_name: str
         A string representing the name of the model.
+    model_cols: list
+        A list of column names for the models.
 
     Returns
     -------
     list
-        A list consisting of column names generated from `params`.
+        A list consisting of column names generated from `params` and
+        `model_cols`.
 
     """
-    return ["{0}_mse_{1}_{2}".format(mse_name, model_name, param)
-            for param, mse_name in product(params, ["train", "test"])]
+    return ["{0}_mse_{1}_{2}".format(model_col, model_name, param)
+            for param, model_col in product(params, model_cols)]
 
 
 def model_traces_and_evaluate(model, model_params, traces, results_lst):

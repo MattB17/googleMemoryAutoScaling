@@ -20,7 +20,7 @@ def build_reg_models_for_traces(trace_lst, results_lst, train_prop):
     data_handler = MLDataHandler(train_prop, FEATURE_COLS, TARGET_COL)
     reg_model = TimeSeriesRegression(data_handler, 2)
     for trace in trace_lst:
-        _, train_mse, test_mse = reg_model.run_model_pipeline_on_trace(
+        _, train_mse, test_mse = reg_model.run_model_pipeline_for_trace(
             trace)
         results_lst.append([trace.get_trace_id(), train_mse, test_mse])
 
