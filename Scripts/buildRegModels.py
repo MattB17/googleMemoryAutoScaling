@@ -4,7 +4,7 @@ performance on the training and testing sets.
 """
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models import TimeSeriesRegression
-from MemoryAutoScaling.DataHandling import MLDataHandler, TraceHandler
+from MemoryAutoScaling.DataHandling import MLDataHandler
 
 
 FEATURE_COLS = utils.get_lagged_trace_columns([2])

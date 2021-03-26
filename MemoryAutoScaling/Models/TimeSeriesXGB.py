@@ -49,8 +49,8 @@ class TimeSeriesXGB(MLModel):
         The depth of the model.
 
     """
-    def __init__(data_handler, lag, learning_rate, estimators, depth):
-        super().__init__("TimeSeriesXGB", data_handler, lag)
+    def __init__(self, data_handler, lags, learning_rate, estimators, depth):
+        super().__init__("TimeSeriesXGB", data_handler, lags)
         self._learning_rate = learning_rate
         self._estimators = estimators
         self._depth = depth
@@ -72,6 +72,7 @@ class TimeSeriesXGB(MLModel):
         self._model = XGBRegressor(learning_rate=self._learning_rate,
                                    max_depth=self._depth,
                                    n_estimators=self._estimators,
+                                   objective='reg:squarederror',
                                    **kwargs)
 
     def get_train_and_test_predictions(self, train_features, test_features):

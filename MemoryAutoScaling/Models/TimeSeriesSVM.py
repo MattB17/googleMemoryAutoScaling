@@ -33,8 +33,8 @@ class TimeSeriesSVM(MLModel):
         Indicates if the model has been fit to training data.
 
     """
-    def __init__(self, data_handler, lag):
-        super().__init__("TimeSeriesSVM", data_handler, lag)
+    def __init__(self, data_handler, lags):
+        super().__init__("TimeSeriesSVM", data_handler, lags)
 
     def initialize(self, **kwargs):
         """Initializes the support vector machine model.
