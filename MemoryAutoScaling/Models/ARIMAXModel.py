@@ -55,7 +55,7 @@ class ARIMAXModel(MLModel):
         self._d = d
         self._q = q
 
-    def get_order(self):
+    def get_params(self):
         """Returns the order for the ARIMA component of the model.
 
         The order is the three element tuple `(p, d, q)` representing the

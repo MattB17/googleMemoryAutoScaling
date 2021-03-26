@@ -55,6 +55,20 @@ class TimeSeriesXGB(MLModel):
         self._estimators = estimators
         self._depth = depth
 
+    def get_params(self):
+        """Returns the parameters of the model.
+
+        The parameters of the model consists of a three element tuple which
+        gives the learning rate, number of estimators, and max depth.
+
+        Returns
+        -------
+        tuple
+            A 3-element tuple containing the model parameters.
+
+        """
+        return self._learning_rate, self._estimators, self._depth
+
     def initialize(self, **kwargs):
         """Initializes the XGBoost Regression model.
 

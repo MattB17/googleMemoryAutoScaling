@@ -49,7 +49,7 @@ class ARIMAModel:
         self._d = d
         self._q = q
 
-    def get_order(self):
+    def get_params(self):
         """Returns the order for the ARIMA model.
 
         The order is the three element tuple `(p, d, q)` representing
