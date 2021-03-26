@@ -18,6 +18,8 @@ class TimeSeriesSVM(MLModel):
         features to the model. That is, for any time series used as a feature
         to the model, the model will use the value of the time series lagged
         by the time points in `lags` when predicting for the target variable.
+    reg_val: float
+        A float specifying the degree of regularization for the model.
 
     Attributes
     ----------
@@ -31,10 +33,13 @@ class TimeSeriesSVM(MLModel):
         The underlying machine learning model being fit.
     _is_fit: bool
         Indicates if the model has been fit to training data.
+    _reg_val: float
+        The regularization parameter for the model.
 
     """
-    def __init__(self, data_handler, lags):
+    def __init__(self, data_handler, lags, reg_val):
         super().__init__("TimeSeriesSVM", data_handler, lags)
+        self._reg_val = reg_val
 
     def initialize(self, **kwargs):
         """Initializes the support vector machine model.

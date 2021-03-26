@@ -3,11 +3,16 @@ predict future time points for a time series.
 
 """
 from MemoryAutoScaling.Models import MLModel
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 
 
 class TimeSeriesRegression(MLModel):
     """A Linear Regression model for time series data.
+
+    The regression model uses L2-regularization to ensure no coefficients
+    are too large. This is used over L1-regularization becuase L1 tends to
+    drive alot of coefficients to zero, but the set of parameters is quite
+    small, so L2-regularization is used.
 
     Parameters
     ----------
@@ -18,6 +23,8 @@ class TimeSeriesRegression(MLModel):
         features to the model. That is, for any time series used as a feature
         to the model, the model will use the value of the time series lagged
         by the time points in `lags` when predicting for the target variable.
+    reg_val: float
+        A float specifying the degree of regularization for the model.
 
     Attributes
     ----------
@@ -31,10 +38,13 @@ class TimeSeriesRegression(MLModel):
         The underlying machine learning model being fit.
     _is_fit: bool
         Indicates if the model has been fit to training data.
+    _reg_val: float
+        The regularization parameter for the model.
 
     """
-    def __init__(self, data_handler, lags):
+    def __init__(self, data_handler, lags, reg_val):
         super().__init__("TimeSeriesRegression", data_handler, lags)
+        self._reg_val = reg_val
 
     def initialize(self, **kwargs):
         """Initializes the linear regression model.
@@ -50,7 +60,7 @@ class TimeSeriesRegression(MLModel):
 
         """
         super().initialize()
-        self._model = LinearRegression(**kwargs)
+        self._model = Ridge(alpha=self._reg_val, **kwargs)
 
     def get_train_and_test_predictions(self, train_features, test_features):
         """Retrieves predictions for the training and testing sets.
