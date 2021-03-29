@@ -92,7 +92,7 @@ class ARIMAXModel(MLModel):
         """
         model = SARIMAX(
             train_target, train_features,
-            order=self.get_order(), simple_differencing=False)
+            order=self.get_params(), simple_differencing=False)
         self._model = model.fit(disp=False)
         self._is_fit = True
 

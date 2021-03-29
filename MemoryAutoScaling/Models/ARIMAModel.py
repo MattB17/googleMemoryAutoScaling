@@ -98,7 +98,7 @@ class ARIMAModel:
 
         """
         model = SARIMAX(
-            train_trace, order=self.get_order(), simple_differencing=False)
+            train_trace, order=self.get_params(), simple_differencing=False)
         self._model = model.fit(disp=False)
 
     def get_predictions(self, test_trace):
@@ -159,7 +159,7 @@ class ARIMAModel:
         """Runs the model pipeline on `data_trace`.
 
         `data_trace` is first split into a training and testing set and then
-        the model pipeline is run on these sets..
+        the model pipeline is run on these sets.
 
         Parameters
         ----------
