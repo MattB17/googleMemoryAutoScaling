@@ -7,6 +7,7 @@ from itertools import product
 import matplotlib.pyplot as plt
 import statsmodels.tsa.api as smt
 from MemoryAutoScaling import specs
+from sklearn.metrics import mean_squared_error
 
 
 def setup_trace_plot(time_points, tick_interval, title):
@@ -33,6 +34,7 @@ def setup_trace_plot(time_points, tick_interval, title):
     plt.xlabel("Time")
     plt.title(title)
     plt.show()
+
 
 def plot_trace_and_prediction(actual, preds, title):
     """Plots `actual` and its predictions given by `preds`.
@@ -61,6 +63,7 @@ def plot_trace_and_prediction(actual, preds, title):
     plt.legend()
     tick_interval = len(actual) // 30
     setup_trace_plot(len(actual), tick_interval, title)
+
 
 def get_train_cutoff(data_trace, train_prop):
     """Calculates the index identifying the end of the training set.
@@ -118,6 +121,7 @@ def plot_autocorrelations_for_data(trace, trace_ax, acf_ax,
     smt.graphics.plot_acf(trace, lags=lags, ax=acf_ax)
     smt.graphics.plot_pacf(trace, lags=lags, ax=pacf_ax)
 
+
 def get_trace_stats(data_trace):
     """Calculates high-level summary statistics for `data_trace`.
 
@@ -143,6 +147,7 @@ def get_trace_stats(data_trace):
             "p25": np.percentile(data_trace, 25),
             "p75": np.percentile(data_trace, 75)}
 
+
 def perform_coin_toss(prob):
     """Performs a coin toss with probability `prob` of heads.
 
@@ -158,6 +163,7 @@ def perform_coin_toss(prob):
 
     """
     return np.random.binomial(1, prob)
+
 
 def get_cumulative_sum_of_trace(data_trace):
     """Computes the cumulative sum of `data_trace`.
@@ -186,6 +192,7 @@ def get_cumulative_sum_of_trace(data_trace):
     cumsum_trace[0] = 0
     return np.cumsum(cumsum_trace) + avg
 
+
 def impute_for_time_series(time_series, impute_val):
     """Performs imputation on `time_series` using `impute_val`.
 
@@ -209,6 +216,7 @@ def impute_for_time_series(time_series, impute_val):
     time_series[np.isnan(time_series)] = impute_val
     return time_series
 
+
 def get_differenced_trace(data_trace, diff_level):
     """Computes the result of differencing `data_trace` `diff_level` times.
 
@@ -229,6 +237,7 @@ def get_differenced_trace(data_trace, diff_level):
     """
     diff_ts = np.diff(data_trace, diff_level)
     return impute_for_time_series(diff_ts, 0)
+
 
 def extract_time_series_from_trace(trace_data, series_name):
     """Extracts the time series for `series_name` from `trace_data`.
@@ -252,6 +261,7 @@ def extract_time_series_from_trace(trace_data, series_name):
     """
     data_trace = trace_data[series_name].to_numpy()
     return impute_for_time_series(data_trace, 0)
+
 
 def output_time_series_list_to_file(time_series_list, output_file):
     """Writes `time_series_list` to `output_file`.
@@ -283,6 +293,7 @@ def output_time_series_list_to_file(time_series_list, output_file):
             ts_file.write(",".join(time_series))
             ts_file.write("\n")
 
+
 def get_trace_columns():
     """The columns in a trace dataframe.
 
@@ -295,6 +306,7 @@ def get_trace_columns():
     """
     return [specs.AVG_MEM_COL, specs.AVG_CPU_COL,
             specs.MAX_MEM_COL, specs.MAX_CPU_COL]
+
 
 def get_lagged_trace_columns(lags):
     """The column names for lagged data in a trace dataframe.
@@ -313,3 +325,56 @@ def get_lagged_trace_columns(lags):
     """
     return ["{0}_lag_{1}".format(col_name, lag) for lag, col_name
             in product(lags, get_trace_columns())]
+
+
+def calculate_train_and_test_mse(y_train, preds_train, y_test, preds_test):
+    """Calculates the mean squared error for the training and testing sets.
+
+    Parameters
+    ----------
+    y_train: np.array
+        A numpy array representing actual values of the target for the
+        training set.
+    preds_train: np.array
+        A numpy array representing predicted values of the target for the
+        training set.
+    y_test: np.array
+        A numpy array representing actual values of the target for the
+        testing set.
+    preds_test: np.array
+        A numpy array representing predicted values of the target for the
+        testing set.
+
+    Returns
+    -------
+    float, float
+        Two floats representing the mean squared errors for the training and
+        testing sets, respectively.
+
+    """
+    train_mse = mean_squared_error(y_train, preds_train)
+    test_mse = mean_squared_error(y_test, preds_test)
+    return train_mse, test_mse
+
+def plot_actual_vs_predicted_on_axis(actual, predicted, ax, ax_title):
+    """Plots `actual` vs `predicted` on `ax`.
+
+    Parameters
+    ----------
+    actual: np.array
+        A numpy array representing actual values.
+    predicted: np.array
+        A numpy array representing predicted values.
+    ax: plt.axis
+        A matplotlib axis on which the plot will be rendered.
+    ax_title: str
+        A string representing the title for the axis.
+
+    Returns
+    -------
+    None
+
+    """
+    ax.plot(actual, color="blue", linewidth=3)
+    ax.plot(predicted, color="red", linewidth=3)
+    ax.set_title(ax_title)

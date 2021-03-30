@@ -1,4 +1,4 @@
-"""The `ExponentialSmoothingModel` class is used to construct a predictive
+"""The `TraceExponentialSmoothing` class is used to construct a predictive
 model based on exponential smoothing. For exponential smoothing, the
 prediction at time `t` is `p_t = alpha * x_t-1 + (1 - alpha) * p_t-1` where
 `alpha` is a configurable weight constant between 0 and 1, `x_t-1` is the
@@ -8,11 +8,11 @@ predictions at times `t` and `t-1` respectively.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from MemoryAutoScaling.Models import TimeSeriesModel
+from MemoryAutoScaling.Models.Sequential import SequentialModel
 
 
-class ExponentialSmoothingModel(TimeSeriesModel):
-    """Builds an Exponential Smoothing Model.
+class TraceExponentialSmoothing(SequentialModel):
+    """Builds an Exponential Smoothing model for a data trace.
 
     Parameters
     ----------
@@ -59,70 +59,55 @@ class ExponentialSmoothingModel(TimeSeriesModel):
         """
         return (self._alpha * past_obs) + ((1 - self._alpha) * past_pred)
 
-    def get_all_predictions(self, data_trace):
-        """Calculates all predictions for `data_trace`.
+    def _get_predictions(self, trace_ts):
+        """Calculates all predictions for `trace_ts`.
 
-        For each time point in `data_trace` the exponential smoothing
-        prediction is calculated. The first prediction is `_start_pred` and
+        For each time point in `trace_ts` the exponential smoothing
+        prediction is calculated. The first prediction is `_initial_pred` and
         the second prediction is the first observation as no past data exists.
         All subsequent predictions are based on the exponential smoothing
         formula.
 
         Parameters
         ----------
-        data_trace: np.array
+        trace_ts: np.array
             A numpy array representing the data trace for which the
             exponential smoothing predictions are calculated.
 
         Returns
         -------
-        np.array
-            A numpy array that is the same length as `data_trace` and has
-            an exponential smoothing prediction for each time point of
-            `data_trace`.
+        np.array, np.array
+            Two numpy arrays that represent the predictions for `trace_ts`
+            on the training and testing sets, respectively.
 
         """
-        time_points = len(data_trace)
+        time_points = len(trace_ts)
         preds = np.array([self._initial_pred for _ in range(time_points)])
         if time_points >= 2:
-            preds[1] = data_trace[0]
+            preds[1] = trace_ts[0]
             for idx in range(2, time_points):
                 preds[idx] = self.get_next_prediction(
-                    data_trace[idx - 1], preds[idx - 1])
-        return preds
+                    trace_ts[idx - 1], preds[idx - 1])
+        return self.split_data(preds)
 
-    def plot_train_trace_and_prediction(self, data_trace):
-        """Plots `data_trace` and its prediction for the training set.
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
+
+        The plot is arranged into two subplots. The first contains the maximum
+        memory usage for the trace versus its prediction for the training set.
+        The second plot is the same but for the testing set.
 
         Parameters
         ----------
-        data_trace: np.array
-            A numpy array representing the data trace being plotted and for
-            which the predictions are calculated.
+        trace: Trace
+            The `Trace` being plotted.
 
         Returns
         -------
         None
 
         """
-        title = "Trace vs {} Exponential Smoothing Prediction - Train".format(
-            self._alpha)
-        super()._plot_train_trace_and_prediction(data_trace, title)
-
-    def plot_test_trace_and_prediction(self, data_trace):
-        """Plots `data_trace` and its prediction for the testing set.
-
-        Parameters
-        ----------
-        data_trace: np.array
-            A numpy array representing the data trace being plotted and for
-            which the predictions are calculated.
-
-        Returns
-        -------
-        None
-
-        """
-        title = "Trace vs {} Exponential Smoothing Prediction - Test".format(
-            self._alpha)
-        super()._plot_test_trace_and_prediction(data_trace, title)
+        trace_ts = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs {1}-Exponential Smoothing Prediction".format(
+            trace.get_trace_id(), self._alpha)
+        self._plot_time_series_vs_prediction(trace_ts, title)

@@ -4,11 +4,11 @@ based on a moving average.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from MemoryAutoScaling.Models import TimeSeriesModel
+from MemoryAutoScaling.Models.Sequential import SequentialModel
 
 
-class MovingAverageModel(TimeSeriesModel):
-    """Builds a Moving Average Model.
+class TraceMovingAverage(SequentialModel):
+    """Builds a Moving Average Model for a data trace.
 
     Parameters
     ----------
@@ -55,64 +55,50 @@ class MovingAverageModel(TimeSeriesModel):
             return np.average(data_trace)
         return np.average(data_trace[-1 * (self._window_length):])
 
-    def get_all_predictions(self, data_trace):
-        """Calculates all moving average prediction traces for `data_trace`.
+    def _get_predictions(self, trace_ts):
+        """Calculates all moving average prediction traces for `trace_ts`.
 
-        For each time point in `data_trace`, the moving average prediction
+        For each time point in `trace_ts`, the moving average prediction
         is calculated. For the first time point, the prediction is
-        `_start_pred` as there is no data on which the prediction can
+        `_initial_pred` as there is no data on which the prediction can
         be based.
 
         Parameters
         ----------
-        data_trace: np.array
+        trace_ts: np.array
             A numpy array representing the data trace for which the
             predictions are calculated.
 
         Returns
         -------
-        np.array
-            A numpy array that is the same length as `data_trace` and contains
-            the moving average predictions for data_trace.
+        np.array, np.array
+            Two numpy arrays that represent the predictions for `trace_ts`
+            on the training and testing sets, respectively.
 
         """
         preds = np.array([self._initial_pred for _ in range(len(data_trace))])
         for idx in range(1, len(data_trace)):
             preds[idx] = self.get_next_prediction(data_trace[:idx])
-        return preds
+        return self.split_data(preds)
 
-    def plot_train_trace_and_prediction(self, data_trace):
-        """Plots `data_trace` and its moving average for the training set.
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
+
+        The plot is arranged into two subplots. The first contains the maximum
+        memory usage for the trace versus its prediction for the training set.
+        The second plot is the same but for the testing set.
 
         Parameters
         ----------
-        data_trace: np.array
-            A numpy array representing the data trace being plotted and for
-            which the predictions are calculated.
+        trace: Trace
+            The `Trace` being plotted.
 
         Returns
         -------
         None
 
         """
-        title = "Trace vs Moving Average {} Prediction - Train".format(
-            self._window_length)
-        super()._plot_train_trace_and_prediction(data_trace, title)
-
-    def plot_test_trace_and_prediction(self, data_trace):
-        """Plots `data_trace` and its moving average for the testing set.
-
-        Parameters
-        ----------
-        data_trace: np.array
-            A numpy array representing the data trace being plotted and for
-            which the predictions are calculated.
-
-        Returns
-        -------
-        None
-
-        """
-        title = "Trace vs Moving Average {} Prediction - Test".format(
-            self._window_length)
-        super()._plot_test_trace_and_prediction(data_trace, title)
+        trace_ts = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs Moving Average {1} Prediction".format(
+            trace.get_trace_id(), self._window_length)
+        self._plot_time_series_vs_prediction(trace_ts, title)
