@@ -49,7 +49,7 @@ class SequentialModel(TraceModel):
             the train-test split.
 
         """
-        train_cutoff = self.get_train_cutoff(model_data, self._train_prop)
+        train_cutoff = utils.get_train_cutoff(model_data, self._train_prop)
         return model_data[:train_cutoff], model_data[train_cutoff:]
 
     def get_model_data_for_trace(self, trace):

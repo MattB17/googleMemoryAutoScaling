@@ -4,15 +4,8 @@ smoothing models are built based on the different alpha values specified by
 `ALPHAS`
 
 """
-import os
-import sys
-import numpy as np
-import pandas as pd
-import multiprocessing as mp
-from itertools import product
 from MemoryAutoScaling import utils, analysis
-from MemoryAutoScaling.Models import ExponentialSmoothingModel
-from MemoryAutoScaling.DataHandling import TraceHandler
+from MemoryAutoScaling.Models.Sequential import TraceExponentialSmoothing
 
 
 ALPHAS = [0.1, 0.3, 0.5, 0.7, 0.9]
@@ -24,7 +17,7 @@ def build_es_models_for_traces(trace_lst, results_lst, train_prop):
                       'train_prop': train_prop}
                      for alpha_val in ALPHAS]
     analysis.model_traces_and_evaluate(
-        ExponentialSmoothingModel, es_params_lst, trace_lst, results_lst)
+        TraceExponentialSmoothing, es_params_lst, trace_lst, results_lst)
 
 
 if __name__ == "__main__":

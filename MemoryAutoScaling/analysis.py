@@ -204,8 +204,7 @@ def get_model_stats_for_trace(data_trace, models):
     """
     trace_stats = [data_trace.get_trace_id()]
     for model in models:
-        train_mse, test_mse = model.calculate_train_and_test_mse(
-            data_trace.get_maximum_memory_time_series())
+        train_mse, test_mse = model.run_model_pipeline_for_trace(data_trace)
         trace_stats.extend([train_mse, test_mse])
     return trace_stats
 

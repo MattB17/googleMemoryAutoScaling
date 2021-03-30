@@ -76,9 +76,9 @@ class TraceMovingAverage(SequentialModel):
             on the training and testing sets, respectively.
 
         """
-        preds = np.array([self._initial_pred for _ in range(len(data_trace))])
-        for idx in range(1, len(data_trace)):
-            preds[idx] = self.get_next_prediction(data_trace[:idx])
+        preds = np.array([self._initial_pred for _ in range(len(trace_ts))])
+        for idx in range(1, len(trace_ts)):
+            preds[idx] = self.get_next_prediction(trace_ts[:idx])
         return self.split_data(preds)
 
     def plot_trace_vs_prediction(self, trace):
