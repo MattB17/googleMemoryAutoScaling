@@ -191,7 +191,7 @@ class MLModel(TraceModel):
 
         """
         if self._is_fit:
-            return self._model.predict(test_features)
+            return self._model.predict(input_features)
 
 
     def _run_model_pipeline(self, train_features, train_target,

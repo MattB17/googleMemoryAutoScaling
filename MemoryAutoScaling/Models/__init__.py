@@ -1,3 +1,1 @@
 from MemoryAutoScaling.Models.TraceModel import TraceModel
-from MemoryAutoScaling.Models.ARIMAModel import ARIMAModel
-from MemoryAutoScaling.Models.ARIMAXModel import ARIMAXModel

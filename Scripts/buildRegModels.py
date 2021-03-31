@@ -3,7 +3,7 @@ performance on the training and testing sets.
 
 """
 from MemoryAutoScaling import analysis, specs, utils
-from MemoryAutoScaling.Models import TimeSeriesRegression
+from MemoryAutoScaling.Models.ML import TraceRegression
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 LAGS = [2, 3, 4]
@@ -17,8 +17,8 @@ def build_reg_models_for_traces(trace_lst, results_lst, train_prop):
     reg_params_lst = [{"data_handler": data_handler,
                        'lags': LAGS, 'reg_val': reg_val}
                        for reg_val in REG_VALS]
-    analysis.build_and_evaluate_ml_models(
-        TimeSeriesRegression, reg_params_lst, trace_lst, results_lst)
+    analysis.model_traces_and_evaluate(
+        TraceRegression, reg_params_lst, trace_lst, results_lst)
 
 
 if __name__ == "__main__":

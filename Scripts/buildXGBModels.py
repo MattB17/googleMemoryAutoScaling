@@ -4,7 +4,7 @@ performance on the training and testing sets.
 """
 from itertools import product
 from MemoryAutoScaling import analysis, specs, utils
-from MemoryAutoScaling.Models import TimeSeriesXGB
+from MemoryAutoScaling.Models.ML import TraceXGB
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 LAGS = [2, 3, 4]
@@ -25,7 +25,7 @@ def build_xgb_models_for_traces(trace_lst, results_lst, train_prop):
                       for learning_rate, n_estimators, depth
                       in product(LEARNING_RATES, ESTIMATORS, DEPTHS)]
     analysis.get_best_model_results_for_traces(
-        TimeSeriesXGB, xgb_params_lst, trace_lst, results_lst, 5)
+        TraceXGB, xgb_params_lst, trace_lst, results_lst, 5)
 
 
 if __name__ == "__main__":

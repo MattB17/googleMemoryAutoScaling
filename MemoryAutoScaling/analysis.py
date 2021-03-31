@@ -526,7 +526,7 @@ def handle_stats_for_model(trace, model, trace_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    _, train_mse, test_mse = model.run_model_pipeline_for_trace(trace)
+    train_mse, test_mse = model.run_model_pipeline_for_trace(trace)
     trace_results = update_with_model_results(
         trace_results, model.get_params(), train_mse, test_mse, cutoff)
     return truncate_list(trace_results, cutoff)
@@ -656,61 +656,3 @@ def get_best_model_results_for_traces(model, model_params,
     for trace in traces:
         result_lst.append(
             get_best_models_for_trace(trace, models, models_count))
-
-def get_ml_model_stats_for_trace(data_trace, models):
-    """Gets statistics from `models` for `data_trace`.
-
-    For each model in `models`, the model is fit to `data_trace` and
-    the mean squared error on the test set is computed.
-
-    Parameters
-    ----------
-    data_trace: Trace
-        A `Trace` representing the data trace from which the statistics
-        will be calculated.
-    models: list
-        A list of `TimeSeriesModel` objects that will be fit to `data_trace`.
-
-    Returns
-    -------
-    list
-        A list containing the ID of `data_trace` followed by the mean squared
-        error on the training and test set, respectively, for each model in
-        `models`.
-
-    """
-    trace_stats = [data_trace.get_trace_id()]
-    for model in models:
-        _, train_mse, test_mse = model.run_model_pipeline_for_trace(data_trace)
-        trace_stats.extend([train_mse, test_mse])
-    return trace_stats
-
-def build_and_evaluate_ml_models(model, model_params, traces, results_lst):
-    """Fits `model` to `traces` and evaluates the performance.
-
-    A separate `model` is built for each parameter set in `model_params` and
-    fit to the `Trace` objects in `traces`. The models are then evaluated, and
-    the results are saved in `results_lst`.
-
-    Parameters
-    ----------
-    model: TimeSeriesModel.class
-        A `TimeSeriesModel` class reference specifying the type of model to
-        be built.
-    model_params: list
-        A list of dictionaries where each dictionary corresponds to the set
-        of parameters to build a model of type `model`.
-    traces: list
-        A list of `Trace` objects specifying the traces to be modelled.
-    results_lst: mp.Manager.list
-        A multiprocessor list representing the list to which model results are
-        saved.
-
-    Returns
-    -------
-    None
-
-    """
-    models = build_models_from_params_list(model, model_params)
-    for trace in traces:
-        results_lst.append(get_ml_model_stats_for_trace(trace, models))

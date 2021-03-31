@@ -72,5 +72,5 @@ class TraceRegression(MLModel):
         None
 
         """
-        super().initialize()
+        super()._initialize()
         self._model = Ridge(alpha=self._reg_val)

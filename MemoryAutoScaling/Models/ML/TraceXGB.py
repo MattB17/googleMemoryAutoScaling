@@ -95,7 +95,7 @@ class TraceXGB(MLModel):
         None
 
         """
-        super().initialize()
+        super()._initialize()
         self._model = XGBRegressor(learning_rate=self._learning_rate,
                                    max_depth=self._depth,
                                    n_estimators=self._estimators,

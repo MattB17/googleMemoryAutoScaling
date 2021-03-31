@@ -67,5 +67,5 @@ class TraceSVM(MLModel):
         None
 
         """
-        super().initialize()
+        super()._initialize()
         self._model = SVR(C=self._reg_val)
