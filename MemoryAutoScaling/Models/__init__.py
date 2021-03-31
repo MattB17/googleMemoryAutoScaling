@@ -1,7 +1,3 @@
 from MemoryAutoScaling.Models.TraceModel import TraceModel
-from MemoryAutoScaling.Models.MLModel import MLModel
-from MemoryAutoScaling.Models.TimeSeriesRegression import TimeSeriesRegression
-from MemoryAutoScaling.Models.TimeSeriesSVM import TimeSeriesSVM
-from MemoryAutoScaling.Models.TimeSeriesXGB import TimeSeriesXGB
 from MemoryAutoScaling.Models.ARIMAModel import ARIMAModel
 from MemoryAutoScaling.Models.ARIMAXModel import ARIMAXModel

@@ -1,15 +1,15 @@
-"""The `TimeSeriesXGB` class builds an additive regression model using
-`xgboost`. This additive regression model recursively builds small regression
-models, in which the current regression model puts more weight on observations
-for which the previous models are bad at predicting. These simple regression
-models are then added together.
+"""The `TraceXGB` class builds an additive regression model using `xgboost`.
+This additive regression model recursively builds small regression models, in
+which the current regression model puts more weight on observations for which
+the previous models are bad at predicting. These simple regression models are
+then added together.
 
 """
-from MemoryAutoScaling.Models import MLModel
+from MemoryAutoScaling.Models.ML import MLModel
 from xgboost import XGBRegressor
 
 
-class TimeSeriesXGB(MLModel):
+class TraceXGB(MLModel):
     """An XGBoost model for time series data.
 
     Parameters
@@ -69,13 +69,26 @@ class TimeSeriesXGB(MLModel):
         """
         return self._learning_rate, self._estimators, self._depth
 
-    def initialize(self, **kwargs):
-        """Initializes the XGBoost Regression model.
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
 
         Parameters
         ----------
-        kwargs: dict
-            Arbitrary keyword arguments used in initialization.
+        trace: Trace
+            The `Trace` being plotted
+
+        Returns
+        -------
+        None
+
+        """
+        trace_df = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs {1}-XGB Regression Predictions".format(
+            trace.get_trace_id(), self.get_params())
+        self._plot_trace_data_vs_predictions(trace_df, title)
+
+    def _initialize(self):
+        """Initializes the XGBoost Regression model.
 
         Returns
         -------
@@ -86,28 +99,4 @@ class TimeSeriesXGB(MLModel):
         self._model = XGBRegressor(learning_rate=self._learning_rate,
                                    max_depth=self._depth,
                                    n_estimators=self._estimators,
-                                   objective='reg:squarederror',
-                                   **kwargs)
-
-    def get_train_and_test_predictions(self, train_features, test_features):
-        """Retrieves predictions for the training and testing sets.
-
-        Parameters
-        ----------
-        train_features: pd.DataFrame
-            A pandas DataFrame representing the values for the features of the
-            training set.
-        test_features: pd.DataFrame
-            A pandas DataFrame representing the values for the features of the
-            testing set.
-
-        Returns
-        -------
-        np.array, np.array
-            Two numpy arrays representing the predictions for the training and
-            testing sets, respectively.
-
-        """
-        train_preds = self.get_predictions(train_features)
-        test_preds = self.get_predictions(test_features)
-        return train_preds, test_preds
+                                   objective='reg:squarederror')

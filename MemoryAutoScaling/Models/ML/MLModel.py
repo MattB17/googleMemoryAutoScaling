@@ -145,6 +145,7 @@ class MLModel(TraceModel):
         """
         return self._model is not None
 
+    @abstractmethod
     def _initialize(self):
         """Initializes the model.
 
@@ -229,7 +230,7 @@ class MLModel(TraceModel):
         return utils.calculate_train_and_test_mse(
             train_target, train_preds, test_target, test_preds)
 
-    def _plot_trace_vs_prediction(self, trace_df, title):
+    def _plot_trace_data_vs_predictions(self, trace_df, title):
         """Plots the target time series of `trace_df` vs its model prediction.
 
         The plot of the time series vs its predictions is divided into two

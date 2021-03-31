@@ -46,6 +46,24 @@ class TraceRegression(MLModel):
         super().__init__("TimeSeriesRegression", data_handler, lags)
         self._reg_val = reg_val
 
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` being plotted.
+
+        Returns
+        -------
+        None
+
+        """
+        trace_df = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs {1}-Ridge Regression Predictions".format(
+            trace.get_trace_id(), self._reg_val)
+        self._plot_trace_data_vs_predictions(trace_df, title)
+
     def _initialize(self):
         """Initializes the linear regression model.
 
@@ -56,27 +74,3 @@ class TraceRegression(MLModel):
         """
         super().initialize()
         self._model = Ridge(alpha=self._reg_val)
-
-    def get_train_and_test_predictions(self, train_features, test_features):
-        """Retrieves predictions for the training and testing sets.
-
-        Parameters
-        ----------
-        train_features: pd.DataFrame
-            A pandas DataFrame representing the values for the features of the
-            training set.
-        test_features: pd.DataFrame
-            A pandas DataFrame representing the values for the features of the
-            testing set.
-
-        Returns
-        -------
-        np.array, np.array
-            Two numpy arrays representing the predictions for the training and
-            testing sets respectively.
-
-
-        """
-        train_preds = self.get_predictions(train_features)
-        test_preds = self.get_predictions(test_features)
-        return train_preds, test_preds
