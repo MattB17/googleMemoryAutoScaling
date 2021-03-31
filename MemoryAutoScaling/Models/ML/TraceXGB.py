@@ -50,7 +50,7 @@ class TraceXGB(MLModel):
 
     """
     def __init__(self, data_handler, lags, learning_rate, estimators, depth):
-        super().__init__("TimeSeriesXGB", data_handler, lags)
+        super().__init__("TraceXGB", data_handler, lags)
         self._learning_rate = learning_rate
         self._estimators = estimators
         self._depth = depth
@@ -69,23 +69,16 @@ class TraceXGB(MLModel):
         """
         return self._learning_rate, self._estimators, self._depth
 
-    def plot_trace_vs_prediction(self, trace):
-        """Creates a plot of `trace` vs its predictions.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` being plotted
+    def get_model_title(self):
+        """A title describing the model.
 
         Returns
         -------
-        None
+        str
+            A string representing the title for the model.
 
         """
-        trace_df = self.get_model_data_for_trace(trace)
-        title = "Trace {0} vs {1}-XGB Regression Predictions".format(
-            trace.get_trace_id(), self.get_params())
-        self._plot_trace_data_vs_predictions(trace_df, title)
+        return "{0}-{1}".format(self.get_params(), self._model_name)
 
     def _initialize(self):
         """Initializes the XGBoost Regression model.

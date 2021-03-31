@@ -134,6 +134,24 @@ class MLModel(TraceModel):
         return self._run_model_pipeline(
             X_train, y_train, X_test, y_test)
 
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` being plotted.
+
+        Returns
+        -------
+        None
+
+        """
+        trace_df = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs {1} Predictions".format(
+            trace.get_trace_id(), self.get_model_title())
+        self._plot_trace_data_vs_predictions(trace_df, title)
+
     def _is_initialized(self):
         """Indicates if the model has been initialized.
 

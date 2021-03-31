@@ -36,6 +36,17 @@ class TraceMovingAverage(SequentialModel):
         self._window_length = window_length
         super().__init__(initial_pred, train_prop)
 
+    def get_model_title(self):
+        """A title describing the model.
+
+        Returns
+        -------
+        str
+            A string representing the title for the model.
+
+        """
+        return "{}-MovingAverage".format(self._window_length)
+
     def get_next_prediction(self, data_trace):
         """Calculates the next prediction for `data_trace`.
 

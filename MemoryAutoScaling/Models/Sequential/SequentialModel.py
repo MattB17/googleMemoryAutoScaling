@@ -113,6 +113,28 @@ class SequentialModel(TraceModel):
         return utils.calculate_train_and_test_mse(
             y_train, preds_train, y_test, preds_test)
 
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
+
+        The plot is arranged into two subplots. The first contains the maximum
+        memory usage for the trace versus its prediction for the training set.
+        The second plot is the same but for the testing set.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` being plotted.
+
+        Returns
+        -------
+        None
+
+        """
+        trace_ts = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs {1} Predictions".format(
+            trace.get_trace_id(), self.get_model_title())
+        self._plot_time_series_vs_prediction(trace_ts, title)
+
     @abstractmethod
     def _get_predictions(self, trace_ts):
         """Gets predictions for the training and testing set for `trace_ts`.

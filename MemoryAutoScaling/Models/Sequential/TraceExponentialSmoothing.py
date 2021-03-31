@@ -40,6 +40,17 @@ class TraceExponentialSmoothing(SequentialModel):
         self._alpha = alpha
         super().__init__(initial_pred, train_prop)
 
+    def get_model_title(self):
+        """A title describing the model.
+
+        Returns
+        -------
+        str
+            A string representing the title for the model.
+
+        """
+        return "{}-ExponentialSmoothing".format(self._alpha)
+
     def get_next_prediction(self, past_obs, past_pred):
         """Calculates the current exponential smoothing model prediction.
 
@@ -89,25 +100,3 @@ class TraceExponentialSmoothing(SequentialModel):
                 preds[idx] = self.get_next_prediction(
                     trace_ts[idx - 1], preds[idx - 1])
         return self.split_data(preds)
-
-    def plot_trace_vs_prediction(self, trace):
-        """Creates a plot of `trace` vs its predictions.
-
-        The plot is arranged into two subplots. The first contains the maximum
-        memory usage for the trace versus its prediction for the training set.
-        The second plot is the same but for the testing set.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` being plotted.
-
-        Returns
-        -------
-        None
-
-        """
-        trace_ts = self.get_model_data_for_trace(trace)
-        title = "Trace {0} vs {1}-Exponential Smoothing Prediction".format(
-            trace.get_trace_id(), self._alpha)
-        self._plot_time_series_vs_prediction(trace_ts, title)

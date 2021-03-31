@@ -43,26 +43,19 @@ class TraceRegression(MLModel):
 
     """
     def __init__(self, data_handler, lags, reg_val):
-        super().__init__("TimeSeriesRegression", data_handler, lags)
+        super().__init__("TraceRegression", data_handler, lags)
         self._reg_val = reg_val
 
-    def plot_trace_vs_prediction(self, trace):
-        """Creates a plot of `trace` vs its predictions.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` being plotted.
+    def get_model_title(self):
+        """A title describing the model.
 
         Returns
         -------
-        None
+        str
+            A string representing the title for the model.
 
         """
-        trace_df = self.get_model_data_for_trace(trace)
-        title = "Trace {0} vs {1}-Ridge Regression Predictions".format(
-            trace.get_trace_id(), self._reg_val)
-        self._plot_trace_data_vs_predictions(trace_df, title)
+        return "{0}-{1}".format(self._reg_val, self._model_name)
 
     def _initialize(self):
         """Initializes the linear regression model.

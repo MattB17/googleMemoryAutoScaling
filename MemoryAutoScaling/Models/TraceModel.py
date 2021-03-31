@@ -16,6 +16,18 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
+    def get_model_title(self):
+        """A title describing the model.
+
+        Returns
+        -------
+        str
+            A string representing the title for the model.
+
+        """
+        pass
+
+    @abstractmethod
     def split_data(self, model_data):
         """Splits `model_data` into the training and testing set.
 
