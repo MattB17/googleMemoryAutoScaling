@@ -1,13 +1,13 @@
-"""The `TimeSeriesRegression` class builds a linear regression model to
+"""The `TraceRegression` class builds a linear regression model to
 predict future time points for a time series.
 
 """
-from MemoryAutoScaling.Models import MLModel
+from MemoryAutoScaling.Models.ML import MLModel
 from sklearn.linear_model import Ridge
 
 
-class TimeSeriesRegression(MLModel):
-    """A Linear Regression model for time series data.
+class TraceRegression(MLModel):
+    """A Linear Regression model for trace data.
 
     The regression model uses L2-regularization to ensure no coefficients
     are too large. This is used over L1-regularization becuase L1 tends to
@@ -46,13 +46,8 @@ class TimeSeriesRegression(MLModel):
         super().__init__("TimeSeriesRegression", data_handler, lags)
         self._reg_val = reg_val
 
-    def initialize(self, **kwargs):
+    def _initialize(self):
         """Initializes the linear regression model.
-
-        Parameters
-        ----------
-        kwargs: dict
-            Arbitrary keyword arguments used in initialization.
 
         Returns
         -------
@@ -60,7 +55,7 @@ class TimeSeriesRegression(MLModel):
 
         """
         super().initialize()
-        self._model = Ridge(alpha=self._reg_val, **kwargs)
+        self._model = Ridge(alpha=self._reg_val)
 
     def get_train_and_test_predictions(self, train_features, test_features):
         """Retrieves predictions for the training and testing sets.

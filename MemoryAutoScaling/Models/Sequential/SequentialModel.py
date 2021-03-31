@@ -3,7 +3,7 @@ models that predict sequentially. That is, these models use previous values
 to predict the current value but do not store any state.
 
 """
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from MemoryAutoScaling import utils
 from MemoryAutoScaling.Models import TraceModel
 
@@ -31,7 +31,7 @@ class SequentialModel(TraceModel):
     """
     def __init__(self, initial_pred, train_prop=0.7):
         self._initial_pred = initial_pred
-        super().__init__(train_prop)
+        self._train_prop = train_prop
 
     def split_data(self, model_data):
         """Splits `model_data` into the training and testing set.
@@ -153,8 +153,5 @@ class SequentialModel(TraceModel):
         fig, (ax1, ax2) = plt.subplots(2)
         y_train, y_test = self.split_data(time_series)
         preds_train, preds_test = self._get_predictions(time_series)
-        utils.plot_actual_vs_predicted_on_axis(
-            y_train, preds_train, ax1, "{} Training Set".format(title))
-        utils.plot_actual_vs_predicted_on_axis(
-            y_test, preds_test, ax2, "{} Testing Set".format(title))
-        plt.show()
+        utils.plot_train_and_test_predictions_on_axes(
+            y_train, preds_train, y_test, preds_test, (ax1, ax2), title)

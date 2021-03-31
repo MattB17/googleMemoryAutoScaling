@@ -378,3 +378,36 @@ def plot_actual_vs_predicted_on_axis(actual, predicted, ax, ax_title):
     ax.plot(actual, color="blue", linewidth=3)
     ax.plot(predicted, color="red", linewidth=3)
     ax.set_title(ax_title)
+
+def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
+                                            preds_test, axes, title):
+    """Plots actual values vs predicted values on the axes given by `axes`.
+
+    The actual vs predicted values are plotted for both the training and
+    testing sets on the different axes of `axes`.
+
+    Parameters
+    ----------
+    y_train: np.array
+        A numpy array containing the actual observations for the training set.
+    preds_train: np.array
+        A numpy array containing the predictions for the training set.
+    y_test: np.array
+        A numpy array containing the actual observations for the testing set.
+    preds_test: np.array
+        A numpy array containing the predictions for the testing set.
+    axes: tuple
+        A tuple containing the axes on which the plots will be rendered.
+    title: str
+        A string representing the title used for the plots.
+
+    Returns
+    -------
+    None
+
+    """
+    plot_actual_vs_predicted_on_axis(
+        y_train, preds_train, axes[0], "{} Training Set".format(title))
+    plot_actual_vs_predicted_on_axis(
+        y_test, preds_test, axes[1], "{} Testing Set".format(title))
+    plt.show()

@@ -11,24 +11,9 @@ from sklearn.metrics import mean_squared_error
 class TraceModel(ABC):
     """Implements the functionality of a generic trace model.
 
-    Parameters
-    ----------
-    initial_pred: float
-        A float representing an initial prediction used for a new time series.
-    train_prop: float
-        A float in the range [0, 1] representing the proportion of
-        observations in the training set. The default value is 0.7.
-
-    Attributes
-    ----------
-    _initial_pred: float
-        Represents the initial prediction used for a new time series.
-    _train_prop: float
-        Represents the percent of data in the training set.
-
     """
-    def __init__(self, train_prop=0.7):
-        self._train_prop = train_prop
+    def __init__(self):
+        pass
 
     @abstractmethod
     def split_data(self, model_data):
