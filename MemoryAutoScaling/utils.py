@@ -412,31 +412,33 @@ def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
         y_test, preds_test, axes[1], "{} Testing Set".format(title))
     plt.show()
 
-def get_count_and_max(arr):
-    """Gets the count and maximum value of arr.
+def get_under_pred_vals(under_preds, pred_count):
+    """Gets the proportion and maximum value of `under_preds`.
 
     Parameters
     ----------
-    arr: collection
-        A collection of floats for which the count and maximum value are
-        obtained.
+    under_preds: np.array
+        A numpy array containing the under predictions.
+    pred_count: int
+        An integer representing the number of predictions
 
     Returns
     -------
-    int, float
-        An integer representing the number of records in `arr` and a float
-        representing the maximum record in `arr`.
+    float, float
+        A float representing the proportion of predictions that were under
+        predictions and a float representing the magnitude of the maximum
+        under prediction.
 
     """
-    count = len(arr)
+    count = len(under_preds)
     if count == 0:
-        return 0, np.nan
-    return count, max(arr)
+        return 0.0, np.nan
+    return (count / pred_count), max(under_preds)
 
 def get_under_prediction_stats(actuals, predicteds):
     """Retrieves statistics of under predictions of predicteds vs actuals.
 
-    The number of mispredictions and the maximum misprediction are calculated.
+    The proportion and maximum of under predictions are calculated.
 
     Parameters
     ----------
@@ -447,16 +449,16 @@ def get_under_prediction_stats(actuals, predicteds):
 
     Returns
     -------
-    int, float
-        An integer representing the number of under predictions for the
-        prediction period and a float representing the magnitude of the
-        maximum under prediction.
+    float, float
+        A float representing the proportion of predictions that were under
+        predictions and a float representing the magnitude of the maximum
+        under prediction.
 
     """
     under_preds = np.array([actuals[i] - predicteds[i]
                             for i in range(len(actuals))
                             if actuals[i] > predicteds[i]])
-    return get_count_and_max(under_preds)
+    return get_under_pred_vals(under_preds, len(predicteds))
 
 def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     """Calculates the evaluation metrics for the training and testing sets.
@@ -483,10 +485,10 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
 
     Returns
     -------
-    float, float, int, float
+    float, float, float, float
         Two floats representing the mean squared error for the training and
-        testing sets, respectively. In addition, an integer and float are
-        returned representing the number of under predictions and the
+        testing sets, respectively. In addition, two more floats are
+        returned representing the proportion of under predictions and the
         magnitude of the maximum under prediction, respectively.
 
     """

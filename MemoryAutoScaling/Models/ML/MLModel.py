@@ -126,10 +126,10 @@ class MLModel(TraceModel):
 
         Returns
         -------
-        float, float, int, float
+        float, float, float, float
             Two floats representing the mean squared error for the training and
-            testing sets, respectively. In addition, an integer and float are
-            returned representing the number of under predictions and the
+            testing sets, respectively. In addition, two more floats are
+            returned representing the proportion of under predictions and the
             magnitude of the maximum under prediction, respectively.
 
         """
@@ -240,10 +240,10 @@ class MLModel(TraceModel):
 
         Returns
         -------
-        float, float, int, float
+        float, float, float, float
             Two floats representing the mean squared error for the training and
-            testing sets, respectively. In addition, an integer and float are
-            returned representing the number of under predictions and the
+            testing sets, respectively. In addition, two more floats are
+            returned representing the proportion of under predictions and the
             magnitude of the maximum under prediction, respectively.
 
         """
