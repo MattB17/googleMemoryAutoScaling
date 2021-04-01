@@ -13,7 +13,7 @@ ALPHAS = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 def build_es_models_for_traces(trace_lst, results_lst, train_prop):
     es_params_lst = [{'alpha': alpha_val,
-                      'initial_pred': 0,
+                      'initial_pred': 0.001,
                       'train_prop': train_prop}
                      for alpha_val in ALPHAS]
     analysis.model_traces_and_evaluate(
@@ -21,10 +21,5 @@ def build_es_models_for_traces(trace_lst, results_lst, train_prop):
 
 
 if __name__ == "__main__":
-    traces, output_dir, train_prop = analysis.get_model_build_input_params()
-    es_results = analysis.perform_trace_modelling(
-        traces, build_es_models_for_traces, train_prop)
-    es_cols = analysis.get_col_list_for_params(
-        ALPHAS, "es", ["train_mse", "test_mse"])
-    analysis.output_model_results(
-        es_results, ["id"] + es_cols, output_dir, "es_results")
+    analysis.run_models_for_all_traces(
+        build_es_models_for_traces, ALPHAS, "es")

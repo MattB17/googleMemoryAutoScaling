@@ -411,3 +411,87 @@ def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
     plot_actual_vs_predicted_on_axis(
         y_test, preds_test, axes[1], "{} Testing Set".format(title))
     plt.show()
+
+def get_count_and_max(arr):
+    """Gets the count and maximum value of arr.
+
+    Parameters
+    ----------
+    arr: collection
+        A collection of floats for which the count and maximum value are
+        obtained.
+
+    Returns
+    -------
+    int, float
+        An integer representing the number of records in `arr` and a float
+        representing the maximum record in `arr`.
+
+    """
+    count = len(arr)
+    if count == 0:
+        return 0, np.nan
+    return count, max(arr)
+
+def get_under_prediction_stats(actuals, predicteds):
+    """Retrieves statistics of under predictions of predicteds vs actuals.
+
+    The number of mispredictions and the maximum misprediction are calculated.
+
+    Parameters
+    ----------
+    actuals: np.array
+        A numpy array representing the actual values.
+    predicteds: np.array
+        A numpy array representing the actual values.
+
+    Returns
+    -------
+    int, float
+        An integer representing the number of under predictions for the
+        prediction period and a float representing the magnitude of the
+        maximum under prediction.
+
+    """
+    under_preds = np.array([actuals[i] - predicteds[i]
+                            for i in range(len(actuals))
+                            if actuals[i] > predicteds[i]])
+    return get_count_and_max(under_preds)
+
+def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
+    """Calculates the evaluation metrics for the training and testing sets.
+
+    The evaluation metrics consist of the mean squared error for the training
+    set, the mean squared error for the testing set, the number of under
+    predictions for the testing set, and the magnitude of the maximum under
+    prediction for the testing set.
+
+    Parameters
+    ----------
+    y_train: np.array
+        A numpy array representing actual values of the target for the
+        training set.
+    preds_train: np.array
+        A numpy array representing predicted values of the target for the
+        training set.
+    y_test: np.array
+        A numpy array representing actual values of the target for the
+        testing set.
+    preds_test: np.array
+        A numpy array representing predicted values of the target for the
+        testing set.
+
+    Returns
+    -------
+    float, float, int, float
+        Two floats representing the mean squared error for the training and
+        testing sets, respectively. In addition, an integer and float are
+        returned representing the number of under predictions and the
+        magnitude of the maximum under prediction, respectively.
+
+    """
+    train_mse, test_mse = calculate_train_and_test_mse(
+        y_train, preds_train, y_test, preds_test)
+    num_under_preds, max_under_pred = get_under_prediction_stats(
+        list(y_test), preds_test)
+    return train_mse, test_mse, num_under_preds, max_under_pred

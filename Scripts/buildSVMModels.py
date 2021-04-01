@@ -22,10 +22,5 @@ def build_svm_models_for_traces(trace_lst, results_lst, train_prop):
 
 
 if __name__ == "__main__":
-    traces, output_dir, train_prop = analysis.get_model_build_input_params()
-    svm_results = analysis.perform_trace_modelling(
-        traces, build_svm_models_for_traces, train_prop)
-    svm_cols = analysis.get_col_list_for_params(
-        REG_VALS, "svm", ["train_mse", "test_mse"])
-    analysis.output_model_results(
-        svm_results, ["id"] + svm_cols, output_dir, "svm_results")
+    analysis.run_models_for_all_traces(
+        build_svm_models_for_traces, REG_VALS, "svm")

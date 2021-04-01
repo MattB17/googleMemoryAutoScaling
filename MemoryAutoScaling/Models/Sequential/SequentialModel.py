@@ -94,6 +94,8 @@ class SequentialModel(TraceModel):
         from `trace`. Next it splits this data into the training and testing
         sets. It then fits the model and obtains predictions. Lastly, these
         predictions are evaluated using MSE on the training and testing sets.
+        The number of under predictions and the magnitude of the maximum under
+        prediction for the test set are also calculated.
 
         Parameters
         ----------
@@ -102,15 +104,17 @@ class SequentialModel(TraceModel):
 
         Returns
         -------
-        float, float
-            Two floats representing the MSEs for the training and testing sets
-            after modeling `trace`.
+        float, float, int, float
+            Two floats representing the mean squared error for the training and
+            testing sets, respectively. In addition, an integer and float are
+            returned representing the number of under predictions and the
+            magnitude of the maximum under prediction, respectively.
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
         y_train, y_test = self.split_data(trace_ts)
         preds_train, preds_test = self._get_predictions(trace_ts)
-        return utils.calculate_train_and_test_mse(
+        return utils.calculate_evaluation_metrics(
             y_train, preds_train, y_test, preds_test)
 
     def plot_trace_vs_prediction(self, trace):

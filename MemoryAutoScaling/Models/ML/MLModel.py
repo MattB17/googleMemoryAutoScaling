@@ -112,8 +112,10 @@ class MLModel(TraceModel):
         The dataframe containing the data for modeling is obtained from
         `trace`. Then this data is split into features and target for both the
         training and test sets. Next, the model pipeline is run on the
-        resulting data, with the model being initialized by parameters
-        specified in **kwargs.
+        resulting data to calculate the mean squared error for the training and
+        testing sets, respectively. The number of under predictions and the
+        magnitude of the maximum under prediction for the test set are also
+        calculated.
 
         Parameters
         ----------
@@ -124,9 +126,11 @@ class MLModel(TraceModel):
 
         Returns
         -------
-        float, float
-            Two floats representing the mean squared errors of the model
-            predictions for the training and testing sets.
+        float, float, int, float
+            Two floats representing the mean squared error for the training and
+            testing sets, respectively. In addition, an integer and float are
+            returned representing the number of under predictions and the
+            magnitude of the maximum under prediction, respectively.
 
         """
         raw_data = self.get_model_data_for_trace(trace)
@@ -216,10 +220,10 @@ class MLModel(TraceModel):
                            test_features, test_target):
         """Runs the model pipeline on the training and testing data.
 
-        The model is instantiated with `kwargs` and then fit on
-        `train_features` and `train_target`. Predictions are made on
-        `test_features` and these predictions are compared to `test_target`
-        using the mean squared error.
+        The model is instantiated and then fit on `train_features` and
+        `train_target`. Predictions are made on `test_features` and these
+        predictions are compared to `test_target` using the mean squared
+        error.
 
         Parameters
         ----------
@@ -236,16 +240,18 @@ class MLModel(TraceModel):
 
         Returns
         -------
-        pd.Series, float, float
-            Two floats representing the mean squared errors of the model
-            predictions for the training and testing sets.
+        float, float, int, float
+            Two floats representing the mean squared error for the training and
+            testing sets, respectively. In addition, an integer and float are
+            returned representing the number of under predictions and the
+            magnitude of the maximum under prediction, respectively.
 
         """
         self._initialize()
         self._fit(train_features, train_target)
         train_preds = self._get_predictions(train_features)
         test_preds = self._get_predictions(test_features)
-        return utils.calculate_train_and_test_mse(
+        return utils.calculate_evaluation_metrics(
             train_target, train_preds, test_target, test_preds)
 
     def _plot_trace_data_vs_predictions(self, trace_df, title):

@@ -29,10 +29,5 @@ def build_xgb_models_for_traces(trace_lst, results_lst, train_prop):
 
 
 if __name__ == "__main__":
-    traces, output_dir, train_prop = analysis.get_model_build_input_params()
-    xgb_results = analysis.perform_trace_modelling(
-        traces, build_xgb_models_for_traces, train_prop)
-    xgb_cols = analysis.get_col_list_for_params(
-        range(1, 6), "xgb", ["params", "train_mse", "test_mse"])
-    analysis.output_model_results(
-        xgb_results, ["id"] + xgb_cols, output_dir, "xgb_results")
+    analysis.run_best_models_for_all_traces(
+        build_xgb_models_for_traces, 5, "xgb")

@@ -204,8 +204,8 @@ def get_model_stats_for_trace(data_trace, models):
     """
     trace_stats = [data_trace.get_trace_id()]
     for model in models:
-        train_mse, test_mse = model.run_model_pipeline_for_trace(data_trace)
-        trace_stats.extend([train_mse, test_mse])
+        model_stats = list(model.run_model_pipeline_for_trace(data_trace))
+        trace_stats.extend(model_stats)
     return trace_stats
 
 
@@ -371,24 +371,18 @@ def model_traces_and_evaluate(model, model_params, traces, results_lst):
     for trace in traces:
         results_lst.append(get_model_stats_for_trace(trace, models))
 
-def insert_model_results_at_index(results_lst, model_params,
-                                  train_mse, test_mse, idx):
+def insert_model_results_at_index(results_lst, model_results, idx):
     """Inserts model results into `results_lst` based on `idx`.
 
-    `model_params`, `train_mse`, and `test_mse` are inserted into
-    `results_lst` at positions `3 * idx + 1`, `3 * idx + 2` and
-    `3 * idx + 3`, respectively.
+    `model_results` are inserted into `results_lst` starting at position
+    `n * idx + 1` where `n` is the length of `model_results`.
 
     Parameters
     ----------
     results_lst: list
         A list of results for which the model results are inserted.
-    model_params: tuple
-        A tuple containing model parameters for the results being inserted.
-    train_mse: float
-        A float representing the training MSE for the model.
-    test_mse: float
-        A float representing the test MSE for the model.
+    model_results: list
+        A list containing the model results.
     idx: int
         An integer used to mark where the model results will be inserted.
 
@@ -398,28 +392,23 @@ def insert_model_results_at_index(results_lst, model_params,
         The list obtained from `results_lst` after inserting the model results.
 
     """
-    results_lst.insert((3 * idx) + 1, model_params)
-    results_lst.insert((3 * idx) + 2, train_mse)
-    results_lst.insert((3 * idx) + 3, test_mse)
+    n = len(model_results)
+    for i in range(n):
+        results_lst.insert((n * idx) + i + 1, model_results[i])
     return results_lst
 
-def extend_model_results_up_to_cutoff(results_lst, model_params, train_mse,
-                                      test_mse, cutoff):
+def extend_model_results_up_to_cutoff(results_lst, model_results, cutoff):
     """Extends `results_lst` with the model results up to `cutoff`.
 
     If `results_lst` has less than `cutoff` elements then it is extended with
-    the model results given by `model_params`, `train_mse` and `test_mse`.
+    the model results given by `model_results`.
 
     Parameters
     ----------
     results_lst: list
         The list containing model results that is being extended.
-    model_params: tuple
-        A tuple containing the model params for the model.
-    train_mse: float
-        A float representing the training MSE for the model.
-    test_mse: float
-        A float representing the testing MSE for the model.
+    model_results: list
+        A list containing the model results.
     cutoff: int
         An integer used to decide if `results_lst` should be extended. If the
         length of `results_lst` is below `cutoff` then it is extended with the
@@ -433,12 +422,11 @@ def extend_model_results_up_to_cutoff(results_lst, model_params, train_mse,
 
     """
     if len(results_lst) < cutoff:
-        results_lst.extend([model_params, train_mse, test_mse])
+        results_lst.extend(model_results)
     return results_lst
 
 
-def update_with_model_results(results_lst, model_params, train_mse,
-                              test_mse, cutoff):
+def update_with_model_results(results_lst, model_results, cutoff):
     """Updates `results_lst` with the model results.
 
     If `results_lst` has fewer than `cutoff` entries or `test_mse` is lower
@@ -449,12 +437,9 @@ def update_with_model_results(results_lst, model_params, train_mse,
     ----------
     results_lst: list
         The list containing model results that is being updated.
-    model_params: tuple
-        A tuple containing the model params for the model.
-    train_mse: float
-        A float representing the training MSE for the model.
-    test_mse: float
-        A float representing the testing MSE for the model.
+    model_results: list
+        A list containing model results where the third element is the mean
+        squared error for the test set.
     cutoff: int
         An integer used to decide if `results_lst` should be extended. If the
         length of `results_lst` is below `cutoff` then it is extended with the
@@ -467,13 +452,13 @@ def update_with_model_results(results_lst, model_params, train_mse,
         the model results.
 
     """
-    model_count = (len(results_lst) - 1) // 3
+    model_count = (len(results_lst) - 1) // len(model_results)
     for idx in range(model_count):
-        if test_mse < results_lst[3 * (idx + 1)]:
+        if model_results[2] < results_lst[len(model_results) * (idx + 1)]:
             return insert_model_results_at_index(
-                results_lst, model_params, train_mse, test_mse, idx)
+                results_lst, model_results, idx)
     return extend_model_results_up_to_cutoff(
-        results_lst, model_params, train_mse, test_mse, cutoff)
+        results_lst, model_results, cutoff)
 
 
 def truncate_list(lst, cutoff):
@@ -526,9 +511,9 @@ def handle_stats_for_model(trace, model, trace_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    train_mse, test_mse = model.run_model_pipeline_for_trace(trace)
+    model_results = list(model.run_model_pipeline_for_trace(trace))
     trace_results = update_with_model_results(
-        trace_results, model.get_params(), train_mse, test_mse, cutoff)
+        trace_results, [model.get_params()] + model_results, cutoff)
     return truncate_list(trace_results, cutoff)
 
 
@@ -615,14 +600,14 @@ def get_best_models_for_trace(trace, models, models_count):
 
     """
     best_results = [trace.get_trace_id()]
-    cutoff = (3 * models_count) + 1
+    cutoff = (5 * models_count) + 1
     for model in models:
         best_results = update_model_stats_for_trace(
             trace, model, best_results, cutoff)
     return pad_list(best_results, np.nan, cutoff)
 
-def get_best_model_results_for_traces(model, model_params,
-                                      traces, result_lst, models_count):
+def get_best_model_results_for_traces(model, model_params, traces,
+                                      result_lst, models_count):
     """Gets the `models_count` best model results for the traces of `traces`.
 
     For each trace in `traces` a `model` object is built for each set of model
@@ -656,3 +641,83 @@ def get_best_model_results_for_traces(model, model_params,
     for trace in traces:
         result_lst.append(
             get_best_models_for_trace(trace, models, models_count))
+
+def run_models_for_all_traces(modeling_func, model_params, model_name):
+    """Models all traces using `modeling_func` with `model_name`.
+
+    A series of models are run on each trace, where the models are specified
+    by the parameters in `model_params`. `modeling_func` is used to run the
+    models on a batch of traces and this function is parallelized to cover all
+    traces.
+
+    Parameters
+    ----------
+    modeling_func: function
+        The function used to perform the modelling on a batch of traces. The
+        function takes three arguments: a list of `Trace` objects on which the
+        models are run, a list to which results are saved, and a float
+        specifying the proportion of data in the training set.
+    model_params: list
+        A list containing the model parameters for the models.
+    model_name: str
+        A string specifying the name of the model.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    The results of the modelling procedure is saved to a csv file containing
+    one row per trace. The file is output to a file named `<name>_results.csv`
+    where `<name>` is `model_name`.
+
+    """
+    traces, output_dir, train_prop = get_model_build_input_params()
+    results = perform_trace_modelling(traces, modeling_func, train_prop)
+    cols = get_col_list_for_params(
+        model_params, model_name,
+        ["train_mse", "test_mse", "num_under_preds", "max_under_pred"])
+    output_model_results(
+        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+
+def run_best_models_for_all_traces(modeling_func, models_count, model_name):
+    """Models all traces using `modeling_func` with `model_name`.
+
+    A series of models are run on each trace, and the best `models_count` of
+    these models for each trace are recorded. `modeling_func` is used to run
+    the models on a batch of traces and this function is parallelized to cover
+    all traces. The best models are then retrieved.
+
+    Parameters
+    ----------
+    modeling_func: function
+        The function used to perform the modelling on a batch of traces. The
+        function takes three arguments: a list of `Trace` objects on which the
+        models are run, a list to which results are saved, and a float
+        specifying the proportion of data in the training set.
+    models_count: int
+        An integer representing the number of models to record. The results
+        for the `models_count` best models for each trace are recorded.
+    model_name: str
+        A string specifying the name of the model.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    The results of the modelling procedure is saved to a csv file containing
+    one row per trace. The file is output to a file named `<name>_results.csv`
+    where `<name>` is `model_name`.
+
+    """
+    traces, output_dir, train_prop = get_model_build_input_params()
+    model_cols = ["params", "train_mse", "test_mse",
+                  "num_under_preds", "max_under_pred"]
+    results = perform_trace_modelling(traces, modeling_func, train_prop)
+    cols = get_col_list_for_params(
+        range(1, models_count + 1), model_name, model_cols)
+    output_model_results(
+        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
