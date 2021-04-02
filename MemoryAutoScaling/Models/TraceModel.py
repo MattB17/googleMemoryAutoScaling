@@ -37,12 +37,6 @@ class TraceModel(ABC):
             A pandas Object (Series or DataFrame) containing the data used to
             build the trace model.
 
-        Returns
-        -------
-        pandas.Object, pandas.Object
-            The two pandas objects obtained from `model_data` after applying
-            the train-test split.
-
         """
         pass
 
