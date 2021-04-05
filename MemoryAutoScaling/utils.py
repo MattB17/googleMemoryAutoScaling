@@ -412,7 +412,7 @@ def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
         y_test, preds_test, axes[1], "{} Testing Set".format(title))
     plt.show()
 
-def get_under_pred_vals(under_preds, pred_count):
+def get_under_pred_vals(under_preds, pred_count, avg_pred):
     """Gets the proportion and maximum value of `under_preds`.
 
     Parameters
@@ -421,19 +421,21 @@ def get_under_pred_vals(under_preds, pred_count):
         A numpy array containing the under predictions.
     pred_count: int
         An integer representing the number of predictions
+    avg_pred: float
+        The average value of the predictions in the prediction window.
 
     Returns
     -------
     float, float
         A float representing the proportion of predictions that were under
         predictions and a float representing the magnitude of the maximum
-        under prediction.
+        under prediction divided by `avg_pred`.
 
     """
     count = len(under_preds)
     if count == 0:
         return 0.0, np.nan
-    return (count / pred_count), max(under_preds)
+    return (count / pred_count), (max(under_preds) / avg_pred)
 
 def get_under_prediction_stats(actuals, predicteds):
     """Retrieves statistics of under predictions of predicteds vs actuals.
@@ -452,13 +454,66 @@ def get_under_prediction_stats(actuals, predicteds):
     float, float
         A float representing the proportion of predictions that were under
         predictions and a float representing the magnitude of the maximum
-        under prediction.
+        under prediction, standardized by the average prediction.
 
     """
     under_preds = np.array([actuals[i] - predicteds[i]
                             for i in range(len(actuals))
                             if actuals[i] > predicteds[i]])
-    return get_under_pred_vals(under_preds, len(predicteds))
+    return get_under_pred_vals(
+        under_preds, len(predicteds), np.mean(predicteds))
+
+def get_over_pred_vals(over_preds, pred_count, avg_pred):
+    """Gets the proportion and average value of `over_preds`.
+
+    Parameters
+    ----------
+    over_preds: np.array
+        A numpy array containing the over predictions.
+    pred_count: int
+        An integer representing the number of predictions.
+    avg_pred: float
+        The average value of the predictions in the prediction window.
+
+    Returns
+    -------
+    float, float
+        A float representing the proportion of predictions that were over
+        predictions and a float representing the magnitude of the average
+        over prediction divided by `avg_pred`.
+
+    """
+    count = len(over_preds)
+    if count == 0:
+        return 0.0, 0.0
+    return (count / pred_count), (np.mean(over_preds) / avg_pred)
+
+def get_over_prediction_stats(actuals, predicteds):
+    """Retrieves statistics of over predictions of predicteds vs actuals.
+
+    The proportion and standardized average of over predictions are
+    calculated.
+
+    Parameters
+    ----------
+    actuals: np.array
+        A numpy array representing the actual values.
+    predicteds: np.array
+        A numpy array representing the actual values.
+
+    Returns
+    -------
+    float, float
+        A float representing the proportion of predictions that were under
+        predictions and a float representing the magnitude of the maximum
+        under prediction, standardized by the average prediction.
+
+    """
+    over_preds = np.array([predicteds[i] - actuals[i]
+                            for i in range(len(actuals))
+                            if actuals[i] < predicteds[i]])
+    return get_over_pred_vals(
+        over_preds, len(predicteds), np.mean(predicteds))
 
 def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     """Calculates the evaluation metrics for the training and testing sets.
@@ -485,15 +540,20 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
 
     Returns
     -------
-    float, float, float, float
-        Two floats representing the mean squared error for the training and
-        testing sets, respectively. In addition, two more floats are
-        returned representing the proportion of under predictions and the
-        magnitude of the maximum under prediction, respectively.
+    tuple
+        A tuple of six floats. The first two represent the mean squared error
+        for the training and testing sets, respectively. The next two
+        represent the proportion of under predictions and the magnitude of
+        the maximum under prediction, respectively. The last two represent
+        the proportion of over predictions and the magnitude of the average
+        over prediction.
 
     """
     train_mse, test_mse = calculate_train_and_test_mse(
         y_train, preds_train, y_test, preds_test)
-    num_under_preds, max_under_pred = get_under_prediction_stats(
+    prop_under_preds, max_under_pred = get_under_prediction_stats(
         list(y_test), preds_test)
-    return train_mse, test_mse, num_under_preds, max_under_pred
+    prop_over_preds, avg_over_pred = get_over_prediction_stats(
+        list(y_test), preds_test)
+    return (train_mse, test_mse, prop_under_preds,
+            max_under_pred, prop_over_preds, avg_over_pred)

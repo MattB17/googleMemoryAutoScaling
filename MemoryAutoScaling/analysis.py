@@ -600,7 +600,7 @@ def get_best_models_for_trace(trace, models, models_count):
 
     """
     best_results = [trace.get_trace_id()]
-    cutoff = (5 * models_count) + 1
+    cutoff = (7 * models_count) + 1
     for model in models:
         best_results = update_model_stats_for_trace(
             trace, model, best_results, cutoff)
@@ -677,7 +677,8 @@ def run_models_for_all_traces(modeling_func, model_params, model_name):
     results = perform_trace_modelling(traces, modeling_func, train_prop)
     cols = get_col_list_for_params(
         model_params, model_name,
-        ["train_mse", "test_mse", "prop_under_preds", "max_under_pred"])
+        ["train_mse", "test_mse", "prop_under_preds",
+        "max_under_pred", "prop_over_preds", "avg_over_pred"])
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
@@ -715,7 +716,8 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     """
     traces, output_dir, train_prop = get_model_build_input_params()
     model_cols = ["params", "train_mse", "test_mse",
-                  "prop_under_preds", "max_under_pred"]
+                  "prop_under_preds", "max_under_pred",
+                  "prop_over_preds", "avg_over_pred"]
     results = perform_trace_modelling(traces, modeling_func, train_prop)
     cols = get_col_list_for_params(
         range(1, models_count + 1), model_name, model_cols)

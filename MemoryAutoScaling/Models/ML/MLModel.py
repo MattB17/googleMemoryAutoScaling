@@ -126,11 +126,13 @@ class MLModel(TraceModel):
 
         Returns
         -------
-        float, float, float, float
-            Two floats representing the mean squared error for the training and
-            testing sets, respectively. In addition, two more floats are
-            returned representing the proportion of under predictions and the
-            magnitude of the maximum under prediction, respectively.
+        tuple
+            A tuple of six floats. The first two represent the mean squared error
+            for the training and testing sets, respectively. The next two
+            represent the proportion of under predictions and the magnitude of
+            the maximum under prediction, respectively. The last two represent
+            the proportion of over predictions and the magnitude of the average
+            over prediction.
 
         """
         raw_data = self.get_model_data_for_trace(trace)
