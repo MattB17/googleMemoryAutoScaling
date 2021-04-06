@@ -104,4 +104,4 @@ class StatisticalModel(TraceModel):
         preds = self._model.get_prediction(
             end=self._model.nobs + forecast_length - 1)
         mean_preds = utils.impute_for_time_series(preds.predicted_mean, 0)
-        return mean_preds[:-n_forecast], mean_preds[-n_forecast:]
+        return mean_preds[:-forecast_length], mean_preds[-forecast_length:]

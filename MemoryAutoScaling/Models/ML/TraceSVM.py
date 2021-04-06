@@ -52,6 +52,9 @@ class TraceSVM(MLModel):
             A 1 element tuple containing the model parameters, corresponding
             to the regularization parameter.
 
+        """
+        return (self._reg_val,)
+
     def get_model_title(self):
         """A title describing the model.
 
