@@ -552,8 +552,8 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     train_mse, test_mse = calculate_train_and_test_mse(
         y_train, preds_train, y_test, preds_test)
     prop_under_preds, max_under_pred = get_under_prediction_stats(
-        list(y_test), preds_test)
+        list(y_test), list(preds_test))
     prop_over_preds, avg_over_pred = get_over_prediction_stats(
-        list(y_test), preds_test)
+        list(y_test), list(preds_test))
     return (train_mse, test_mse, prop_under_preds,
             max_under_pred, prop_over_preds, avg_over_pred)

@@ -4,10 +4,11 @@ a regression model on explanatory features.
 
 """
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from MemoryAutoScaling.Models.ML import MLModel
+from MemoryAutoScaling.Models.ML import MLBase
+from MemoryAutoScaling import utils
 
 
-class TraceARIMAX(MLModel):
+class TraceARIMAX(MLBase):
     """An `ARIMAX` model for data traces.
 
     Parameters
@@ -71,7 +72,18 @@ class TraceARIMAX(MLModel):
         """
         return self._p, self._d, self._q
 
-    def fit(self, train_features, train_target):
+    def get_model_title(self):
+        """A title describing the model.
+
+        Returns
+        -------
+        str
+            A string representing the title for the model.
+
+        """
+        return "{0}-{1}".format(self.get_params(), self._model_name)
+
+    def _fit(self, train_features, train_target):
         """Fits the model based on `train_features` and `train_target`.
 
         An ARIMAX model is built to predict the target variable with data
@@ -96,7 +108,7 @@ class TraceARIMAX(MLModel):
         self._model = model.fit(disp=False)
         self._is_fit = True
 
-    def get_predictions(self, test_features):
+    def _get_predictions(self, test_features):
         """Retrieves model predictions for `test_features`.
 
         Parameters
@@ -117,26 +129,87 @@ class TraceARIMAX(MLModel):
                 end=self._model.nobs + forecast_len, exog=test_features)
             return preds.predicted_mean
 
-    def get_train_and_test_predictions(self, train_features, test_features):
-        """Retrieves predictions for the training and testing sets.
+    def _get_train_and_test_predictions(self, train_features, test_features):
+        """Gets predictions from `train_features` and `test_features`.
 
         Parameters
         ----------
         train_features: pd.DataFrame
-            A pandas DataFrame representing the values for the features of the
-            training set.
+            A pandas DataFrame containing the features for the training set.
         test_features: pd.DataFrame
-            A pandas DataFrame representing the values for the features of the
-            testing set.
+            A pandas DataFrame containing the features for the testing set.
 
         Returns
         -------
         np.array, np.array
             Two numpy arrays representing the predictions for the training and
-            testing sets respectively.
-
+            testing sets on `trace`.
 
         """
-        preds = self.get_predictions(test_features)
+        preds = self._get_predictions(test_features)
         train_cutoff = len(train_features)
         return preds[:train_cutoff], preds[train_cutoff:]
+
+    def _run_model_pipeline(self, train_features, train_target,
+                            test_features, test_target):
+        """Runs the model pipeline on the training and testing data.
+
+        The model is instantiated and then fit on `train_features` and
+        `train_target`. Predictions are made on `test_features` and these
+        predictions are compared to `test_target` using the mean squared
+        error.
+
+        Parameters
+        ----------
+        train_features: pd.DataFrame
+            A pandas DataFrame representing the features for the training set.
+        train_target: pd.Series
+            A pandas Series representing the target variable for the
+            training set.
+        test_features: pd.DataFrame
+            A pandas Dataframe representing the features for the testing set.
+        test_target: pd.Series
+            A pandas Series representing the target variable for the testing
+            set.
+
+        Returns
+        -------
+        tuple
+            A tuple of six floats. The first two represent the mean squared error
+            for the training and testing sets, respectively. The next two
+            represent the proportion of under predictions and the magnitude of
+            the maximum under prediction, respectively. The last two represent
+            the proportion of over predictions and the magnitude of the average
+            over prediction.
+
+        """
+        self._fit(train_features, train_target)
+        train_preds, test_preds = self._get_train_and_test_predictions(
+            train_features, test_features)
+        return utils.calculate_evaluation_metrics(
+            train_target, train_preds, test_target, test_preds)
+
+    def _plot_trace_data_vs_predictions(self, trace_df, title):
+        """Plots the target time series of `trace_df` vs its model prediction.
+
+        The plot of the time series vs its predictions is divided into two
+        subplots: one for the training set and another for the testing set.
+
+        Parameters
+        ----------
+        trace_df: pd.DataFrame
+            A pandas DataFrame containing the trace data used for modeling.
+        title: str
+            A string representing the title of the plot.
+
+        Returns
+        -------
+        None
+
+        """
+        fig, (ax1, ax2) = plt.subplots(2)
+        X_train, y_train, X_test, y_test = self.split_data(trace_df)
+        preds_train, preds_test = self._get_train_and_test_predictions(
+            train_features, test_features)
+        utils.plot_train_and_test_predictions_on_axes(
+            y_train, preds_train, y_test, preds_test, (ax1, ax2), title)

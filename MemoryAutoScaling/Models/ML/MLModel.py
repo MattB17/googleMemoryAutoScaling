@@ -196,8 +196,8 @@ class MLModel(MLBase):
         """
         self._initialize()
         self._fit(train_features, train_target)
-        train_preds = self._get_predictions(train_features)
-        test_preds = self._get_predictions(test_features)
+        train_preds, test_preds = self._get_train_and_test_predictions(
+            train_features, test_features)
         return utils.calculate_evaluation_metrics(
             train_target, train_preds, test_target, test_preds)
 
@@ -221,7 +221,7 @@ class MLModel(MLBase):
         """
         fig, (ax1, ax2) = plt.subplots(2)
         X_train, y_train, X_test, y_test = self.split_data(trace_df)
-        preds_train = self._get_predictions(X_train)
-        preds_test = self._get_predictions(X_test)
+        preds_train, preds_test = self._get_train_and_test_predictions(
+            train_features, test_features)
         utils.plot_train_and_test_predictions_on_axes(
             y_train, preds_train, y_test, preds_test, (ax1, ax2), title)
