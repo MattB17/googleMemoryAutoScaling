@@ -40,6 +40,20 @@ class TraceExponentialSmoothing(SequentialModel):
         self._alpha = alpha
         super().__init__(initial_pred, train_prop)
 
+    def get_params(self):
+        """The parameters of the model.
+
+        The model parameters are the initial prediction and the alpha value.
+
+        Returns
+        -------
+        tuple
+            A two element tuple containing the parameters of the model,
+            corresponding to the initial prediction and the alpha value.
+
+        """
+        return (self._initial_pred, self._alpha)
+
     def get_model_title(self):
         """A title describing the model.
 

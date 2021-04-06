@@ -28,15 +28,3 @@ class StatisticalModel(TraceModel):
     def __init__(self, train_prop=0.7):
         self._train_prop = train_prop
         self._model = None
-
-    @abstractmethod
-    def get_params(self):
-        """Returns the parameters of the model.
-
-        Returns
-        -------
-        tuple
-            A tuple containing the model parameters.
-
-        """
-        pass

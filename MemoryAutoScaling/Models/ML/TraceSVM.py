@@ -41,6 +41,17 @@ class TraceSVM(MLModel):
         super().__init__("TraceSVM", data_handler, lags)
         self._reg_val = reg_val
 
+    def get_params(self):
+        """The parameters of the model.
+
+        The model parameters correspond to the regularization parameter.
+
+        Returns
+        -------
+        tuple
+            A 1 element tuple containing the model parameters, corresponding
+            to the regularization parameter.
+
     def get_model_title(self):
         """A title describing the model.
 

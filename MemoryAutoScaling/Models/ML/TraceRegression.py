@@ -46,6 +46,20 @@ class TraceRegression(MLModel):
         super().__init__("TraceRegression", data_handler, lags)
         self._reg_val = reg_val
 
+    def get_params(self):
+        """The parameters of the model.
+
+        The model parameters correspond to the regularization value.
+
+        Returns
+        -------
+        tuple
+            A 1 element tuple containing the model parameters, corresponding
+            to the regularization value used in regression.
+
+        """
+        return (self._reg_val,)
+
     def get_model_title(self):
         """A title describing the model.
 

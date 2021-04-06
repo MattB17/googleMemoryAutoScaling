@@ -36,6 +36,20 @@ class TraceMovingAverage(SequentialModel):
         self._window_length = window_length
         super().__init__(initial_pred, train_prop)
 
+    def get_params(self):
+        """The parameters of the model.
+
+        The model parameters are the initial prediction and window length.
+
+        Returns
+        -------
+        tuple
+            A 2 element tuple containing the model parameters, corresponding
+            to the initial prediction and the window length.
+
+        """
+        return (self._initial_pred, self._window_length)
+
     def get_model_title(self):
         """A title describing the model.
 

@@ -16,6 +16,18 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
+    def get_params(self):
+        """The parameters of the model.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the parameters of the model.
+
+        """
+        pass
+
+    @abstractmethod
     def get_model_title(self):
         """A title describing the model.
 
