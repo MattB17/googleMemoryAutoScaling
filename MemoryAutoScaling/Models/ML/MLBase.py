@@ -1,16 +1,16 @@
-"""The `MLModel` class is an abstract base class used for all machine
+"""The `MLBase` class is an abstract base class used for all machine
 learning models that predict using a time series. It represents an interface
 providing the basic framework used by all machine learning models.
 
 """
 from abc import abstractmethod
 from MemoryAutoScaling import utils
-from MemoryAutoScaling.Models.ML import MLBase
+from MemoryAutoScaling.Models import TraceModel
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 
 
-class MLModel(MLBase):
+class MLBase(TraceModel):
     """Used to predict future values of a time series.
 
     The model has an `MLDataHandler`, `data_handler`, to ensure that all
@@ -43,7 +43,23 @@ class MLModel(MLBase):
 
     """
     def __init__(self, model_name, data_handler, lags):
-        super().__init__(model_name, data_handler, lags)
+        self._model_name = model_name
+        self._data_handler = data_handler
+        self._lags = lags
+        self._model = None
+        self._is_fit = False
+
+    @abstractmethod
+    def get_model_title(self):
+        """A title describing the model.
+
+        Returns
+        -------
+        str
+            A string representing the title for the model.
+
+        """
+        pass
 
     def split_data(self, data):
         """Splits data into features and targets for the train and test sets.
@@ -81,65 +97,78 @@ class MLModel(MLBase):
         """
         return trace.get_lagged_df(self._lags)
 
-    def _is_initialized(self):
-        """Indicates if the model has been initialized.
+    def get_predictions_for_trace(self, trace):
+        """Gets predictions for the training and testing set for `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which predictions are retrieved.
 
         Returns
         -------
-        bool
-            True if the model has been initialized, otherwise False.
+        np.array, np.array
+            Two numpy arrays representing the predictions for the training and
+            testing sets on `trace`.
 
         """
-        return self._model is not None
+        trace_df = self.get_model_data_for_trace(trace)
+        X_train, _, X_test, _ = self.split_data(trace_df)
+        return self._get_train_and_test_predictions(X_train, X_test)
+
+    def run_model_pipeline_for_trace(self, trace):
+        """Runs the model pipeline on `trace`.
+
+        The dataframe containing the data for modeling is obtained from
+        `trace`. Then this data is split into features and target for both the
+        training and test sets. Next, the model pipeline is run on the
+        resulting data to calculate the mean squared error for the training and
+        testing sets, respectively. The number of under predictions and the
+        magnitude of the maximum under prediction for the test set are also
+        calculated.
+
+        Parameters
+        ----------
+        trace: Trace
+            A `Trace` object containing the data being modelled.
+        kwargs: dict
+            Arbitrary keyword arguments used to initialize the model.
+
+        Returns
+        -------
+        tuple
+            A tuple of six floats. The first two represent the mean squared error
+            for the training and testing sets, respectively. The next two
+            represent the proportion of under predictions and the magnitude of
+            the maximum under prediction, respectively. The last two represent
+            the proportion of over predictions and the magnitude of the average
+            over prediction.
+
+        """
+        raw_data = self.get_model_data_for_trace(trace)
+        X_train, y_train, X_test, y_test = self.split_data(raw_data)
+        return self._run_model_pipeline(
+            X_train, y_train, X_test, y_test)
+
+    def plot_trace_vs_prediction(self, trace):
+        """Creates a plot of `trace` vs its predictions.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` being plotted.
+
+        Returns
+        -------
+        None
+
+        """
+        trace_df = self.get_model_data_for_trace(trace)
+        title = "Trace {0} vs {1} Predictions".format(
+            trace.get_trace_id(), self.get_model_title())
+        self._plot_trace_data_vs_predictions(trace_df, title)
 
     @abstractmethod
-    def _initialize(self):
-        """Initializes the model.
-
-        Returns
-        -------
-        None
-
-        """
-        self._is_fit = False
-
-    def _fit(self, train_features, train_target):
-        """Fits the model based on `train_features` and `train_target`.
-
-        Parameters
-        ----------
-        train_features: pd.DataFrame
-            A pandas DataFrame representing the training features.
-        train_target: pd.Series
-            A pandas Series representing the target variable.
-
-        Returns
-        -------
-        None
-
-        """
-        if self._is_initialized():
-            self._model.fit(train_features, train_target)
-            self._is_fit = True
-
-    def _get_predictions(self, input_features):
-        """Retrieves model predictions for `input_features`.
-
-        Parameters
-        ----------
-        input_features: pd.DataFrame
-            A pandas DataFrame representing the input features.
-
-        Returns
-        -------
-        pd.Series
-            A pandas Series representing the predictions based on
-            `input_features`.
-
-        """
-        if self._is_fit:
-            return self._model.predict(input_features)
-
     def _get_train_and_test_predictions(self, train_features, test_features):
         """Gets predictions from `train_features` and `test_features`.
 
@@ -157,12 +186,11 @@ class MLModel(MLBase):
             testing sets on `trace`.
 
         """
-        train_preds = self._get_predictions(train_features)
-        test_preds = self._get_predictions(test_features)
-        return train_preds, test_preds
+        pass
 
+    @abstractmethod
     def _run_model_pipeline(self, train_features, train_target,
-                           test_features, test_target):
+                            test_features, test_target):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `train_features` and
@@ -194,13 +222,9 @@ class MLModel(MLBase):
             over prediction.
 
         """
-        self._initialize()
-        self._fit(train_features, train_target)
-        train_preds = self._get_predictions(train_features)
-        test_preds = self._get_predictions(test_features)
-        return utils.calculate_evaluation_metrics(
-            train_target, train_preds, test_target, test_preds)
+        pass
 
+    @abstractmethod
     def _plot_trace_data_vs_predictions(self, trace_df, title):
         """Plots the target time series of `trace_df` vs its model prediction.
 
@@ -219,9 +243,4 @@ class MLModel(MLBase):
         None
 
         """
-        fig, (ax1, ax2) = plt.subplots(2)
-        X_train, y_train, X_test, y_test = self.split_data(trace_df)
-        preds_train = self._get_predictions(X_train)
-        preds_test = self._get_predictions(X_test)
-        utils.plot_train_and_test_predictions_on_axes(
-            y_train, preds_train, y_test, preds_test, (ax1, ax2), title)
+        pass

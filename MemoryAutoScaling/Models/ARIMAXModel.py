@@ -1,24 +1,24 @@
-"""The `ARIMAXModel` class is used to construct a predictive model based on
+"""The `TraceARIMAX` class is used to construct a predictive model based on
 the ARIMAX model. ARIMAX models are the combination of an ARIMA model and
 a regression model on explanatory features.
 
 """
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from MemoryAutoScaling.Models import MLModel
+from MemoryAutoScaling.Models.ML import MLModel
 
 
-class ARIMAXModel(MLModel):
+class TraceARIMAX(MLModel):
     """An `ARIMAX` model for data traces.
 
     Parameters
     ----------
     data_handler: MLDataHandler
         An `MLDataHandler` used to pre-process data for the model.
-    lag: int
-        An integer representing the lag to use for time series features to
-        the model. That is, for any time series used as a feature to the
-        model, the values of that time series lagged by `lag` will be a
-        feature used in the regression component of the ARIMAX model.
+    lags: list
+        A list of integers representing the lags to use for time series
+        features to the model. That is, for any time series used as a feature
+        to the model, the model will use the value of the time series lagged
+        by the time points in `lags` when predicting for the target variable.
     p: int
         An integer representing the autoregressive component of the model.
     d: int
@@ -34,8 +34,8 @@ class ARIMAXModel(MLModel):
         The name of the machine learning model.
     _data_handler: MLDataHandler
         The handler used to pre-process data for the model.
-    _lag: int
-        The lag used for time series features to the model.
+    _lags: list
+        The lags used for time series features to the model.
     _p: int
         The autoregressive component of the model.
     _d: int
@@ -49,8 +49,8 @@ class ARIMAXModel(MLModel):
         Indicates if the model has been fit to the training data.
 
     """
-    def __init__(self, data_handler, lag, p, d, q):
-        super().__init__("ARIMAXModel", data_handler, lag)
+    def __init__(self, data_handler, lags, p, d, q):
+        super().__init__("TraceARIMAX", data_handler, lags)
         self._p = p
         self._d = d
         self._q = q
