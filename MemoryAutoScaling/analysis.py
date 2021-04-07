@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
+from MemoryAutoScaling import utils
 from MemoryAutoScaling.DataHandling import TraceHandler
 
 
@@ -759,3 +760,25 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
         range(1, models_count + 1), model_name, model_cols)
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+
+def plot_cumulative_distribution_function(dist_vals, title):
+    """Plots the cumulative distribution of `dist_vals`.
+
+    Parameters
+    ----------
+    dist_vals: np.array
+        A numpy array representing the values of the distribution for
+        which the cumulative distribution function is generated.
+    title: str
+        A string representing the title for the distribution function.
+
+    Returns
+    -------
+    None
+
+    """
+    x_vals = np.sort(dist_vals)
+    pdf = x_vals / np.sum(x_vals)
+    cdf = np.cumsum(pdf)
+    title = "Cumulative Distribution Function - {}".format(title)
+    utils.render_x_y_plot(x_vals, cdf, title, "blue")
