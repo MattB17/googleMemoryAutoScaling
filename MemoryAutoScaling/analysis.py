@@ -341,7 +341,8 @@ def get_col_list_for_params(params, model_name, model_cols):
             for param, model_col in product(params, model_cols)]
 
 
-def model_traces_and_evaluate(model, model_params, traces, results_lst):
+def model_traces_and_evaluate(model, model_params, traces,
+                              results_lst, verbose=True):
     """Fits `model` to `traces` and evaluates the performance.
 
     A separate `model` is built for each parameter set in `model_params` and
@@ -361,6 +362,8 @@ def model_traces_and_evaluate(model, model_params, traces, results_lst):
     results_lst: mp.Manager.list
         A multiprocessor list representing the list to which model results are
         saved.
+    verbose: bool
+        A boolean indicating whether the log will be printed.
 
     Returns
     -------
@@ -368,8 +371,10 @@ def model_traces_and_evaluate(model, model_params, traces, results_lst):
 
     """
     models = build_models_from_params_list(model, model_params)
-    for trace in traces:
-        results_lst.append(get_model_stats_for_trace(trace, models))
+    trace_count = len(traces)
+    for idx in range(trace_count):
+        results_lst.append(get_model_stats_for_trace(traces[idx], models))
+        log_modeling_progress(idx, trace_count, verbose)
 
 def insert_model_results_at_index(results_lst, model_results, idx):
     """Inserts model results into `results_lst` based on `idx`.
@@ -607,7 +612,7 @@ def get_best_models_for_trace(trace, models, models_count):
     return pad_list(best_results, np.nan, cutoff)
 
 def get_best_model_results_for_traces(model, model_params, traces,
-                                      result_lst, models_count):
+                                      result_lst, models_count, verbose=True):
     """Gets the `models_count` best model results for the traces of `traces`.
 
     For each trace in `traces` a `model` object is built for each set of model
@@ -631,6 +636,9 @@ def get_best_model_results_for_traces(model, model_params, traces,
         An integer representing the number of model results to save. The
         results for the `models_count` best models for each trace will be
         saved.
+    verbose: bool
+        A boolean indicating whether to run in verbose mode. The default
+        value is True, in which case progress is printed to the screen.
 
     Returns
     -------
@@ -638,9 +646,37 @@ def get_best_model_results_for_traces(model, model_params, traces,
 
     """
     models = build_models_from_params_list(model, model_params)
-    for trace in traces:
+    trace_count = len(traces)
+    for idx in range(trace_count):
         result_lst.append(
-            get_best_models_for_trace(trace, models, models_count))
+            get_best_models_for_trace(traces[idx], models, models_count))
+        log_modeling_progress(idx, trace_count, verbose)
+
+def log_modeling_progress(trace_idx, trace_count, verbose):
+    """Logs the modeling progress if `verbose` is set to True.
+
+    The model progress prints a message to the screen indicating how many
+    traces have been modeled by the current process based on `trace_idx`
+    and `trace_count`.
+
+    Parameters
+    ----------
+    trace_idx: int
+        An integer representing the index of the trace that has finished
+        processing.
+    trace_count: int
+        An integer representing the total number of traces to be processed.
+     verbose: bool
+        A boolean indicating whether the log will be printed.
+
+    Returns
+    -------
+    None
+
+    """
+    if verbose:
+        print("Process {0}: {1} of {2} traces modeled".format(
+            os.getpid(), trace_idx + 1, trace_count))
 
 def run_models_for_all_traces(modeling_func, model_params, model_name):
     """Models all traces using `modeling_func` with `model_name`.

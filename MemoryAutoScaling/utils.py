@@ -308,13 +308,19 @@ def get_trace_columns():
             specs.MAX_MEM_COL, specs.MAX_CPU_COL]
 
 
-def get_lagged_trace_columns(lags):
+def get_lagged_trace_columns(lags, exclude_cols=None):
     """The column names for lagged data in a trace dataframe.
+
+    Column names are generated for each lag in `lags`. Any columns specified
+    in `exclude_cols` are excluded. If exclude_cols is None, no columns are
+    excluded.
 
     Parameters
     ----------
     lags: list
         A list of integers representing the lags for the columns.
+    exclude_cols: list
+        A list of the columns to exclude. The default value is None.
 
     Returns
     -------
@@ -323,8 +329,10 @@ def get_lagged_trace_columns(lags):
         trace dataframe.
 
     """
+    excluded_columns = exclude_cols if exclude_cols else []
     return ["{0}_lag_{1}".format(col_name, lag) for lag, col_name
-            in product(lags, get_trace_columns())]
+            in product(lags, get_trace_columns())
+            if col_name not in excluded_columns]
 
 
 def calculate_train_and_test_mse(y_train, preds_train, y_test, preds_test):
