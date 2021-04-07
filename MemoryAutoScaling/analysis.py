@@ -653,7 +653,7 @@ def get_best_model_results_for_traces(model, model_params, traces,
             get_best_models_for_trace(traces[idx], models, models_count))
         log_modeling_progress(idx, trace_count, verbose)
 
-def log_modeling_progress(trace_idx, trace_count, verbose):
+def log_modeling_progress(trace_idx, trace_count, verbose=True):
     """Logs the modeling progress if `verbose` is set to True.
 
     The model progress prints a message to the screen indicating how many

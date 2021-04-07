@@ -9,11 +9,14 @@ from MemoryAutoScaling.DataHandling import Trace, TraceHandler
 
 
 CAUSAL_COLS = [specs.AVG_MEM_COL, specs.MAX_CPU_COL, specs.AVG_CPU_COL]
+LAGS = [2, 3, 4]
 
 
 def run_trace_stats(traces, results_lst, causal_lags):
     analyzer = TraceAnalyzer("whitegrid", "seaborn-dark", 10, "blue", "Raw Data")
-    for trace in traces:
+    trace_count = len(traces)
+    for idx in range(trace_count):
+        trace = traces[idx]
         p_val = analyzer.test_for_stationarity(
             trace.get_maximum_memory_time_series())
         p_val_diff = analyzer.test_for_stationarity(
@@ -22,7 +25,7 @@ def run_trace_stats(traces, results_lst, causal_lags):
         p_val_diff2 = analyzer.test_for_stationarity(
             utils.get_differenced_trace(
                 trace.get_maximum_memory_time_series(), 2))
-        trace_df = trace.get_trace_df()
+        trace_df = trace.get_lagged_df(LAGS)
         corr_series = trace_df.corr()[specs.MAX_MEM_COL]
         trace_stats = ([trace.get_trace_id(), p_val, p_val_diff, p_val_diff2]
                         + list(corr_series))
@@ -37,6 +40,8 @@ def run_trace_stats(traces, results_lst, causal_lags):
                 trace_stats.extend(
                     [np.nan for _ in range(len(causal_lags) * 4)])
         results_lst.append(trace_stats)
+        analysis.log_modeling_progress(idx, trace_count)
+
 
 
 if __name__ == "__main__":
@@ -63,7 +68,8 @@ if __name__ == "__main__":
     stat_df = pd.DataFrame(list(stat_results))
     stat_cols = ["id", "adf_p_val", "adf_p_val_diff", "adf_p_val_diff2"] + [
         "corr_{}".format(col_name)
-        for col_name in utils.get_trace_columns()]
+        for col_name in
+        utils.get_trace_columns() + utils.get_lagged_trace_columns(LAGS)]
     stat_cols += analysis.get_all_granger_col_names(CAUSAL_COLS, causal_lags)
     stat_df.columns = stat_cols
     stat_df.to_csv(
