@@ -7,7 +7,6 @@ from itertools import product
 import matplotlib.pyplot as plt
 import statsmodels.tsa.api as smt
 from MemoryAutoScaling import specs
-from sklearn.metrics import mean_squared_error
 
 
 def setup_trace_plot(time_points, tick_interval, title):
@@ -335,8 +334,38 @@ def get_lagged_trace_columns(lags, exclude_cols=None):
             if col_name not in excluded_columns]
 
 
-def calculate_train_and_test_mse(y_train, preds_train, y_test, preds_test):
-    """Calculates the mean squared error for the training and testing sets.
+def get_mean_absolute_percentage_error(actuals, predicteds):
+    """The mean absolute percentage error of `predicteds` vs `actuals`.
+
+    The mean absolute percetage error is calculated as the average of
+    `|a[i] - p[i]| / a[i]` where `a[i]` and `p[i]` refer to the values of
+    `actuals` and `predicteds` at index `i`, respectively. The index `i`
+    ranges over the indices of `actuals`. Whenever the value of `a[i]` in
+    the denominator is zero it is replaced by the median to avoid division
+    by zero errors. The result is multiplied by 100 to get a percentage.
+
+    Parameters
+    ----------
+    actuals: np.array
+        A numpy array representing the actual values.
+    predicteds: np.array
+        A numpy array representing the predicted values.
+
+    Returns
+    -------
+    float
+        A float representing the mean absolute percentage error between
+        `actuals` and `predicteds`.
+
+    """
+    med = np.median(actuals)
+    denoms = copy.deepcopy(actuals)
+    denoms[denoms == 0] = med
+    return np.mean(np.abs((actuals - predicteds) / denoms)) * 100
+
+
+def calculate_train_and_test_mape(y_train, preds_train, y_test, preds_test):
+    """The mean absolute percentage error for the training and testing sets.
 
     Parameters
     ----------
@@ -356,13 +385,15 @@ def calculate_train_and_test_mse(y_train, preds_train, y_test, preds_test):
     Returns
     -------
     float, float
-        Two floats representing the mean squared errors for the training and
-        testing sets, respectively.
+        Two floats representing the mean absolute percentage errors for the
+        training and testing sets, respectively.
 
     """
-    train_mse = mean_squared_error(y_train, preds_train)
-    test_mse = mean_squared_error(y_test, preds_test)
-    return train_mse, test_mse
+    train_mape = get_mean_absolute_percentage_error(y_train, preds_train)
+    test_mape = get_mean_absolute_percentage_error(y_test, preds_test)
+    print(train_mape)
+    print(test_mape)
+    return train_mape, test_mape
 
 def plot_actual_vs_predicted_on_axis(actual, predicted, ax, ax_title):
     """Plots `actual` vs `predicted` on `ax`.
@@ -526,10 +557,10 @@ def get_over_prediction_stats(actuals, predicteds):
 def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     """Calculates the evaluation metrics for the training and testing sets.
 
-    The evaluation metrics consist of the mean squared error for the training
-    set, the mean squared error for the testing set, the number of under
-    predictions for the testing set, and the magnitude of the maximum under
-    prediction for the testing set.
+    The evaluation metrics consist of the mean absolute percentage error for
+    the training set, the mean absolute percentage error for the testing set,
+    the number of under predictions for the testing set, and the magnitude of
+    the maximum under prediction for the testing set.
 
     Parameters
     ----------
@@ -549,21 +580,21 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     Returns
     -------
     tuple
-        A tuple of six floats. The first two represent the mean squared error
-        for the training and testing sets, respectively. The next two
-        represent the proportion of under predictions and the magnitude of
-        the maximum under prediction, respectively. The last two represent
-        the proportion of over predictions and the magnitude of the average
-        over prediction.
+        A tuple of six floats. The first two represent the mean absolute
+        percentage error for the training and testing sets, respectively.
+        The next two represent the proportion of under predictions and the
+        magnitude of the maximum under prediction, respectively. The last two
+        represent the proportion of over predictions and the magnitude of the
+        average over prediction.
 
     """
-    train_mse, test_mse = calculate_train_and_test_mse(
+    train_mape, test_mape = calculate_train_and_test_mape(
         y_train, preds_train, y_test, preds_test)
     prop_under_preds, max_under_pred = get_under_prediction_stats(
         list(y_test), list(preds_test))
     prop_over_preds, avg_over_pred = get_over_prediction_stats(
         list(y_test), list(preds_test))
-    return (train_mse, test_mse, prop_under_preds,
+    return (train_mape, test_mape, prop_under_preds,
             max_under_pred, prop_over_preds, avg_over_pred)
 
 def render_x_y_plot(x, y, title, color):

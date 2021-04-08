@@ -156,8 +156,8 @@ class TraceARIMAX(MLBase):
 
         The model is instantiated and then fit on `train_features` and
         `train_target`. Predictions are made on `test_features` and these
-        predictions are compared to `test_target` using the mean squared
-        error.
+        predictions are compared to `test_target` using the mean absolute
+        percentage error.
 
         Parameters
         ----------
@@ -175,12 +175,12 @@ class TraceARIMAX(MLBase):
         Returns
         -------
         tuple
-            A tuple of six floats. The first two represent the mean squared error
-            for the training and testing sets, respectively. The next two
-            represent the proportion of under predictions and the magnitude of
-            the maximum under prediction, respectively. The last two represent
-            the proportion of over predictions and the magnitude of the average
-            over prediction.
+            A tuple of six floats. The first two represent the mean absolute
+            percentage error for the training and testing sets, respectively.
+            The next two represent the proportion of under predictions and the
+            magnitude of the maximum under prediction, respectively. The last
+            two represent the proportion of over predictions and the magnitude
+            of the average over prediction.
 
         """
         self._fit(train_features, train_target)

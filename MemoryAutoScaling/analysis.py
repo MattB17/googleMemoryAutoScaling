@@ -185,7 +185,7 @@ def get_model_stats_for_trace(data_trace, models):
     """Gets statistics from `models` for `data_trace`.
 
     For each model in `models`, the model is fit to `data_trace` and
-    the mean squared error on the test set is computed.
+    the mean absolute percentage error on the test set is computed.
 
     Parameters
     ----------
@@ -435,8 +435,8 @@ def extend_model_results_up_to_cutoff(results_lst, model_results, cutoff):
 def update_with_model_results(results_lst, model_results, cutoff):
     """Updates `results_lst` with the model results.
 
-    If `results_lst` has fewer than `cutoff` entries or `test_mse` is lower
-    than the test MSE of a model already contained in `results_lst`, then
+    If `results_lst` has fewer than `cutoff` entries or the test MAPE is lower
+    than the test MAPE of a model already contained in `results_lst`, then
     the model results are inserted into `results_lst`.
 
     Parameters
@@ -586,7 +586,7 @@ def get_best_models_for_trace(trace, models, models_count):
     """Gets statistics for the best models in `models` for `trace`.
 
     The best models in `models` are the `models_count` models with the lowest
-    test MSE when built on `trace`.
+    test MAPE when built on `trace`.
 
     Parameters
     ----------
@@ -714,7 +714,7 @@ def run_models_for_all_traces(modeling_func, model_params, model_name):
     results = perform_trace_modelling(traces, modeling_func, train_prop)
     cols = get_col_list_for_params(
         model_params, model_name,
-        ["train_mse", "test_mse", "prop_under_preds",
+        ["train_mape", "test_mape", "prop_under_preds",
         "max_under_pred", "prop_over_preds", "avg_over_pred"])
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
@@ -752,7 +752,7 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
 
     """
     traces, output_dir, train_prop = get_model_build_input_params()
-    model_cols = ["params", "train_mse", "test_mse",
+    model_cols = ["params", "train_mape", "test_mape",
                   "prop_under_preds", "max_under_pred",
                   "prop_over_preds", "avg_over_pred"]
     results = perform_trace_modelling(traces, modeling_func, train_prop)
