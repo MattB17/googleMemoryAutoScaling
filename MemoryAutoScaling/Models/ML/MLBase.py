@@ -122,7 +122,7 @@ class MLBase(TraceModel):
         The dataframe containing the data for modeling is obtained from
         `trace`. Then this data is split into features and target for both the
         training and test sets. Next, the model pipeline is run on the
-        resulting data to calculate the mean absolute percentage error for the
+        resulting data to calculate the mean absolute scaled error for the
         training and testing sets, respectively. The number of under
         predictions and the magnitude of the maximum under prediction for the
         test set are also calculated.
@@ -138,7 +138,7 @@ class MLBase(TraceModel):
         -------
         tuple
             A tuple of six floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
+            scaled error for the training and testing sets, respectively.
             The next two represent the proportion of under predictions and the
             magnitude of the maximum under prediction, respectively. The last
             two represent the proportion of over predictions and the magnitude
@@ -215,7 +215,7 @@ class MLBase(TraceModel):
         -------
         tuple
             A tuple of six floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
+            scaled error for the training and testing sets, respectively.
             The next two represent the proportion of under predictions and the
             magnitude of the maximum under prediction, respectively. The last
             two represent the proportion of over predictions and the magnitude

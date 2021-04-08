@@ -93,7 +93,7 @@ class SequentialModel(TraceModel):
         The modeling pipeline first obtains the data needed for modeling
         from `trace`. Next it splits this data into the training and testing
         sets. It then fits the model and obtains predictions. Lastly, these
-        predictions are evaluated using MAPE on the training and testing sets.
+        predictions are evaluated using MASE on the training and testing sets.
         The number of under predictions and the magnitude of the maximum under
         prediction for the test set are also calculated.
 
@@ -106,7 +106,7 @@ class SequentialModel(TraceModel):
         -------
         tuple
             A tuple of six floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
+            scaled error for the training and testing sets, respectively.
             The next two represent the proportion of under predictions and the
             magnitude of the maximum under prediction, respectively. The last
             two represent the proportion of over predictions and the magnitude

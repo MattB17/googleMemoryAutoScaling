@@ -95,7 +95,7 @@ class TraceModel(ABC):
         The modeling pipeline first obtains the data needed for modeling
         from `trace`. Next it splits this data into the training and testing
         sets. It then fits the model and obtains predictions. Lastly, these
-        predictions are evaluated using MAPE on the training and testing sets.
+        predictions are evaluated using MASE on the training and testing sets.
 
         Parameters
         ----------

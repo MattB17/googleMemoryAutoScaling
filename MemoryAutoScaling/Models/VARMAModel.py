@@ -123,7 +123,7 @@ class VARMAModel:
 
         The model is instantiated and fit based on `train_df`. Then
         predictions are obtained for the test time frame and these
-        predictions are compared to `test_df` using the MAPE.
+        predictions are compared to `test_df` using the MASE.
 
         Parameters
         ----------
@@ -139,7 +139,7 @@ class VARMAModel:
         VARMAX.prediction, list, list
             A `VARMAX.prediction` object containing the predictions for
             the time series up to the end of the testing period and two
-            lists corresponding to the MAPEs of the predictions for the
+            lists corresponding to the MASEs of the predictions for the
             training and testing sets, respectively, for all of variables
             being modelled.
 
@@ -147,16 +147,16 @@ class VARMAModel:
         self.fit(train_df)
         preds = self.get_predictions(test_df)
         n_forecast = len(test_df)
-        train_mapes = []
-        test_mapes = []
+        train_mases = []
+        test_mases = []
         for col_name in self._model_vars:
             mean_preds = utils.impute_for_time_series(
                 preds.predicted_mean[col_name], 0)
-            train_mapes.append(mean_squared_error(
+            train_mases.append(utils.get_mean_absolute_scaled_error(
                 train_df[col_name], mean_preds[:-n_forecast]))
-            test_mapes.append(mean_squared_error(
+            test_mases.append(utils.get_mean_absolute_scaled_error(
                 test_df[col_name], mean_preds[-n_forecast:]))
-        return preds, train_mapes, test_mapes
+        return preds, train_mases, test_mases
 
     def run_model_pipeline_for_trace(self, data_trace):
         """Runs the model pipeline on `data_trace`.
@@ -174,7 +174,7 @@ class VARMAModel:
         SARIMAX.prediction, float, float
             A `SARIMAX.prediction` object containing the predictions for
             the time series up to the end of the testing period and two
-            floats corresponding to the MAPE of the predictions for the
+            floats corresponding to the MASE of the predictions for the
             training and testing sets respectively.
 
         """

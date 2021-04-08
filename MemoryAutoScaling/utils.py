@@ -334,15 +334,15 @@ def get_lagged_trace_columns(lags, exclude_cols=None):
             if col_name not in excluded_columns]
 
 
-def get_mean_absolute_percentage_error(actuals, predicteds):
-    """The mean absolute percentage error of `predicteds` vs `actuals`.
+def get_mean_absolute_scaled_error(actuals, predicteds):
+    """The mean absolute scaled error of `predicteds` vs `actuals`.
 
-    The mean absolute percetage error is calculated as the average of
-    `|a[i] - p[i]| / a[i]` where `a[i]` and `p[i]` refer to the values of
-    `actuals` and `predicteds` at index `i`, respectively. The index `i`
-    ranges over the indices of `actuals`. Whenever the value of `a[i]` in
-    the denominator is zero it is replaced by the median to avoid division
-    by zero errors. The result is multiplied by 100 to get a percentage.
+    The mean absolute scaled error is calculated as the mean of the scaled
+    errors. The scaled errors are the prediction errors scaled by the average
+    baseline error. The prediction errors are `|a[i] - p[i]|` where `a[i]` is
+    the actual value and `p[i]` is the predicted value for period `i`. The
+    baseline errors are the errors from a model that predicts the current value
+    based on the past value.
 
     Parameters
     ----------
@@ -354,18 +354,19 @@ def get_mean_absolute_percentage_error(actuals, predicteds):
     Returns
     -------
     float
-        A float representing the mean absolute percentage error between
+        A float representing the mean absolute scaled error between
         `actuals` and `predicteds`.
 
     """
-    med = np.median(actuals)
-    denoms = copy.deepcopy(actuals)
-    denoms[denoms == 0] = med
-    return np.mean(np.abs((actuals - predicteds) / denoms)) * 100
+    actuals = list(actuals)
+    predicteds = list(predicteds)
+    errors = [np.abs(actuals[i] - predicteds[i]) for i in range(len(actuals))]
+    denom = np.mean(np.abs(np.diff(actuals)))
+    return np.mean(errors / denom)
 
 
-def calculate_train_and_test_mape(y_train, preds_train, y_test, preds_test):
-    """The mean absolute percentage error for the training and testing sets.
+def calculate_train_and_test_mase(y_train, preds_train, y_test, preds_test):
+    """The mean absolute scaled error for the training and testing sets.
 
     Parameters
     ----------
@@ -385,15 +386,13 @@ def calculate_train_and_test_mape(y_train, preds_train, y_test, preds_test):
     Returns
     -------
     float, float
-        Two floats representing the mean absolute percentage errors for the
+        Two floats representing the mean absolute scaled errors for the
         training and testing sets, respectively.
 
     """
-    train_mape = get_mean_absolute_percentage_error(y_train, preds_train)
-    test_mape = get_mean_absolute_percentage_error(y_test, preds_test)
-    print(train_mape)
-    print(test_mape)
-    return train_mape, test_mape
+    train_mase = get_mean_absolute_scaled_error(y_train, preds_train)
+    test_mase = get_mean_absolute_scaled_error(y_test, preds_test)
+    return train_mase, test_mase
 
 def plot_actual_vs_predicted_on_axis(actual, predicted, ax, ax_title):
     """Plots `actual` vs `predicted` on `ax`.
@@ -557,8 +556,8 @@ def get_over_prediction_stats(actuals, predicteds):
 def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     """Calculates the evaluation metrics for the training and testing sets.
 
-    The evaluation metrics consist of the mean absolute percentage error for
-    the training set, the mean absolute percentage error for the testing set,
+    The evaluation metrics consist of the mean absolute scaled error for
+    the training set, the mean absolute scaled error for the testing set,
     the number of under predictions for the testing set, and the magnitude of
     the maximum under prediction for the testing set.
 
@@ -588,13 +587,13 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
         average over prediction.
 
     """
-    train_mape, test_mape = calculate_train_and_test_mape(
+    train_mase, test_mase = calculate_train_and_test_mase(
         y_train, preds_train, y_test, preds_test)
     prop_under_preds, max_under_pred = get_under_prediction_stats(
         list(y_test), list(preds_test))
     prop_over_preds, avg_over_pred = get_over_prediction_stats(
         list(y_test), list(preds_test))
-    return (train_mape, test_mape, prop_under_preds,
+    return (train_mase, test_mase, prop_under_preds,
             max_under_pred, prop_over_preds, avg_over_pred)
 
 def render_x_y_plot(x, y, title, color):

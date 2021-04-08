@@ -187,7 +187,7 @@ class MLModel(MLBase):
         -------
         tuple
             A tuple of six floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
+            scaled error for the training and testing sets, respectively.
             The next two represent the proportion of under predictions and the
             magnitude of the maximum under prediction, respectively. The last
             two represent the proportion of over predictions and the magnitude
