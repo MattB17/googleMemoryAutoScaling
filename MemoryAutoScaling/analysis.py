@@ -761,7 +761,7 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
-def plot_cumulative_distribution_function(dist_vals, title):
+def plot_cumulative_distribution_function(dist_vals, ax, title, color):
     """Plots the cumulative distribution of `dist_vals`.
 
     Parameters
@@ -769,16 +769,21 @@ def plot_cumulative_distribution_function(dist_vals, title):
     dist_vals: np.array
         A numpy array representing the values of the distribution for
         which the cumulative distribution function is generated.
+    ax: plt.axis
+        The axis on which the cumulative distribution is rendered.
     title: str
         A string representing the title for the distribution function.
+    color: str
+        A string representing the color for the plot.
 
     Returns
     -------
     None
 
     """
+    dist_vals[np.isnan(dist_vals)] = 0
     x_vals = np.sort(dist_vals)
     pdf = x_vals / np.sum(x_vals)
     cdf = np.cumsum(pdf)
-    title = "Cumulative Distribution Function - {}".format(title)
-    utils.render_x_y_plot(x_vals, cdf, title, "blue")
+    ax.plot(x_vals, cdf, color=color)
+    ax.set_title("CDF of Maximum Memory vs {}".format(title))

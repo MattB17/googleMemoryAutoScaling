@@ -595,27 +595,3 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
         list(y_test), list(preds_test))
     return (train_mase, test_mase, prop_under_preds,
             max_under_pred, prop_over_preds, avg_over_pred)
-
-def render_x_y_plot(x, y, title, color):
-    """Renders a plot of `x` vs `y`.
-
-    Parameters
-    ----------
-    x: np.array
-        A numpy array representing the x values for the plot.
-    y: np.array
-        A numpy array representing the y values for the plot.
-    title: str
-        A string representing the title for the plot.
-    color: str
-        A string representing the color used for the plotted data.
-
-    Returns
-    -------
-    None
-
-    """
-    plt.figure(figsize=(20, 8))
-    plt.plot(x, y, color=color)
-    plt.title(title)
-    plt.show()
