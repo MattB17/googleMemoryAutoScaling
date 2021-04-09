@@ -287,7 +287,6 @@ class TraceAnalyzer:
         stats = utils.get_trace_stats(data_trace)
         trace_stats = {"std": stats["std"],
                        "range": stats["max"] - stats["min"],
-                       "IQR": stats["p75"] - stats["p25"],
                        "median": stats["median"],
                        "avg": stats["avg"]}
         return pd.Series(trace_stats)

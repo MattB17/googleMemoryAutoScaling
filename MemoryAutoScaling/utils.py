@@ -3,6 +3,7 @@
 """
 import copy
 import numpy as np
+import pandas as pd
 from itertools import product
 import matplotlib.pyplot as plt
 import statsmodels.tsa.api as smt
@@ -121,6 +122,133 @@ def plot_autocorrelations_for_data(trace, trace_ax, acf_ax,
     smt.graphics.plot_pacf(trace, lags=lags, ax=pacf_ax)
 
 
+def aggregate_time_series(time_series, window_length):
+    """Max aggregates `time_series` at the period `window_length`.
+
+    The aggregation computes the maximum, standard deviation, average, median,
+    and range of `time_series` for each interval of length `window_length`.
+
+    Parameters
+    ----------
+    time_series: np.array
+        A numpy array representing the time series to be aggregated.
+    window_length: int
+        An integer denoting the aggregation interval. That is, every
+        `window_length` time periods of `time_series` are aggregated.
+
+    Returns
+    -------
+    dict
+        A dictionary with the aggregate statistics for `time_series`. Each
+        key is a string representing the statistic name and the corresponding
+        value is a list representing the aggregated values of the statistic.
+
+    """
+    agg_dict = {"avg": [],
+                "std": [],
+                "median": [],
+                "max": [],
+                "range": []}
+    intervals = len(time_series) // window_length
+    for idx in range(intervals):
+        start = window_length * idx
+        end = window_length * (idx + 1)
+        agg_stats = get_trace_stats(time_series[start:end])
+        for stat in agg_stats.keys():
+            agg_dict[stat].append(agg_stats[stat])
+    return agg_dict
+
+
+def rename_aggregate_stats(agg_stats, ts_name, is_max=True):
+    """Renames the statistics in `agg_stats` based on `ts_name`.
+
+    Parameters
+    ----------
+    agg_stats: dict
+        A dictionary containing the aggregate stats to be renamed.
+    ts_name: str
+        A string representing the name of the time series.
+    is_max: bool
+        A boolean value indicating whether the time series records the
+        maximum or not. The default value is True.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `agg_stats` after renaming.
+
+    """
+    agg_stats = {"{0}_{1}".format(ts_name, stat_name): stat
+                 for stat_name, stat in agg_stats.items()}
+    ts_col = "{}_max".format(ts_name) if is_max else "{}_avg".format(ts_name)
+    agg_stats["{}_ts".format(ts_name)] = agg_stats[ts_col]
+    del agg_stats[ts_col]
+    return agg_stats
+
+
+def append_aggregate_stats_for_time_series(trace_df, ts_name, append_dict,
+                                           window_length, is_max=True):
+    """Appends aggregate stats for `ts_name` in `trace_df` to `append_dict`.
+
+    The aggregate statistics for `ts_name` are calculated based on
+    `window_length` and combined with the data in `append_dict`.
+
+    Parameters
+    ----------
+    trace_df: pd.DataFrame
+        A pandas DataFrame containing the trace data.
+    ts_name: str
+        A string representing the name of the time series.
+    append_dict: dict
+        The dictionary to which the aggregate stats are appended.
+    window_length: int
+        An integer representing the aggregation window.
+    is_max: bool
+        A boolean value indicating whether the time series records the
+        maximum or not. The default value is True.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `append_dict` after adding the
+        aggregate statistics for `ts_name`.
+
+    """
+    ts = trace_df[ts_name].values
+    agg_stats = rename_aggregate_stats(
+        aggregate_time_series(ts, window_length), ts_name, is_max)
+    return {**append_dict, **agg_stats}
+
+
+def build_trace_aggregate_df(raw_trace_df, window_len):
+    """Builds an aggregated dataframe from `raw_trace_df` using `window_len`.
+
+    Parameters
+    ----------
+    raw_trace_df: pd.DataFrame
+        A pandas DataFrame containing the raw data for the trace.
+    window_len: int
+        The aggregation window for the trace. Data will be aggregated every
+        `window_len` time periods.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the aggregated measures for the trace
+        data specified in `raw_trace_df` using `window_len` as the aggregation
+        period.
+
+    """
+    trace_dict = {}
+    for ts_name in [specs.MAX_MEM_COL, specs.MAX_CPU_COL]:
+        trace_dict = append_aggregate_stats_for_time_series(
+            raw_trace_df, ts_name, trace_dict, window_len, True)
+    for ts_name in [specs.AVG_MEM_COL, specs.AVG_CPU_COL]:
+        trace_dict = append_aggregate_stats_for_time_series(
+            raw_trace_df, ts_name, trace_dict, window_len, True)
+    return pd.DataFrame(trace_dict)
+
+
 def get_trace_stats(data_trace):
     """Calculates high-level summary statistics for `data_trace`.
 
@@ -138,13 +266,12 @@ def get_trace_stats(data_trace):
         values are the corresponding statistical value for `data_trace`.
 
     """
+    max_val = np.max(data_trace)
     return {"avg": np.mean(data_trace),
             "std": np.std(data_trace),
             "median": np.median(data_trace),
             "max": np.max(data_trace),
-            "min": np.min(data_trace),
-            "p25": np.percentile(data_trace, 25),
-            "p75": np.percentile(data_trace, 75)}
+            "range": max_val - np.min(data_trace)}
 
 
 def perform_coin_toss(prob):

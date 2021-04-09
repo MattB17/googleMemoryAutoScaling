@@ -11,3 +11,6 @@ AVG_CPU_COL = "average_usage.cpus"
 MAX_CPU_COL = "maximum_usage.cpus"
 AVG_MEM_COL = "average_usage.memory"
 MAX_MEM_COL = "maximum_usage.memory"
+
+MAX_STATS_COLS = ["avg", "std", "median", "ts", "range"]
+AVG_STATS_COLS = ["ts", "std", "median", "max", "range"]
