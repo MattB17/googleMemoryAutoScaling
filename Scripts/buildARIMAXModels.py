@@ -14,7 +14,7 @@ ARIMA_p = [p for p in range(8)]
 ARIMA_d = [d for d in range(2)]
 ARIMA_q = [q for q in range(8)]
 LAGS = [2, 3, 4]
-FEATURE_COLS = utils.get_lagged_trace_columns(LAGS, specs.MAX_MEM_COL)
+FEATURE_COLS = specs.get_lagged_trace_columns(LAGS, specs.MAX_MEM_COL)
 TARGET_COL = specs.MAX_MEM_COL
 
 

@@ -232,7 +232,7 @@ class Trace:
         lagged_dfs = []
         for lag in lags:
             lagged_data = trace_df[(max_lag - lag):-lag]
-            lagged_data.columns = utils.get_lagged_trace_columns([lag])
+            lagged_data.columns = specs.get_lagged_trace_columns([lag])
             lagged_data = lagged_data.reset_index(drop=True)
             lagged_dfs.append(lagged_data)
         target_data = target_data.reset_index(drop=True)

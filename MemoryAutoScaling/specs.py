@@ -14,3 +14,46 @@ MAX_MEM_COL = "maximum_usage.memory"
 
 MAX_STATS_COLS = ["avg", "std", "median", "ts", "range"]
 AVG_STATS_COLS = ["ts", "std", "median", "max", "range"]
+
+
+def get_trace_columns():
+    """The columns in a trace dataframe.
+
+    Returns
+    -------
+    list
+        A list of strings representing the names of the columns in a
+        trace dataframe.
+
+    """
+    max_cols = ["{0}_{1}".format(ts_name, stat_name) for ts_name, stat_name
+                in product([MAX_MEM_COL, MAX_CPU_COL], MAX_STATS_COLS)]
+    avg_cols = ["{0}_{1}".format(ts_name, stat_name) for ts_name, stat_name
+                in product([AVG_MEM_COL, AVG_CPU_COL], AVG_STATS_COLS)]
+
+
+def get_lagged_trace_columns(lags, exclude_cols=None):
+    """The column names for lagged data in a trace dataframe.
+
+    Column names are generated for each lag in `lags`. Any columns specified
+    in `exclude_cols` are excluded. If exclude_cols is None, no columns are
+    excluded.
+
+    Parameters
+    ----------
+    lags: list
+        A list of integers representing the lags for the columns.
+    exclude_cols: list
+        A list of the columns to exclude. The default value is None.
+
+    Returns
+    -------
+    list
+        A list of strings representing the names of the lagged columns in a
+        trace dataframe.
+
+    """
+    excluded_columns = exclude_cols if exclude_cols else []
+    return ["{0}_lag_{1}".format(col_name, lag) for lag, col_name
+            in product(lags, get_trace_columns())
+            if col_name not in excluded_columns]

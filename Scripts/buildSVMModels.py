@@ -7,7 +7,7 @@ from MemoryAutoScaling.Models.ML import TraceSVM
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 LAGS = [2, 3, 4]
-FEATURE_COLS = utils.get_lagged_trace_columns(LAGS)
+FEATURE_COLS = specs.get_lagged_trace_columns(LAGS)
 TARGET_COL = specs.MAX_MEM_COL
 REG_VALS = [0.01, 0.03, 0.1, 0.3, 1.0, 3.0]
 

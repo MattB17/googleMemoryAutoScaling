@@ -69,7 +69,7 @@ if __name__ == "__main__":
     stat_cols = ["id", "adf_p_val", "adf_p_val_diff", "adf_p_val_diff2"] + [
         "corr_{}".format(col_name)
         for col_name in
-        utils.get_trace_columns() + utils.get_lagged_trace_columns(LAGS)]
+        specs.get_trace_columns() + specs.get_lagged_trace_columns(LAGS)]
     stat_cols += analysis.get_all_granger_col_names(CAUSAL_COLS, causal_lags)
     stat_df.columns = stat_cols
     stat_df.to_csv(

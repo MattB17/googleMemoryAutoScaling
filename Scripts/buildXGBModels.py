@@ -8,7 +8,7 @@ from MemoryAutoScaling.Models.ML import TraceXGB
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 LAGS = [2, 3, 4]
-FEATURE_COLS = utils.get_lagged_trace_columns(LAGS)
+FEATURE_COLS = specs.get_lagged_trace_columns(LAGS)
 TARGET_COL = specs.MAX_MEM_COL
 LEARNING_RATES = [0.01, 0.03, 0.1, 0.3, 0.5]
 ESTIMATORS = [10, 50, 100, 200, 500, 1000]
