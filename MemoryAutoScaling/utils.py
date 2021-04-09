@@ -343,6 +343,31 @@ def impute_for_time_series(time_series, impute_val):
     return time_series
 
 
+def build_trace_data_from_trace_df(raw_trace_df, agg_window):
+    """Builds data for a `Trace` object from `raw_trace_df`.
+
+    The DataFrame containing the data for a `Trace` is built. This is done
+    by first replacing NaN values with 0 and then computing the aggregated
+    statistics for `raw_trace_df` based on `agg_window`.
+
+    Parameters
+    ----------
+    trace_df: pd.DataFrame
+        A pandas DataFrame containing the raw data for the trace.
+    agg_window: int
+        An integer representing the aggregation period.
+
+    Returns
+    -------
+    pd.DataFrame
+        The DataFrame obtained from `raw_trace_df` after removing NaN values
+        and aggregating data according to `agg_window`.
+
+    """
+    trace_df = raw_trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
+    return build_trace_aggregate_df(trace_df, agg_window)
+
+
 def get_differenced_trace(data_trace, diff_level):
     """Computes the result of differencing `data_trace` `diff_level` times.
 

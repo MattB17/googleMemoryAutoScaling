@@ -20,6 +20,9 @@ class Trace:
         The time at which the trace data ends
     ts_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
+    agg_window: int
+        An integer representing the length of the aggregation window. That is,
+        for every `agg_window` periods the trace data is aggregated.
 
     Attributes
     ----------
@@ -29,50 +32,42 @@ class Trace:
         The time at which the trace data starts.
     _end_time: int
         The time at which the trace data ends.
-    _avg_mem_ts: np.array
-        A time series representing average memory usage.
-    _max_mem_ts: np.array
-        A time series representing maximum memory usage.
-    _avg_cpu_ts: np.array
-        A time series representing average CPU usage.
-    _max_cpu_ts: np.array
-        A time series representing maximum CPU usage.
+    _trace_df: pd.DataFrame
+        A pandas DataFrame containing the time series data for the trace.
+    _agg_window: int
+        The aggregation window for the trace.
 
     """
-    def __init__(self, trace_id, start_time, end_time, ts_df):
+    def __init__(self, trace_id, start_time, end_time, ts_df, agg_window):
         self._trace_id = trace_id
         self._start_time = start_time
         self._end_time = end_time
-        self._avg_mem_ts = utils.extract_time_series_from_trace(
-            ts_df, specs.AVG_MEM_COL)
-        self._max_mem_ts = utils.extract_time_series_from_trace(
-            ts_df, specs.MAX_MEM_COL)
-        self._avg_cpu_ts = utils.extract_time_series_from_trace(
-            ts_df, specs.AVG_CPU_COL)
-        self._max_cpu_ts = utils.extract_time_series_from_trace(
-            ts_df, specs.MAX_CPU_COL)
+        self._trace_df = ts_df
+        self._agg_window = agg_window
         print("Trace {} created".format(trace_id))
 
     @classmethod
-    def from_raw_trace_data(cls, trace_df):
+    def from_raw_trace_data(cls, trace_df, agg_window):
         """Constructs a `Trace` from the raw data in `trace_df`.
 
         Parameters
         ----------
         trace_df: pd.DataFrame
             A dataframe representing the raw data extracted for a Borg job.
+        agg_window: int
+            An integer representing the aggregation window for the trace.
 
         Returns
         -------
         Trace
-            The `Trace` represented by trace_df
+            The `Trace` represented by trace_df.
+
         """
         trace_id = int(trace_df[specs.TRACE_ID_COL].to_numpy()[0])
         start_time = int(trace_df[specs.START_INTERVAL_COL].to_numpy()[0])
         end_time = int(trace_df[specs.END_INTERVAL_COL].to_numpy()[-1])
-        ts_df = trace_df[[specs.AVG_MEM_COL, specs.MAX_MEM_COL,
-                          specs.AVG_CPU_COL, specs.MAX_CPU_COL]]
-        return cls(trace_id, start_time, end_time, ts_df)
+        ts_df = utils.build_trace_data_from_trace_df(trace_df, agg_window)
+        return cls(trace_id, start_time, end_time, ts_df, agg_window)
 
     def get_trace_id(self):
         """The ID of the trace.
@@ -109,17 +104,16 @@ class Trace:
         """
         return self._end_time
 
-    def get_average_memory_time_series(self):
-        """The average memory usage time series for the trace.
+    def get_aggregation_window(self):
+        """The aggregation window used for the trace.
 
         Returns
         -------
-        np.array
-            A numpy array representing the time series of average memory
-            usage.
+        int
+            An integer representing the aggregation window used for the trace.
 
         """
-        return self._avg_mem_ts
+        return self._agg_window
 
     def get_maximum_memory_time_series(self):
         """The maximum memory usage time series for the trace.
@@ -131,18 +125,8 @@ class Trace:
             usage.
 
         """
-        return self._max_mem_ts
-
-    def get_average_cpu_time_series(self):
-        """The average CPU usage time series for the trace.
-
-        Returns
-        -------
-        np.array
-            A numpy array representing the time series of average CPU usage.
-
-        """
-        return self._avg_cpu_ts
+        max_mem_col = "{}_ts".format(specs.MAX_MEM_COL)
+        return self._trace_df[max_mem_col].values
 
     def get_maximum_cpu_time_series(self):
         """The maximum CPU usage time series for the trace.
@@ -153,7 +137,8 @@ class Trace:
             A numpy array representing the time series of maximum CPU usage.
 
         """
-        return self._max_cpu_ts
+        max_cpu_col = "{}_ts".format(specs.MAX_CPU_COL)
+        return self._trace_df[max_cpu_col].values
 
     def get_number_of_observations(self):
         """The number of observations of the trace.
@@ -165,7 +150,7 @@ class Trace:
             in the trace.
 
         """
-        return len(self._max_mem_ts)
+        return len(self._trace_df)
 
     def get_trace_df(self):
         """A dataframe for the trace.
@@ -177,10 +162,19 @@ class Trace:
             one column per series.
 
         """
-        return pd.DataFrame({specs.AVG_MEM_COL: self._avg_mem_ts,
-                             specs.AVG_CPU_COL: self._avg_cpu_ts,
-                             specs.MAX_MEM_COL: self._max_mem_ts,
-                             specs.MAX_CPU_COL: self._max_cpu_ts})
+        return self._trace_df
+
+    def get_max_time_series_df(self):
+        """A dataframe of only the maximum usage time series.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing the maximum usage time series for
+            the trace.
+
+        """
+        return self._trace_df[[specs.MAX_MEM_TS, specs.MAX_CPU_TS]]
 
     def output_trace(self, output_dir):
         """Outputs the trace to a csv file.
@@ -200,8 +194,9 @@ class Trace:
         Outputs the trace to `output_dir` as a csv file.
 
         """
-        file_name = "trace_df_{0}_{1}_{2}.csv".format(
-            self._trace_id, self._start_time, self._end_time)
+        file_name = "trace_df_{0}_{1}_{2}_{3}.csv".format(
+            self._trace_id, self._start_time,
+            self._end_time, self._agg_window)
         trace_df = self.get_trace_df()
         trace_df.to_csv(
             os.path.join(output_dir, file_name), sep=",", index=False)
@@ -226,7 +221,7 @@ class Trace:
             periods indicated in `lags`.
 
         """
-        trace_df = self.get_trace_df()
+        trace_df = self.get_max_time_series_df()
         max_lag = max(lags)
         target_data = trace_df[max_lag:]
         lagged_dfs = []
@@ -248,6 +243,7 @@ class Trace:
             A string representing the trace.
 
         """
-        return "Trace {0} - {1} Observations from {2} to {3}".format(
-            self._trace_id, self.get_number_of_observations(),
-            self._start_time, self._end_time)
+        return ("Trace {0} - {1} Observations from {2} to {3}\n"
+                "Aggregated every {4} time periods.".format(
+                    self._trace_id, self.get_number_of_observations(),
+                    self._start_time, self._end_time, self._agg_window))

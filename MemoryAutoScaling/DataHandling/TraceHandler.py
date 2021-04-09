@@ -29,6 +29,10 @@ class TraceHandler:
     min_length: int
         An integer representing the minimum length of a time series for a
         trace to be considered.
+    agg_window: int
+        An integer representing the aggregation window for the traces. That is,
+        for each trace, the time series data will be aggregated every
+        `agg_window` time periods.
 
     Attributes
     ----------
@@ -36,15 +40,20 @@ class TraceHandler:
         The path to the directory containing the raw data.
     _file_identifier: str
         Identifies the files in `_dir_path` to be processed.
+    _min_length: int
+        The minimum required length for a time series as part of a trace.
+    _agg_window: int
+        The aggregation window used for traces.
     _traces: list
         A list of `Trace` objects representing the traces that have been
         processed by the handler.
 
     """
-    def __init__(self, dir_path, file_identifier, min_length):
+    def __init__(self, dir_path, file_identifier, min_length, agg_window):
         self._dir_path = dir_path
         self._file_identifier = file_identifier
         self._min_length = min_length
+        self._agg_window = agg_window
         self._traces = []
 
     def get_directory_path(self):
@@ -166,7 +175,8 @@ class TraceHandler:
         order = trace_df[specs.START_INTERVAL_COL].sort_values().index
         trace_df = trace_df.loc[order]
         if len(trace_df) >= self._min_length:
-            self._traces.append(Trace.from_raw_trace_data(trace_df))
+            self._traces.append(
+                Trace.from_raw_trace_data(trace_df, self._agg_window))
 
     def run_processing_pipeline(self, verbose=True):
         """Runs the processing pipeline.
@@ -247,10 +257,11 @@ class TraceHandler:
         trace_id = file_name_comps[2]
         start_time = file_name_comps[3]
         end_time = file_name_comps[4]
+        agg_window = file_name_comps[5]
         ts_data = pd.read_csv(ts_file)
         if len(ts_data) >= self._min_length:
             self._traces.append(
-                Trace(trace_id, start_time, end_time, ts_data))
+                Trace(trace_id, start_time, end_time, ts_data, agg_window))
 
     def output_data_traces(self, output_dir):
         """Outputs each trace to its own csv file
