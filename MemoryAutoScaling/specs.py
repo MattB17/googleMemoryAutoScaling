@@ -2,6 +2,7 @@
 Scaling project. These are a set of parameters used throughout the project.
 
 """
+from itertools import product
 
 
 TRACE_ID_COL = "collection_id"
@@ -13,6 +14,7 @@ AVG_MEM_COL = "average_usage.memory"
 MAX_MEM_COL = "maximum_usage.memory"
 MAX_MEM_TS = "{}_ts".format(MAX_MEM_COL)
 MAX_CPU_TS = "{}_ts".format(MAX_CPU_COL)
+LAGS = [1, 2, 3]
 
 RAW_TIME_SERIES_COLS = [MAX_MEM_COL, AVG_MEM_COL, MAX_CPU_COL, AVG_CPU_COL]
 
@@ -34,6 +36,7 @@ def get_trace_columns():
                 in product([MAX_MEM_COL, MAX_CPU_COL], MAX_STATS_COLS)]
     avg_cols = ["{0}_{1}".format(ts_name, stat_name) for ts_name, stat_name
                 in product([AVG_MEM_COL, AVG_CPU_COL], AVG_STATS_COLS)]
+    return max_cols + avg_cols
 
 
 def get_lagged_trace_columns(lags, exclude_cols=None):

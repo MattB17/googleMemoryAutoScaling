@@ -8,8 +8,8 @@ from MemoryAutoScaling.Analysis import TraceAnalyzer
 from MemoryAutoScaling.DataHandling import Trace, TraceHandler
 
 
-CAUSAL_COLS = [specs.AVG_MEM_COL, specs.MAX_CPU_COL, specs.AVG_CPU_COL]
-LAGS = [2, 3, 4]
+CAUSAL_COLS = ["{}_ts".format(col_name) for col_name
+               in [specs.AVG_MEM_COL, specs.MAX_CPU_COL, specs.AVG_CPU_COL]]
 
 
 def run_trace_stats(traces, results_lst, causal_lags):
@@ -25,15 +25,15 @@ def run_trace_stats(traces, results_lst, causal_lags):
         p_val_diff2 = analyzer.test_for_stationarity(
             utils.get_differenced_trace(
                 trace.get_maximum_memory_time_series(), 2))
-        trace_df = trace.get_lagged_df(LAGS)
-        corr_series = trace_df.corr()[specs.MAX_MEM_COL]
+        trace_df = trace.get_lagged_df(specs.LAGS)
+        corr_series = trace_df.corr()[specs.MAX_MEM_TS]
         trace_stats = ([trace.get_trace_id(), p_val, p_val_diff, p_val_diff2]
                         + list(corr_series))
         for causal_col in CAUSAL_COLS:
             try:
                 granger = analyzer.test_for_causality(
-                    trace_df, [specs.MAX_MEM_COL, causal_col], causal_lags)
-                for lag in causal_lags:
+                    trace_df, [specs.MAX_MEM_TS, causal_col], specs.LAGS)
+                for lag in specs.LAGS:
                     trace_stats.extend(
                         analysis.get_granger_pvalues_at_lag(granger, lag))
             except:
@@ -48,10 +48,11 @@ if __name__ == "__main__":
     input_dir = sys.argv[1]
     output_dir = sys.argv[2]
     file_id = sys.argv[3]
-    causal_lags = [lag+1 for lag in range(int(sys.argv[4]))]
-    min_trace_length = int(sys.argv[5])
+    min_trace_length = int(sys.argv[4])
+    aggregation_window = int(sys.argv[5])
 
-    handler = TraceHandler(input_dir, file_id, min_trace_length)
+    handler = TraceHandler(
+        input_dir, file_id, min_trace_length, aggregation_window)
     traces = handler.run_processing_pipeline()
     stat_results = mp.Manager().list()
     procs = []
@@ -62,15 +63,15 @@ if __name__ == "__main__":
         core_traces = analysis.get_traces_for_core(
             traces, traces_per_core, core_num)
         procs.append(mp.Process(target=run_trace_stats,
-                                args=(core_traces, stat_results, causal_lags)))
+                                args=(core_traces, stat_results, specs.LAGS)))
     analysis.initialize_and_join_processes(procs)
 
     stat_df = pd.DataFrame(list(stat_results))
     stat_cols = ["id", "adf_p_val", "adf_p_val_diff", "adf_p_val_diff2"] + [
         "corr_{}".format(col_name)
         for col_name in
-        specs.get_trace_columns() + specs.get_lagged_trace_columns(LAGS)]
-    stat_cols += analysis.get_all_granger_col_names(CAUSAL_COLS, causal_lags)
+        specs.get_trace_columns() + specs.get_lagged_trace_columns(specs.LAGS)]
+    stat_cols += analysis.get_all_granger_col_names(CAUSAL_COLS, specs.LAGS)
     stat_df.columns = stat_cols
     stat_df.to_csv(
         os.path.join(output_dir, "trace_stats.csv"), sep=",", index=False)
