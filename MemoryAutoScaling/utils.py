@@ -473,7 +473,7 @@ def get_mean_absolute_scaled_error(actuals, predicteds):
     predicteds = list(predicteds)
     errors = [np.abs(actuals[i] - predicteds[i]) for i in range(len(actuals))]
     denom = np.mean(np.abs(np.diff(actuals)))
-    return np.mean(errors / denom)
+    return np.mean(errors / denom) if denom != 0 else np.mean(errors)
 
 def get_one_sided_errors(actuals, predicteds, lower=True):
     """Gets the one sided error of `actuals` vs `predicted` based on `lower`.
@@ -538,7 +538,7 @@ def get_one_sided_mean_absolute_scaled_error(actuals, predicteds, lower=True):
     predicteds = list(predicteds)
     errors = get_one_sided_errors(actuals, predicteds, lower)
     denom = np.mean(np.abs(np.diff(actuals)))
-    return np.mean(errors / denom)
+    return np.mean(errors / denom) if denom != 0 else np.mean(errors)
 
 
 def calculate_train_and_test_mase(y_train, preds_train, y_test, preds_test):
