@@ -437,6 +437,21 @@ def extend_model_results_up_to_cutoff(results_lst, model_results, cutoff):
     return results_lst
 
 
+def is_better_model(new_mase, new_under_mase, old_mase, old_under_mase):
+    """Determines if the new model performs better than the old model.
+
+    The new model performs better than the old model if the weighted
+    difference of the MASEs is positive.
+
+    """
+    under_mase_diff = (old_under_mase - new_under_mase) / old_under_mase
+    mase_diff = (old_mase - new_mase) / old_mase
+    w = specs.OVERALL_MASE_WEIGHT
+    return ((under_mase_diff >= 0 and mase_diff >= 0) or
+            (under_mase_diff >= 0 and under_mase_diff >= -w * mase_diff) or
+            (mase_diff >= 0 and w * mase_diff > -under_mase_diff))
+
+
 def update_with_model_results(results_lst, model_results, cutoff):
     """Updates `results_lst` with the model results.
 
@@ -465,7 +480,11 @@ def update_with_model_results(results_lst, model_results, cutoff):
     """
     model_count = (len(results_lst) - 1) // len(model_results)
     for idx in range(model_count):
-        if model_results[2] < results_lst[len(model_results) * (idx + 1)]:
+        old_model_idx = 2 + (len(model_results) * idx)
+        is_better = is_better_model(
+            model_results[2], model_results[3],
+            results_lst[old_model_idx + 1], results_lst[old_model_idx + 2])
+        if is_better:
             return insert_model_results_at_index(
                 results_lst, model_results, idx)
     return extend_model_results_up_to_cutoff(
@@ -613,7 +632,7 @@ def get_best_models_for_trace(trace, models, models_count):
     best_results = [trace.get_trace_id()]
     cutoff = (len(specs.MODELING_COLS) * models_count) + 1
     for model in models:
-        best_results = update_model_stats_for_trace(
+        best_results = handle_stats_for_model(
             trace, model, best_results, cutoff)
     return pad_list(best_results, np.nan, cutoff)
 

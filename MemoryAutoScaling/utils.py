@@ -475,6 +475,71 @@ def get_mean_absolute_scaled_error(actuals, predicteds):
     denom = np.mean(np.abs(np.diff(actuals)))
     return np.mean(errors / denom)
 
+def get_one_sided_errors(actuals, predicteds, lower=True):
+    """Gets the one sided error of `actuals` vs `predicted` based on `lower`.
+
+    The one sided errors are the maximum of `actuals - predicteds` and 0 if
+    `lower` is true. Otherwise, they are the maximum of `predicteds - actuals`
+    and 0.
+
+    Parameters
+    ----------
+    actuals: list
+        The actual values.
+    predicteds: list
+        The predicted values.
+    lower: bool
+        A boolean indicating the type of errors computed. If True, the under
+        predictions are calculated. Otherwise, the over prediction are
+        calculated.
+
+    Returns
+    -------
+    list
+        A list containing the one sided errors.
+
+    """
+    if lower:
+        return [max(0, actuals[i] - predicteds[i])
+                for i in range(len(actuals))]
+    return [max(predicteds[i] - actuals[i], 0) for i in range(len(actuals))]
+
+
+def get_one_sided_mean_absolute_scaled_error(actuals, predicteds, lower=True):
+    """The one-sided mean absolute scaled error of `predicteds` vs `actuals`.
+
+    The mean absolute scaled error is calculated as the mean of the scaled
+    errors. The scaled errors are the prediction errors scaled by the average
+    baseline error. The prediction errors are `|a[i] - p[i]|` where `a[i]` is
+    the actual value and `p[i]` is the predicted value for period `i`. The
+    baseline errors are the errors from a model that predicts the current
+    value based on the past value. The one sided variant only considers under
+    or over predictions, with the other errors being set to 0.
+
+    Parameters
+    ----------
+    actuals: np.array
+        A numpy array representing the actual values.
+    predicteds: np.array
+        A numpy array representing the predicted values.
+    lower: bool
+        A boolean indicating the type of errors computed. If True, the under
+        predictions are calculated. Otherwise, the over prediction are
+        calculated.
+
+    Returns
+    -------
+    float
+        A float representing the one-sided mean absolute scaled error between
+        `actuals` and `predicteds` based on `lower`.
+
+    """
+    actuals = list(actuals)
+    predicteds = list(predicteds)
+    errors = get_one_sided_errors(actuals, predicteds, lower)
+    denom = np.mean(np.abs(np.diff(actuals)))
+    return np.mean(errors / denom)
+
 
 def calculate_train_and_test_mase(y_train, preds_train, y_test, preds_test):
     """The mean absolute scaled error for the training and testing sets.
@@ -600,17 +665,21 @@ def get_under_prediction_stats(actuals, predicteds):
 
     Returns
     -------
-    float, float
-        A float representing the proportion of predictions that were under
-        predictions and a float representing the magnitude of the maximum
-        under prediction, standardized by the average prediction.
+    float, float, float
+        A float representing the one-sided mean absolute scaled error for
+        under predictions. A float representing the proportion of predictions
+        that were under predictions and a float representing the magnitude of
+        the maximum under prediction, standardized by the average prediction.
 
     """
     under_preds = np.array([actuals[i] - predicteds[i]
                             for i in range(len(actuals))
                             if actuals[i] > predicteds[i]])
-    return get_under_pred_vals(
+    under_mase = get_one_sided_mean_absolute_scaled_error(
+        actuals, predicteds, True)
+    under_prop, under_max = get_under_pred_vals(
         under_preds, len(predicteds), np.mean(predicteds))
+    return under_mase, under_prop, under_max
 
 def get_over_pred_vals(over_preds, pred_count, avg_pred):
     """Gets the proportion and average value of `over_preds`.
@@ -652,17 +721,21 @@ def get_over_prediction_stats(actuals, predicteds):
 
     Returns
     -------
-    float, float
-        A float representing the proportion of predictions that were under
-        predictions and a float representing the magnitude of the maximum
-        under prediction, standardized by the average prediction.
+    float, float, float
+        A float representing the one-sided mean absolute scaled error for
+        over predictions. A float representing the proportion of predictions
+        that were over predictions and a float representing the magnitude of
+        the average over prediction, standardized by the average prediction.
 
     """
     over_preds = np.array([predicteds[i] - actuals[i]
                             for i in range(len(actuals))
                             if actuals[i] < predicteds[i]])
-    return get_over_pred_vals(
+    over_mase = get_one_sided_mean_absolute_scaled_error(
+        actuals, predicteds, True)
+    over_prop, over_avg = get_over_pred_vals(
         over_preds, len(predicteds), np.mean(predicteds))
+    return over_mase, over_prop, over_avg
 
 def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     """Calculates the evaluation metrics for the training and testing sets.
@@ -690,19 +763,21 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     Returns
     -------
     tuple
-        A tuple of six floats. The first two represent the mean absolute
+        A tuple of eight floats. The first two represent the mean absolute
         percentage error for the training and testing sets, respectively.
-        The next two represent the proportion of under predictions and the
-        magnitude of the maximum under prediction, respectively. The last two
-        represent the proportion of over predictions and the magnitude of the
-        average over prediction.
+        The next three represent the one-sided mean absolute scaled error for
+        under predictions, the proportion of under predictions, and the
+        magnitude of the maximum under prediction, respectively. The last
+        three represent the one-sided mean absolute scaled error for over
+        predictions, the proportion of over predictions, and the magnitude of
+        the average over prediction.
 
     """
     train_mase, test_mase = calculate_train_and_test_mase(
         y_train, preds_train, y_test, preds_test)
-    prop_under_preds, max_under_pred = get_under_prediction_stats(
+    under_mase, prop_under_preds, max_under_pred = get_under_prediction_stats(
         list(y_test), list(preds_test))
-    prop_over_preds, avg_over_pred = get_over_prediction_stats(
+    over_mase, prop_over_preds, avg_over_pred = get_over_prediction_stats(
         list(y_test), list(preds_test))
-    return (train_mase, test_mase, prop_under_preds,
-            max_under_pred, prop_over_preds, avg_over_pred)
+    return (train_mase, test_mase, under_mase, prop_under_preds,
+            max_under_pred, over_mase, prop_over_preds, avg_over_pred)
