@@ -340,8 +340,11 @@ def get_col_list_for_params(params, model_name, model_cols):
         `model_cols`.
 
     """
-    return ["{0}_{1}_{2}".format(model_col, model_name, param)
-            for param, model_col in product(params, model_cols)]
+    if len(params) > 1:
+        return ["{0}_{1}_{2}".format(model_col, model_name, param)
+                for param, model_col in product(params, model_cols)]
+    return ["{0}_{1}".format(model_col, model_name)
+            for model_col in model_cols]
 
 
 def model_traces_and_evaluate(model, model_params, traces,
@@ -608,7 +611,7 @@ def get_best_models_for_trace(trace, models, models_count):
 
     """
     best_results = [trace.get_trace_id()]
-    cutoff = (7 * models_count) + 1
+    cutoff = (len(specs.MODELING_COLS) * models_count) + 1
     for model in models:
         best_results = update_model_stats_for_trace(
             trace, model, best_results, cutoff)
@@ -721,13 +724,13 @@ def run_models_for_all_traces(modeling_func, model_params, model_name):
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
-def run_best_models_for_all_traces(modeling_func, model_name):
+def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     """Models all traces using `modeling_func` with `model_name`.
 
-    A series of models are run on each trace, and the best of these models for
-    each trace are recorded. `modeling_func` is used to run the models on a
-    batch of traces and this function is parallelized to cover all traces.
-    The best models are then retrieved.
+    A series of models are run on each trace, and the best `models_count` of
+    these models for each trace are recorded. `modeling_func` is used to run
+    the models on a batch of traces and this function is parallelized to cover
+    all traces. The best models are then retrieved.
 
     Parameters
     ----------
@@ -736,6 +739,9 @@ def run_best_models_for_all_traces(modeling_func, model_name):
         function takes three arguments: a list of `Trace` objects on which the
         models are run, a list to which results are saved, and a float
         specifying the proportion of data in the training set.
+    models_count: int
+        An integer representing the number of models to record. The results
+        for the `models_count` best models for each trace are recorded.
     model_name: str
         A string specifying the name of the model.
 
@@ -752,9 +758,10 @@ def run_best_models_for_all_traces(modeling_func, model_name):
     """
     traces, output_dir, train_prop = get_model_build_input_params()
     results = perform_trace_modelling(traces, modeling_func, train_prop)
+    cols = get_col_list_for_params(
+        range(1, models_count + 1), model_name, specs.MODELING_COLS)
     output_model_results(
-        results, specs.MODELING_COLS,
-        output_dir, "{}_results".format(model_name))
+        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
 def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):
     """Plots the cumulative distribution of `dist_vals`.

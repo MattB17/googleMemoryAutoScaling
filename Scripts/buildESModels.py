@@ -4,7 +4,7 @@ smoothing models are built based on the different alpha values specified by
 `ALPHAS`
 
 """
-from MemoryAutoScaling import utils, analysis
+from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Sequential import TraceExponentialSmoothing
 
 
@@ -16,10 +16,11 @@ def build_es_models_for_traces(trace_lst, results_lst, train_prop):
                       'initial_pred': 0.001,
                       'train_prop': train_prop}
                      for alpha_val in ALPHAS]
-    analysis.model_traces_and_evaluate(
-        TraceExponentialSmoothing, es_params_lst, trace_lst, results_lst)
+    analysis.get_best_model_results_for_traces(
+        TraceExponentialSmoothing, es_params_lst, trace_lst,
+        results_lst, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":
-    analysis.run_models_for_all_traces(
-        build_es_models_for_traces, ALPHAS, "es")
+    analysis.run_best_models_for_all_traces(
+        build_es_models_for_traces, specs.MODELS_COUNT, "es")

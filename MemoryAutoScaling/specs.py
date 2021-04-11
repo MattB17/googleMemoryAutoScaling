@@ -15,13 +15,14 @@ MAX_MEM_COL = "maximum_usage.memory"
 MAX_MEM_TS = "{}_ts".format(MAX_MEM_COL)
 MAX_CPU_TS = "{}_ts".format(MAX_CPU_COL)
 LAGS = [1, 2, 3]
+MODELS_COUNT = 1
 
 RAW_TIME_SERIES_COLS = [MAX_MEM_COL, AVG_MEM_COL, MAX_CPU_COL, AVG_CPU_COL]
 
 MAX_STATS_COLS = ["avg", "std", "median", "ts", "range"]
 AVG_STATS_COLS = ["ts", "std", "median", "max", "range"]
 
-MODELING_COLS = ["id", "params", "train_mase", "test_mase",
+MODELING_COLS = ["params", "train_mase", "test_mase",
                  "prop_under_preds", "max_under_pred",
                  "prop_over_preds", "avg_over_pred"]
 

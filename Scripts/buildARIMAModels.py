@@ -5,13 +5,13 @@ based on the different values of `p`, `d`, and `q` specified in `ARIMA_p`,
 
 """
 from itertools import product
-from MemoryAutoScaling import analysis, utils
+from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Statistical import TraceARIMA
 
 
-ARIMA_p = [p for p in range(8)]
+ARIMA_p = [p for p in range(4)]
 ARIMA_d = [d for d in range(2)]
-ARIMA_q = [q for q in range(8)]
+ARIMA_q = [q for q in range(4)]
 
 
 def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
@@ -19,9 +19,10 @@ def build_arima_models_for_traces(traces_lst, results_lst, train_prop):
                         'p': p, 'd': d, 'q': q}
                         for p, d, q in product(ARIMA_p, ARIMA_d, ARIMA_q)]
     analysis.get_best_model_results_for_traces(
-        TraceARIMA, arima_params_lst, traces_lst, results_lst, 5)
+        TraceARIMA, arima_params_lst, traces_lst,
+        results_lst, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":
     analysis.run_best_models_for_all_traces(
-        build_arima_models_for_traces, 5, "arima")
+        build_arima_models_for_traces, specs.MODELS_COUNT, "arima")

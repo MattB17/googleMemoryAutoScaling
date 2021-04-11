@@ -4,7 +4,7 @@ models are built based on the different window lengths specified in
 `MA_WINDOWS`.
 
 """
-from MemoryAutoScaling import utils, analysis
+from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Sequential import TraceMovingAverage
 
 
@@ -17,9 +17,10 @@ def build_ma_models_for_traces(trace_lst, results_lst, train_prop):
                       'train_prop': train_prop}
                      for ma_win in MA_WINDOWS]
     analysis.get_best_model_results_for_traces(
-        TraceMovingAverage, ma_params_lst, trace_lst, results_lst, 1)
+        TraceMovingAverage, ma_params_lst, trace_lst,
+        results_lst, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":
     analysis.run_best_models_for_all_traces(
-        build_ma_models_for_traces, "ma")
+        build_ma_models_for_traces, specs.MODELS_COUNT, "ma")
