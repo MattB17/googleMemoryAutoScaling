@@ -444,8 +444,8 @@ def is_better_model(new_mase, new_under_mase, old_mase, old_under_mase):
     difference of the MASEs is positive.
 
     """
-    under_mase_diff = (old_under_mase - new_under_mase) / old_under_mase
-    mase_diff = (old_mase - new_mase) / old_mase
+    under_mase_diff = old_under_mase - new_under_mase
+    mase_diff = old_mase - new_mase
     w = specs.OVERALL_MASE_WEIGHT
     return ((under_mase_diff >= 0 and mase_diff >= 0) or
             (under_mase_diff >= 0 and under_mase_diff >= -w * mase_diff) or
