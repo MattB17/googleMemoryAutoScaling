@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import specs, utils
 from MemoryAutoScaling.DataHandling import TraceHandler
 
 
@@ -229,7 +229,8 @@ def read_modelling_input_params():
             "output_dir": sys.argv[2],
             "file_id": sys.argv[3],
             "min_trace_length": int(sys.argv[4]),
-            "train_prop": float(sys.argv[5])}
+            "train_prop": float(sys.argv[5]),
+            "aggregation_window": int(sys.argv[6])}
 
 
 def get_model_build_input_params():
@@ -251,7 +252,8 @@ def get_model_build_input_params():
     """
     params = read_modelling_input_params()
     trace_handler = TraceHandler(
-        params['input_dir'], params['file_id'], params['min_trace_length'])
+        params['input_dir'], params['file_id'],
+        params['min_trace_length'], params["aggregation_window"])
     traces = trace_handler.run_processing_pipeline()
     return traces, params['output_dir'], params['train_prop']
 
@@ -719,13 +721,13 @@ def run_models_for_all_traces(modeling_func, model_params, model_name):
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
-def run_best_models_for_all_traces(modeling_func, models_count, model_name):
+def run_best_models_for_all_traces(modeling_func, model_name):
     """Models all traces using `modeling_func` with `model_name`.
 
-    A series of models are run on each trace, and the best `models_count` of
-    these models for each trace are recorded. `modeling_func` is used to run
-    the models on a batch of traces and this function is parallelized to cover
-    all traces. The best models are then retrieved.
+    A series of models are run on each trace, and the best of these models for
+    each trace are recorded. `modeling_func` is used to run the models on a
+    batch of traces and this function is parallelized to cover all traces.
+    The best models are then retrieved.
 
     Parameters
     ----------
@@ -734,9 +736,6 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
         function takes three arguments: a list of `Trace` objects on which the
         models are run, a list to which results are saved, and a float
         specifying the proportion of data in the training set.
-    models_count: int
-        An integer representing the number of models to record. The results
-        for the `models_count` best models for each trace are recorded.
     model_name: str
         A string specifying the name of the model.
 
@@ -752,14 +751,10 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
 
     """
     traces, output_dir, train_prop = get_model_build_input_params()
-    model_cols = ["params", "train_mase", "test_mase",
-                  "prop_under_preds", "max_under_pred",
-                  "prop_over_preds", "avg_over_pred"]
     results = perform_trace_modelling(traces, modeling_func, train_prop)
-    cols = get_col_list_for_params(
-        range(1, models_count + 1), model_name, model_cols)
     output_model_results(
-        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+        results, specs.MODELING_COLS,
+        output_dir, "{}_results".format(model_name))
 
 def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):
     """Plots the cumulative distribution of `dist_vals`.

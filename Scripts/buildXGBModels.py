@@ -10,9 +10,9 @@ from MemoryAutoScaling.DataHandling import MLDataHandler
 LAGS = [2, 3, 4]
 FEATURE_COLS = specs.get_lagged_trace_columns(LAGS)
 TARGET_COL = specs.MAX_MEM_COL
-LEARNING_RATES = [0.01, 0.03, 0.1, 0.3, 0.5]
-ESTIMATORS = [10, 50, 100, 200, 500, 1000]
-DEPTHS = [1, 2, 5]
+LEARNING_RATES = [0.1, 0.3, 0.5]
+ESTIMATORS = [10, 50, 100, 200]
+DEPTHS = [1, 2]
 
 
 def build_xgb_models_for_traces(trace_lst, results_lst, train_prop):
