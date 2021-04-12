@@ -20,8 +20,8 @@ OVERALL_MASE_WEIGHT = 5
 
 RAW_TIME_SERIES_COLS = [MAX_MEM_COL, AVG_MEM_COL, MAX_CPU_COL, AVG_CPU_COL]
 
-MAX_STATS_COLS = ["avg", "std", "median", "ts", "range"]
-AVG_STATS_COLS = ["ts", "std", "median", "max", "range"]
+MAX_STATS_COLS = ["ts", "avg", "std", "median", "range"]
+AVG_STATS_COLS = ["ts", "max", "std", "median", "range"]
 
 MODELING_COLS = ["params", "train_mase", "test_mase",
                  "under_mase", "prop_under_preds", "max_under_pred",

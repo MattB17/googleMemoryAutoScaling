@@ -162,7 +162,7 @@ class Trace:
             one column per series.
 
         """
-        return self._trace_df
+        return self._trace_df[specs.get_trace_columns()]
 
     def get_max_time_series_df(self):
         """A dataframe of only the maximum usage time series.

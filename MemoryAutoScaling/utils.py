@@ -245,7 +245,7 @@ def build_trace_aggregate_df(raw_trace_df, window_len):
             raw_trace_df, ts_name, trace_dict, window_len, True)
     for ts_name in [specs.AVG_MEM_COL, specs.AVG_CPU_COL]:
         trace_dict = append_aggregate_stats_for_time_series(
-            raw_trace_df, ts_name, trace_dict, window_len, True)
+            raw_trace_df, ts_name, trace_dict, window_len, False)
     return pd.DataFrame(trace_dict)
 
 
