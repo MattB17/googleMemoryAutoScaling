@@ -149,8 +149,12 @@ class MLBase(TraceModel):
         """
         raw_data = self.get_model_data_for_trace(trace)
         X_train, y_train, X_test, y_test = self.split_data(raw_data)
-        return self._run_model_pipeline(
-            X_train, y_train, X_test, y_test)
+        try:
+            return self._run_model_pipeline(X_train, y_train, X_test, y_test)
+        except:
+            print(raw_data)
+            print(trace.get_trace_df())
+            return tuple([np.nan for _ in range(8)])
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its predictions.
