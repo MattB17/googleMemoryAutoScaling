@@ -626,7 +626,7 @@ def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
         y_test, preds_test, axes[1], "{} Testing Set".format(title))
     plt.show()
 
-def get_under_pred_vals(under_preds, pred_count, avg_pred):
+def get_under_pred_vals(under_preds, pred_count):
     """Gets the proportion and maximum value of `under_preds`.
 
     Parameters
@@ -634,22 +634,43 @@ def get_under_pred_vals(under_preds, pred_count, avg_pred):
     under_preds: np.array
         A numpy array containing the under predictions.
     pred_count: int
-        An integer representing the number of predictions
-    avg_pred: float
-        The average value of the predictions in the prediction window.
+        An integer representing the number of predictions.
 
     Returns
     -------
     float, float
         A float representing the proportion of predictions that were under
         predictions and a float representing the magnitude of the maximum
-        under prediction divided by `avg_pred`.
+        under prediction.
 
     """
     count = len(under_preds)
     if count == 0:
         return 0.0, np.nan
-    return (count / pred_count), (max(under_preds) / avg_pred)
+    return (count / pred_count), max(under_preds)
+
+def get_under_predictions(actuals, predicteds):
+    """Retrieves the under predictions of `predicteds` vs `actuals`.
+
+    The under predictions are the actual values minus the predicted values
+    divided by the predicted values for the predictions that are less than
+    the actuals.
+
+    Parameters
+    ----------
+    actuals: np.array
+        A numpy array representing the actual values.
+    predicteds: np.array
+        A numpy array representing the actual values.
+
+    Returns
+    -------
+    list
+        A list containing the under predictions.
+
+    """
+    return [(actuals[i] - predicteds[i]) / max(predicteds[i], specs.EPS)
+            for i in range(len(actuals)) if actuals[i] > predicteds[i]]
 
 def get_under_prediction_stats(actuals, predicteds):
     """Retrieves statistics of under predictions of predicteds vs actuals.
@@ -672,16 +693,14 @@ def get_under_prediction_stats(actuals, predicteds):
         the maximum under prediction, standardized by the average prediction.
 
     """
-    under_preds = np.array([actuals[i] - predicteds[i]
-                            for i in range(len(actuals))
-                            if actuals[i] > predicteds[i]])
+    under_preds = np.array(get_under_predictions(actuals, predicteds))
     under_mase = get_one_sided_mean_absolute_scaled_error(
         actuals, predicteds, True)
     under_prop, under_max = get_under_pred_vals(
-        under_preds, len(predicteds), np.mean(predicteds))
+        under_preds, len(predicteds))
     return under_mase, under_prop, under_max
 
-def get_over_pred_vals(over_preds, pred_count, avg_pred):
+def get_over_pred_vals(over_preds, pred_count):
     """Gets the proportion and average value of `over_preds`.
 
     Parameters
@@ -690,21 +709,42 @@ def get_over_pred_vals(over_preds, pred_count, avg_pred):
         A numpy array containing the over predictions.
     pred_count: int
         An integer representing the number of predictions.
-    avg_pred: float
-        The average value of the predictions in the prediction window.
 
     Returns
     -------
     float, float
         A float representing the proportion of predictions that were over
         predictions and a float representing the magnitude of the average
-        over prediction divided by `avg_pred`.
+        over prediction.
 
     """
     count = len(over_preds)
     if count == 0:
         return 0.0, 0.0
-    return (count / pred_count), (np.mean(over_preds) / avg_pred)
+    return (count / pred_count), np.mean(over_preds)
+
+def get_over_predictions(actuals, predicteds):
+    """Retrieves the over predictions of `predicteds` vs `actuals`.
+
+    The under predictions are the predicted values minus the actual values
+    divided by the predicted values for the predictions that are greater than
+    the actuals.
+
+    Parameters
+    ----------
+    actuals: np.array
+        A numpy array representing the actual values.
+    predicteds: np.array
+        A numpy array representing the actual values.
+
+    Returns
+    -------
+    list
+        A list containing the under predictions.
+
+    """
+    return [(predicteds[i] - actuals[i]) / max(predicteds[i], specs.EPS)
+            for i in range(len(actuals)) if actuals[i] < predicteds[i]]
 
 def get_over_prediction_stats(actuals, predicteds):
     """Retrieves statistics of over predictions of predicteds vs actuals.
@@ -728,13 +768,11 @@ def get_over_prediction_stats(actuals, predicteds):
         the average over prediction, standardized by the average prediction.
 
     """
-    over_preds = np.array([predicteds[i] - actuals[i]
-                            for i in range(len(actuals))
-                            if actuals[i] < predicteds[i]])
+    over_preds = np.array(get_over_predictions(actuals, predicteds))
     over_mase = get_one_sided_mean_absolute_scaled_error(
         actuals, predicteds, True)
     over_prop, over_avg = get_over_pred_vals(
-        over_preds, len(predicteds), np.mean(predicteds))
+        over_preds, len(predicteds))
     return over_mase, over_prop, over_avg
 
 def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
