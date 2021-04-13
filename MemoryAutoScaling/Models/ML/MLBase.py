@@ -3,6 +3,7 @@ learning models that predict using a time series. It represents an interface
 providing the basic framework used by all machine learning models.
 
 """
+import numpy as np
 from abc import abstractmethod
 from MemoryAutoScaling import utils
 from MemoryAutoScaling.Models import TraceModel
