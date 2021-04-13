@@ -526,9 +526,42 @@ def get_best_models_for_trace(trace, models, models_count):
     best_results = [trace.get_trace_id()]
     cutoff = (len(specs.MODELING_COLS) * models_count) + 1
     for model in models:
-        best_results = handle_stats_for_model(
+        best_results = update_model_stats_for_trace(
             trace, model, best_results, cutoff)
     return pad_list(best_results, np.nan, cutoff)
+
+def get_best_multivariate_models_for_trace(trace, models, models_count):
+    """Gets stats for the best multivariate models in `models` for `trace`.
+
+    The best models in `models` are the `models_count` models with the lowest
+    test MASE when built on `trace`.
+
+    Parameters
+    ----------
+    trace: Trace
+        The `Trace` object being modeled.
+    models: list
+        A list of `TraceModel` objects representing the models being fit
+        to `trace` and from which the best models are chosen.
+    models_count: int
+        An integer representing the number of models to include in the results.
+
+    Returns
+    -------
+    dict
+        A dictionary consisting of a list for each variable being modeled.
+        Each list consists of the ID of `trace` followed by the results for the
+        `models_count` best models from `models` fit to `trace`.
+
+    """
+    cutoff = (len(specs.MODELING_COLS) * models_count) + 1
+    for model in models:
+        best_results = update_model_stats_for_trace(
+            trace, model, best_results, cutoff)
+    for model_var in best_results.keys():
+        best_results[model_var] = pad_list(
+            best_results[model_var], np.nan, cutoff)
+    return best_results
 
 def get_best_model_results_for_traces(model, model_params, traces,
                                       result_lst, models_count, verbose=True):
@@ -569,6 +602,72 @@ def get_best_model_results_for_traces(model, model_params, traces,
     for idx in range(trace_count):
         result_lst.append(
             get_best_models_for_trace(traces[idx], models, models_count))
+        log_modeling_progress(idx, trace_count, verbose)
+
+def add_model_results_to_dict(trace, models, models_count, result_dict):
+    """Adds the model results of `models` fit on `trace` to `result_dict`.
+
+    Parameters
+    ----------
+    trace: Trace
+        The `Trace` being modeled.
+    models: list
+        A list of models to be fit to `trace`.
+    models_count: int
+        An integer representing the number of model results to save to
+        `result_dict`
+    result_dict: dict
+        A dictionary storing model results for each trace.
+
+    Returns
+    -------
+    None
+
+    """
+    model_results = get_best_multivariate_models_for_trace(
+        trace, models, models_count)
+    for model_var in model_results.keys():
+        results_dict[model_var].append(model_results[model_var])
+
+def get_best_multivariate_model_results_for_traces(
+    model, model_params, traces, result_dict, models_count, verbose=True):
+    """Gets the `models_count` best model results for the traces of `traces`.
+
+    For each trace in `traces` a `model` object is built for each set of model
+    parameters in `model_params` and the results of the best `models_count`
+    models are saved in `result_dict`. If fewer than `models_count` models are
+    fitted to the trace, then the result is padded with `np.nan`.
+
+    Parameters
+    ----------
+    model: TimeSeriesModel.class
+        A `TimeSeriesModel` class specifying the model to be built.
+    model_params: list
+        A list of dictionaries specifying the model parameters for each model
+        to be built.
+    traces: list
+        A list of `Trace` objects specifying the traces to which models are
+        fit.
+    result_dict: dict
+        The dictionary to which the model results for each trace are saved.
+    models_count: int
+        An integer representing the number of model results to save. The
+        results for the `models_count` best models for each trace will be
+        saved.
+    verbose: bool
+        A boolean indicating whether to run in verbose mode. The default
+        value is True, in which case progress is printed to the screen.
+
+    Returns
+    -------
+    None
+
+    """
+    models = build_models_from_params_list(model, model_params)
+    trace_count = len(traces)
+    for idx in range(trace_count):
+        add_model_results_to_dict(
+            traces[idx], models, models_count, result_dict)
         log_modeling_progress(idx, trace_count, verbose)
 
 def log_modeling_progress(trace_idx, trace_count, verbose=True):

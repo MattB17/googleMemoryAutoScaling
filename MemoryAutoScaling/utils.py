@@ -611,7 +611,8 @@ def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
     preds_test: np.array
         A numpy array containing the predictions for the testing set.
     axes: tuple
-        A tuple containing the axes on which the plots will be rendered.
+        A two-element tuple containing the axes on which the plots will be
+        rendered.
     title: str
         A string representing the title used for the plots.
 
@@ -625,6 +626,51 @@ def plot_train_and_test_predictions_on_axes(y_train, preds_train, y_test,
     plot_actual_vs_predicted_on_axis(
         y_test, preds_test, axes[1], "{} Testing Set".format(title))
     plt.show()
+
+def plot_multivariate_train_and_test_predictions(
+    train_df, train_preds, test_df, test_preds, axes, model_vars, base_title):
+    """Plots actual vs predicted values for the variables in `model_vars`.
+
+    The actual vs predicted values are plotted for both the training and
+    testing sets for all of the variables in `model_vars` on `axes`. Each
+    row consists of two plots for the training and testing sets for a
+    particular variable of `model_vars`.
+
+    Parameters
+    ----------
+    train_df: pd.DataFrame
+        A pandas DataFrame containing the target data for the training set.
+    train_preds: pd.DataFrame
+        A pandas DataFrame containing the predictions for the training set.
+    test_df: pd.DataFrame
+        A pandas DataFrame containing the target data for the testing set.
+    test_preds: pd.DataFrame
+        A pandas DataFrame containing the predictions for the testing set.
+    axes: tuple
+        A tuple containing the aces on which the plots will be rendered. The
+        tuple has dimensions `d` by 2 where `d` is the length of `model_vars`.
+    model_vars: list
+        A list of strings representing the variables being modeled.
+    base_title: str
+        A string representing the base title used for all plot title.
+
+    Returns
+    -------
+    None
+
+    """
+    for idx in len(model_vars):
+        model_var = model_vars[idx]
+        plot_actual_vs_predicted_on_axis(
+            train_df[model_var].values, train_preds[model_var].values,
+            axes[idx, 0],
+            "{0} Training Set - {1}".format(base_title, model_var))
+        plot_actual_vs_predicted_on_axis(
+            test_df[model_var].values, test_preds[model_var].values,
+            axes[idx, 1],
+            "{0} Testing Set - {1}".format(base_title, model_var))
+    plt.show()
+
 
 def get_under_pred_vals(under_preds, pred_count):
     """Gets the proportion and maximum value of `under_preds`.
@@ -819,3 +865,49 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
         list(y_test), list(preds_test))
     return (train_mase, test_mase, under_mase, prop_under_preds,
             max_under_pred, over_mase, prop_over_preds, avg_over_pred)
+
+def calculate_multivariate_evaluation_metrics(train_df, train_preds, test_df,
+                                              test_preds, model_vars):
+    """Calculates the evaluation metrics for the training and testing sets.
+
+    The evaluation metrics consist of the mean absolute scaled error for
+    the training set, the mean absolute scaled error for the testing set,
+    the number of under predictions for the testing set, and the magnitude of
+    the maximum under prediction for the testing set. They are calculated
+    for each variable specified in `model_vars`.
+
+    Parameters
+    ----------
+    train_df: pd.DataFrame
+        A pandas DataFrame containing the target data for the training set.
+    train_preds: pd.DataFrame
+        A pandas DataFrame containing the predictions for the training set.
+    test_df: pd.DataFrame
+        A pandas DataFrame containing the target data for the testing set.
+    test_preds: pd.DataFrame
+        A pandas DataFrame containing the predictions for the testing set.
+    model_vars: list
+        A list of strings with the names of the variables being modeled.
+
+    Returns
+    -------
+    dict
+        A dictionary of tuples where each tuple represents the evaluation
+        metrics for one of the model variables specified in `model_vars`.
+        Each tuple consists of eight floats. The first two represent the mean
+        absolute percentage error for the training and testing sets,
+        respectively. The next three represent the one-sided mean absolute
+        scaled error for under predictions, the proportion of under
+        predictions, and the magnitude of the maximum under prediction,
+        respectively. The last three represent the one-sided mean absolute
+        scaled error for over predictions, the proportion of over predictions,
+        and the magnitude of the average over prediction.
+
+    """
+    results_dict = {}
+    for model_var in model_vars:
+        model_results = calculate_evaluation_metrics(
+            train_df[model_var].values, train_preds[model_var].values,
+            test_df[model_var].values, test_preds[model_var].values)
+        results_dict[model_var] = model_results
+    return results_dict
