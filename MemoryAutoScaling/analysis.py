@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
-from MemoryAutoScaling import specs, utils
-from MemoryAutoScaling.DataHandling import TraceHandler, Trace
+from MemoryAutoScaling import parallel, specs, utils
+from MemoryAutoScaling.DataHandling import TraceHandler
 
 
 def get_granger_pvalues_at_lag(granger_dict, lag):
@@ -81,79 +81,6 @@ def get_all_granger_col_names(causal_cols, causal_lags):
                   for col_name in lag_list]
     return ["causal_{0}_{1}".format(causal_tup[0], causal_tup[1])
             for causal_tup in product(causal_cols, causal_lst)]
-
-
-def get_cores_and_traces_per_core(trace_count):
-    """Gets the number of cores to use and the number of traces per core.
-
-    The number of cores to use is determined based on the system and
-    `trace_count`. Then, given the number of cores, the number of
-    traces to be processed on each core is calculated based on `trace_count`.
-
-    Parameters
-    ----------
-    trace_count: int
-        An integer representing the number of total traces to be processed.
-
-    Returns
-    -------
-    int, int
-        Two integers representing the number of cores to use and the number
-        of traces to be handled by each core, respectively.
-
-    """
-    core_count = min(trace_count, mp.cpu_count() - 1)
-    traces_per_core = int(np.ceil(trace_count / core_count))
-    return core_count, traces_per_core
-
-
-def get_traces_for_core(traces, traces_per_core, core_num):
-    """Gets the traces from `traces` for the core specified by `core_num`.
-
-    Subsets `traces` to a list of length `traces_per_core` to get a list of
-    traces to be processed on the core specified by `core_num`.
-
-    Parameters
-    ----------
-    traces: list
-        A list of `Trace` objects.
-    traces_per_core: int
-        An integer specifying the number of traces to be processed by
-        each core.
-    core_num: int
-        An integer representing the specific core processing the subsetted
-        traces.
-
-    Returns
-    -------
-    list
-        A list representing the subset of `Trace` objects in `traces` that
-        will be processed on the core specified by `core_num`.
-
-    """
-    start = traces_per_core * core_num
-    end = min(len(traces), traces_per_core * (core_num + 1))
-    return traces[start:end]
-
-
-def initialize_and_join_processes(procs):
-    """Initializes and joins all the processes in `procs`.
-
-    Parameters
-    ----------
-    procs: list
-        A list of `mp.Process` objects representing the processes
-        to be initialized and joined.
-
-    Returns
-    -------
-    None
-
-    """
-    for proc in procs:
-        proc.start()
-    for proc in procs:
-        proc.join()
 
 
 def build_models_from_params_list(time_series_model, params_lst):
@@ -256,39 +183,6 @@ def get_model_build_input_params():
         params['min_trace_length'], params["aggregation_window"])
     traces = trace_handler.run_processing_pipeline()
     return traces, params['output_dir'], params['train_prop']
-
-
-def perform_trace_modelling(traces, model_func, train_prop):
-    """Performs the modelling procedure on `traces` according to `model_func`.
-
-    Parameters
-    ----------
-    traces: list
-        A list of `Trace` objects to be modelled
-    model_func: function
-        A function specifying how modelling should be carried out for a
-        collection of traces. The function takes three parameters: a list
-        of `Trace` objects, a list to store model results, and a float in the
-        range [0, 1] representing the proportion of data in the training set.
-    train_prop: float
-        A float representing the proportion of data in the training set.
-
-    Returns
-    -------
-    list
-        A list of lists in which each list contains the trace ID and model
-        results for that trace, for each trace in `traces`.
-
-    """
-    results = mp.Manager().list()
-    procs = []
-    cores, traces_per_core = get_cores_and_traces_per_core(len(traces))
-    for core_num in range(cores):
-        core_traces = get_traces_for_core(traces, traces_per_core, core_num)
-        procs.append(mp.Process(target=model_func,
-                                args=(core_traces, results, train_prop)))
-    initialize_and_join_processes(procs)
-    return list(results)
 
 
 def output_model_results(results, col_list, output_dir, file_name):
@@ -735,7 +629,8 @@ def run_models_for_all_traces(modeling_func, model_params, model_name):
 
     """
     traces, output_dir, train_prop = get_model_build_input_params()
-    results = perform_trace_modelling(traces, modeling_func, train_prop)
+    results = parallel.perform_trace_modelling(
+        traces, modeling_func, train_prop)
     cols = get_col_list_for_params(
         model_params, model_name,
         ["train_mase", "test_mase", "prop_under_preds",
@@ -776,7 +671,8 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
 
     """
     traces, output_dir, train_prop = get_model_build_input_params()
-    results = perform_trace_modelling(traces, modeling_func, train_prop)
+    results = parallel.perform_trace_modelling(
+        traces, modeling_func, train_prop)
     cols = get_col_list_for_params(
         range(1, models_count + 1), model_name, specs.MODELING_COLS)
     output_model_results(
@@ -810,30 +706,3 @@ def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):
     cdf = np.cumsum(pdf)
     ax.plot(x_vals, cdf, color=color)
     ax.set_title("{0} of Maximum Memory vs {1}".format(desc, title))
-
-def process_raw_trace_file(self, trace_file, min_length, agg_window):
-    """Performs the processing pipeline on `trace_file`.
-
-    Parameters
-    ----------
-    trace_file: str
-        A string representing the name of the file to be processed.
-    min_length: int
-        An integer representing the minimum number of time points needed
-        for a trace to be considered.
-    agg_window: int
-        An integer representing the aggregation window for the trace.
-
-    Returns
-    -------
-    Trace
-        The `Trace` obtained from `trace_file` or None if the trace does
-        not meet the length criteria specified by `min_length`
-
-    """
-    trace_df = pd.read_csv(trace_file)
-    order = trace_df[specs.START_INTERVAL_COL].sort_values().index
-    trace_df = trace_df.loc[order]
-    if len(trace_df) >= min_length:
-        return Trace.from_raw_trace_data(trace_df, agg_window)
-    return None

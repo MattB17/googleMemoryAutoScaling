@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
-from MemoryAutoScaling import specs, utils, analysis
+from MemoryAutoScaling import analysis, parallel, specs, utils
 from MemoryAutoScaling.Analysis import TraceAnalyzer
 from MemoryAutoScaling.DataHandling import Trace, TraceHandler
 
@@ -56,15 +56,15 @@ if __name__ == "__main__":
     traces = handler.run_processing_pipeline()
     stat_results = mp.Manager().list()
     procs = []
-    cores, traces_per_core = analysis.get_cores_and_traces_per_core(
+    cores, traces_per_core = parallel.get_cores_and_traces_per_core(
         len(traces))
 
     for core_num in range(cores):
-        core_traces = analysis.get_traces_for_core(
+        core_traces = parallel.get_traces_for_core(
             traces, traces_per_core, core_num)
         procs.append(mp.Process(target=run_trace_stats,
                                 args=(core_traces, stat_results, specs.LAGS)))
-    analysis.initialize_and_join_processes(procs)
+    parallel.initialize_and_join_processes(procs)
 
     stat_df = pd.DataFrame(list(stat_results))
     stat_cols = ["id", "adf_p_val", "adf_p_val_diff", "adf_p_val_diff2"] + [

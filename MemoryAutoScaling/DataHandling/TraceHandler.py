@@ -7,8 +7,7 @@ import re
 import sys
 import io
 import pandas as pd
-from MemoryAutoScaling import utils
-from MemoryAutoScaling import specs
+from MemoryAutoScaling import parallel, utils, specs
 from MemoryAutoScaling.DataHandling.Trace import Trace
 
 
@@ -154,29 +153,10 @@ class TraceHandler:
         None
 
         """
-        for trace_file in self.get_trace_files():
-            trace_path = os.path.join(self._dir_path, trace_file)
-            self.process_raw_trace_file(trace_path)
-
-    def process_raw_trace_file(self, trace_file):
-        """Performs the processing pipeline on `trace_file`.
-
-        Parameters
-        ----------
-        trace_file: str
-            A string representing the name of the file to be processed.
-
-        Returns
-        -------
-        None
-
-        """
-        trace_df = pd.read_csv(trace_file)
-        order = trace_df[specs.START_INTERVAL_COL].sort_values().index
-        trace_df = trace_df.loc[order]
-        if len(trace_df) >= self._min_length:
-            self._traces.append(
-                Trace.from_raw_trace_data(trace_df, self._agg_window))
+        trace_files = [os.path.join(self._dir_path, trace_file)
+                       for trace_file in self.get_trace_files()]
+        self._traces = parallel.build_all_traces_from_files(
+            trace_files, self._min_length, self._agg_window)
 
     def run_processing_pipeline(self, verbose=True):
         """Runs the processing pipeline.
