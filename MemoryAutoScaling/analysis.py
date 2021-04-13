@@ -8,7 +8,7 @@ import pandas as pd
 import multiprocessing as mp
 from itertools import product
 from MemoryAutoScaling import specs, utils
-from MemoryAutoScaling.DataHandling import TraceHandler
+from MemoryAutoScaling.DataHandling import TraceHandler, Trace
 
 
 def get_granger_pvalues_at_lag(granger_dict, lag):
@@ -810,3 +810,30 @@ def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):
     cdf = np.cumsum(pdf)
     ax.plot(x_vals, cdf, color=color)
     ax.set_title("{0} of Maximum Memory vs {1}".format(desc, title))
+
+def process_raw_trace_file(self, trace_file, min_length, agg_window):
+    """Performs the processing pipeline on `trace_file`.
+
+    Parameters
+    ----------
+    trace_file: str
+        A string representing the name of the file to be processed.
+    min_length: int
+        An integer representing the minimum number of time points needed
+        for a trace to be considered.
+    agg_window: int
+        An integer representing the aggregation window for the trace.
+
+    Returns
+    -------
+    Trace
+        The `Trace` obtained from `trace_file` or None if the trace does
+        not meet the length criteria specified by `min_length`
+
+    """
+    trace_df = pd.read_csv(trace_file)
+    order = trace_df[specs.START_INTERVAL_COL].sort_values().index
+    trace_df = trace_df.loc[order]
+    if len(trace_df) >= min_length:
+        return Trace.from_raw_trace_data(trace_df, agg_window)
+    return None

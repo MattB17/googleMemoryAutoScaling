@@ -151,7 +151,7 @@ class MLBase(TraceModel):
         X_train, y_train, X_test, y_test = self.split_data(raw_data)
         try:
             return self._run_model_pipeline(X_train, y_train, X_test, y_test)
-        except e:
+        except Exception as e:
             print(e)
             print(raw_data)
             print(trace.get_trace_df())
