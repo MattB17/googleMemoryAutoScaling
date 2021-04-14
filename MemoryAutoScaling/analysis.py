@@ -302,6 +302,60 @@ def insert_model_results_at_index(results_lst, model_results, idx):
         results_lst.insert((n * idx) + i + 1, model_results[i])
     return results_lst
 
+def insert_multivariate_model_results_at_index(results, model_results, idx):
+    """Inserts model results into `results` based on `idx`.
+
+    `model_results` are inserted into `results` starting at position
+    `n * idx` where `n` is the length of `model_results`.
+
+    Parameters
+    ----------
+    results: list
+        A list of results for which the model results are inserted.
+    model_results: list
+        A list containing the model results.
+    idx: int
+        An integer used to mark where the model results will be inserted.
+
+    Returns
+    -------
+    list
+        The list obtained from `results` after inserting the model results.
+
+    """
+    n = len(model_results)
+    for i in range(n):
+        results_lst.insert((n * idx) + i, model_results[i])
+    return results_lst
+
+def insert_multivariate_model_results_at_index(results, model_results, idx):
+    """Inserts the model results into `results` based on `idx`.
+
+    For each model variable, the model results for that variable, specified
+    in `model_results` are inserted into the corresponding results of
+    `results` starting at position `n * idx + 1` where `n` is the length
+    of the results in `model_results`.
+
+    Parameters
+    ----------
+    results: dict
+        A dictionary of results for which the model results are inserted.
+    model_results: dict
+        A dictionary containing the model results.
+    idx: int
+        An integer used to mark where the model results will be inserted.
+
+    Returns
+    -------
+    dict
+        The dict obtained from `results` after inserting the model results.
+
+    """
+    for model_var in results.keys():
+        results[model_var] = insert_multivariate_model_results_at_index(
+            results[model_var], model_results[model_var], idx)
+    return results
+
 def extend_model_results_up_to_cutoff(results_lst, model_results, cutoff):
     """Extends `results_lst` with the model results up to `cutoff`.
 
@@ -329,6 +383,36 @@ def extend_model_results_up_to_cutoff(results_lst, model_results, cutoff):
     if len(results_lst) < cutoff:
         results_lst.extend(model_results)
     return results_lst
+
+def extend_multivariate_model_results_up_to_cutoff(results, model_results,
+                                                   cutoff):
+    """Extends `results` with the model results up to `cutoff`.
+
+    If each list in `results` has less than `cutoff` elements then it is
+    extended with the model results given by `model_results`.
+
+    Parameters
+    ----------
+    results: dictionary
+        The dictionary containing model results that is being extended.
+    model_results: list
+        A dictionary containing the model results.
+    cutoff: int
+        An integer used to decide if `results` should be extended. If the
+        length of each list in `results` is below `cutoff` then it is extended
+        with the model results.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `results` after possibly extending with the
+        model results.
+
+    """
+    for model_var in results.keys():
+        results[model_var] = extend_model_results_up_to_cutoff(
+            results[model_var], model_results[model_var], cutoff)
+    return results
 
 
 def is_better_model(new_mase, new_under_mase, old_mase, old_under_mase):
@@ -384,6 +468,45 @@ def update_with_model_results(results_lst, model_results, cutoff):
     return extend_model_results_up_to_cutoff(
         results_lst, model_results, cutoff)
 
+def update_with_multivariate_model_results(results, model_results, cutoff):
+    """Updates `results` with the model results.
+
+    If `results` has fewer than `cutoff` entries or the test MASE is lower
+    than the test MASE of a model already contained in `results`, then the
+    model results are inserted into `results`.
+
+    Parameters
+    ----------
+    results: dict
+        The dictionary containing model results that is being updated.
+    model_results: dict
+        A dictionary containing model results where the third element in each
+        list is the mean scaled error for the test set.
+    cutoff: int
+        An integer used to decide if `results` should be extended. If the
+        length of `results` is below `cutoff` then it is extended with the
+        model results.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `results` after possibly extending or
+        inserting the model results.
+
+    """
+    model_count = (len(results) - 1) // len(model_results)
+    for idx in range(model_count):
+        old_model_idx = 2 + (len(model_results) * idx)
+        is_better = is_better_model(
+            model_results[specs.MAX_MEM_TS][2],
+            model_results[specs.MAX_MEM_TS][3],
+            results[specs.MAX_MEM_TS][old_model_idx],
+            results[specs.MAX_MEM_TS][old_model_idx + 1])
+        if is_better:
+            return insert_multivariate_model_results_at_index(
+                results, model_results, idx)
+    return extend_multivariate_model_results_up_to_cutoff(
+        results, model_results, cutoff)
 
 def truncate_list(lst, cutoff):
     """Truncates `lst` if it is longer than `cutoff`.
@@ -407,6 +530,31 @@ def truncate_list(lst, cutoff):
     if len(lst) > cutoff:
         return lst[:cutoff]
     return lst
+
+
+def truncate_dict(raw_dict, cutoff):
+    """Truncates each list of `raw_dict` if it is longer than `cutoff`.
+
+    The size of each list in `raw_dict` is reduced to `cutoff` if it is longer
+    than `cutoff`. Otherwise, it is unchanged.
+
+    Parameters
+    ----------
+    raw_dict: dict
+        The dictionary being truncated.
+    cutoff: int
+        An integer representing the maximum length for the lists of `raw_dict`.
+
+    Returns
+    -------
+    dict
+        The dictionary resulting from truncating each list of `raw_dict` to a
+        length of `cutoff`.
+
+    """
+    for model_var in raw_dict.keys():
+        raw_dict[model_var] = truncate_list(raw_dict[model_var], cutoff)
+    return raw_dict
 
 
 def handle_stats_for_model(trace, model, trace_results, cutoff):
@@ -440,6 +588,62 @@ def handle_stats_for_model(trace, model, trace_results, cutoff):
         trace_results, [model.get_params()] + model_results, cutoff)
     return truncate_list(trace_results, cutoff)
 
+def initialize_multivariate_results(model_results, trace):
+    """Initializes the multivariate results using `model_results` for `trace`.
+
+    Parameters
+    ----------
+    model_results: dict
+        A dictionary of multivariate model results for trace.
+    trace: Trace
+        The `Trace` being modeled.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the model results for `trace` for each
+        variable in the multivariate model.
+
+    """
+    return {model_var: var_results
+            for model_var, var_results in model_results.items()}
+
+def handle_stats_for_multivariate_model(trace, model, results, cutoff):
+    """Handles the stats for `model` built on `trace`.
+
+    `trace` is modeled using `model` and the results are added to
+    `results` if it has fewer than `cutoff` entries or if the results
+    for the model are better than the results of at least one model contained
+    in `results`.
+
+    Parameters
+    ----------
+    trace: Trace
+        The `Trace` object being modeled.
+    model: TraceModel
+        A `TraceModel` to be fit to `trace`.
+    results: dict
+        A dictionary containing results for modelling done on the trace.
+    cutoff: int
+        An integer representing the maximum length of `results`.
+
+    Returns
+    -------
+    dict
+        A dictionary obtained from `results` after handling the results of
+        modeling `trace` with `model`.
+
+    """
+    model_results = {model_var: [model.get_params()] + list(var_results)
+                     for model_var, var_results
+                     in model.run_model_pipeline_for_trace(trace).items()}
+    if results == {}:
+        results = initialize_multivariate_results(model_results, trace)
+    else:
+        results = update_with_multivariate_model_results(
+            results, model_results, cutoff)
+    return truncate_dict(results, cutoff)
+
 
 def update_model_stats_for_trace(trace, model, model_results, cutoff):
     """Updates the stats for `model` built on `trace`.
@@ -468,10 +672,41 @@ def update_model_stats_for_trace(trace, model, model_results, cutoff):
 
     """
     try:
-        return handle_stats_for_model(trace, model, model_results, cutoff)
+        results = handle_stats_for_model(trace, model, model_results, cutoff)
     except:
         return model_results
 
+def update_multivariate_model_stats_for_trace(trace, model, results, cutoff):
+    """Updates the stats for `model` built on `trace`.
+
+    `trace` is modeled using `model` and the results are added to
+    `results` if it has fewer than `cutoff` entries or if the results
+    for the model are better than the results of at least one model contained
+    in `trace_results`.
+
+    Parameters
+    ----------
+    model: TraceModel
+        A `TraceModel` to be fit to `trace`.
+    trace: Trace
+        The `Trace` object being modeled.
+    results: dict
+        A dictionary containing results for modelling done on the trace.
+    cutoff: int
+        An integer representing the maximum length of `results`.
+
+    Returns
+    -------
+    list
+        A list obtained from `trace_results` after handling the results of
+        modeling `trace` with `model`.
+
+    """
+    try:
+        return handle_stats_for_multivariate_model(
+            trace, model, results, cutoff)
+    except:
+        return results
 
 def pad_list(lst, pad_val, pad_len):
     """Pads `lst` with `pad_val` to length `pad_len`.
@@ -498,6 +733,33 @@ def pad_list(lst, pad_val, pad_len):
     if len(lst) < pad_len:
         lst += [pad_val for _ in range(pad_len - len(lst))]
     return lst
+
+def pad_dict(raw_dict, pad_val, pad_len):
+    """Pads each list in `raw_dict` with `pad_val` to length `pad_len`.
+
+    If the length of the lists are already greater or equal to `pad_len` then
+    lists are not modified.
+
+    Parameters
+    ----------
+    raw_dict: dict
+        The dictionary being padded.
+    pad_val: float
+        The value used to pad `raw_dict`.
+    pad_len: int
+        An integer representing the length to which each list in `raw_dict`
+        should be padded.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `raw_dict` after padding each list with
+        `pad_val` up to length `pad_len`.
+
+    """
+    for model_var in raw_dict.keys():
+        raw_dict[model_var] = pad_list(raw_dict[model_var], pad_val, pad_len)
+    return raw_dict
 
 
 def get_best_models_for_trace(trace, models, models_count):
@@ -554,14 +816,13 @@ def get_best_multivariate_models_for_trace(trace, models, models_count):
         `models_count` best models from `models` fit to `trace`.
 
     """
-    cutoff = (len(specs.MODELING_COLS) * models_count) + 1
+    cutoff = (len(specs.MODELING_COLS) * models_count)
+    best_results_dict = {}
     for model in models:
-        best_results = update_model_stats_for_trace(
-            trace, model, best_results, cutoff)
-    for model_var in best_results.keys():
-        best_results[model_var] = pad_list(
-            best_results[model_var], np.nan, cutoff)
-    return best_results
+        best_results_dict = update_multivariate_model_stats_for_trace(
+            trace, model, best_results_dict, cutoff)
+    return {"id": trace.get_trace_id(),
+            **pad_dict(best_results_dict, np.nan, cutoff)}
 
 def get_best_model_results_for_traces(model, model_params, traces,
                                       result_lst, models_count, verbose=True):
@@ -604,38 +865,13 @@ def get_best_model_results_for_traces(model, model_params, traces,
             get_best_models_for_trace(traces[idx], models, models_count))
         log_modeling_progress(idx, trace_count, verbose)
 
-def add_model_results_to_dict(trace, models, models_count, result_dict):
-    """Adds the model results of `models` fit on `trace` to `result_dict`.
-
-    Parameters
-    ----------
-    trace: Trace
-        The `Trace` being modeled.
-    models: list
-        A list of models to be fit to `trace`.
-    models_count: int
-        An integer representing the number of model results to save to
-        `result_dict`
-    result_dict: dict
-        A dictionary storing model results for each trace.
-
-    Returns
-    -------
-    None
-
-    """
-    model_results = get_best_multivariate_models_for_trace(
-        trace, models, models_count)
-    for model_var in model_results.keys():
-        results_dict[model_var].append(model_results[model_var])
-
 def get_best_multivariate_model_results_for_traces(
-    model, model_params, traces, result_dict, models_count, verbose=True):
+    model, model_params, traces, result_lst, models_count, verbose=True):
     """Gets the `models_count` best model results for the traces of `traces`.
 
     For each trace in `traces` a `model` object is built for each set of model
     parameters in `model_params` and the results of the best `models_count`
-    models are saved in `result_dict`. If fewer than `models_count` models are
+    models are saved in `result_lst`. If fewer than `models_count` models are
     fitted to the trace, then the result is padded with `np.nan`.
 
     Parameters
@@ -648,8 +884,8 @@ def get_best_multivariate_model_results_for_traces(
     traces: list
         A list of `Trace` objects specifying the traces to which models are
         fit.
-    result_dict: dict
-        The dictionary to which the model results for each trace are saved.
+    result_lst: list
+        The list to which the model results for each trace are saved.
     models_count: int
         An integer representing the number of model results to save. The
         results for the `models_count` best models for each trace will be
@@ -666,8 +902,8 @@ def get_best_multivariate_model_results_for_traces(
     models = build_models_from_params_list(model, model_params)
     trace_count = len(traces)
     for idx in range(trace_count):
-        add_model_results_to_dict(
-            traces[idx], models, models_count, result_dict)
+        result_lst.append(get_best_multivariate_models_for_trace(
+            traces[idx], models, models_count))
         log_modeling_progress(idx, trace_count, verbose)
 
 def log_modeling_progress(trace_idx, trace_count, verbose=True):
@@ -774,6 +1010,81 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
         traces, modeling_func, train_prop)
     cols = get_col_list_for_params(
         range(1, models_count + 1), model_name, specs.MODELING_COLS)
+    output_model_results(
+        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+
+def unnest_results_dicts(results_dicts, model_vars):
+    """Unnests `results_dicts` using `model_vars`.
+
+    The dictionaries in `results_dict` are converted to lists
+    in the order specified by `model_vars`.
+
+    Parameters
+    ----------
+    results_dicts: list
+        A list of dictionaries representing the results to be unnested.
+    model_vars: list
+        A list of strings specifying the modeled variables in `results_dict`
+        and specifies the order of the unnesting.
+
+    Returns
+    -------
+    list
+        The list obtained from `results_dict` after unnesting the
+        dictionaries.
+
+    """
+    results_lst = []
+    for result_dict in results_dicts:
+        result_lst = [result_dict['id']]
+        for model_var in model_vars:
+            result_lst.extend(result_dict[model_var])
+        results_lst.append(result_lst)
+    return results_lst
+
+def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
+                                                model_name, model_vars):
+    """Models all traces using `modeling_func` with `model_name`.
+
+    A series of multivariate models are run on each trace, and the best
+    `models_count` of these models for each trace are recorded. `modeling_func`
+    is used to run the models on a batch of traces and this function is
+    parallelized to cover all traces. The best models are then retrieved.
+
+    Parameters
+    ----------
+    modeling_func: function
+        The function used to perform the modelling on a batch of traces. The
+        function takes three arguments: a list of `Trace` objects on which the
+        models are run, a list to which results are saved, and a float
+        specifying the proportion of data in the training set.
+    models_count: int
+        An integer representing the number of models to record. The results
+        for the `models_count` best models for each trace are recorded.
+    model_name: str
+        A string specifying the name of the model.
+    model_vars: list
+        A list of the variables being modelled.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    The results of the modelling procedure is saved to a csv file containing
+    one row per trace. The file is output to a file named `<name>_results.csv`
+    where `<name>` is `model_name`.
+
+    """
+    traces, output_dir, train_prop = get_model_build_input_params()
+    results = parallel.perform_trace_modelling(
+        traces, modeling_func, train_prop)
+    results = unnest_results_dicts(results, model_vars)
+    cols = get_col_list_for_params(
+        range(1, models_count + 1), model_name, specs.MODELING_COLS)
+    cols = ["{0}_{1}".format(col, model_var)
+            for model_var, col in product(model_vars, cols)]
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 

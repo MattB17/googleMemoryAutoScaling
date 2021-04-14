@@ -7,7 +7,6 @@ errors used in the model.
 
 """
 from MemoryAutoScaling import utils
-from sklearn.metrics import mean_squared_error
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.varmax import VARMAX
 
@@ -103,9 +102,9 @@ class TraceVARMA(StatisticalModel):
             test sets respectively.
 
         """
-        train_cutoff = utils.get_train_cutoff(trace_df, self._train_prop)
-        trace_df = trace_df.reset_index(drop=True)
-        return trace_df[:train_cutoff], trace_df[train_cutoff:]
+        train_cutoff = utils.get_train_cutoff(model_data, self._train_prop)
+        model_data = model_data.reset_index(drop=True)
+        return model_data[:train_cutoff], model_data[train_cutoff:]
 
     def get_model_data_for_trace(self, trace):
         """Retrieves the multivariate data for modeling from `trace`.

@@ -19,6 +19,8 @@ MODELS_COUNT = 1
 OVERALL_MASE_WEIGHT = 5
 EPS = 0.00001
 
+MULTI_VAR_COLS = [MAX_MEM_TS, MAX_CPU_TS]
+
 RAW_TIME_SERIES_COLS = [MAX_MEM_COL, AVG_MEM_COL, MAX_CPU_COL, AVG_CPU_COL]
 RAW_TIME_SERIES_NAMES = ["Maximum Memory", "Average Memory",
                          "Maximum CPU", "Average CPU"]
