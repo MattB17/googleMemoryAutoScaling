@@ -1,15 +1,15 @@
-"""The `TraceARIMAX` class is used to construct a predictive model based on
-the ARIMAX model. ARIMAX models are the combination of an ARIMA model and
+"""The `TraceVARMAX` class is used to construct a predictive model based on
+the VARMAX model. VARMAX models are the combination of a VARMA model and
 a regression model on explanatory features.
 
 """
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from MemoryAutoScaling.Models.ML import MLBase
 from MemoryAutoScaling import utils
+from MemoryAutoScaling.Models.ML import MLBase
+from statsmodels.tsa.statespace.varmax import VARMAX
 
 
-class TraceARIMAX(MLBase):
-    """An `ARIMAX` model for data traces.
+class TraceVARMAX(MLBase):
+    """A `VARMAX` model for data traces.
 
     Parameters
     ----------
@@ -22,10 +22,6 @@ class TraceARIMAX(MLBase):
         by the time points in `lags` when predicting for the target variable.
     p: int
         An integer representing the autoregressive component of the model.
-    d: int
-        An integer representing the integrated component of the model. That
-        is, the level of differencing needed to make the time series
-        stationary.
     q: int
         An integer representing the moving average component of the model.
 
@@ -39,38 +35,35 @@ class TraceARIMAX(MLBase):
         The lags used for time series features to the model.
     _p: int
         The autoregressive component of the model.
-    _d: int
-        The integrated component of the model.
     _q: int
         The moving average component of the model.
-    _model: SARIMAX
-        The underlying SARIMAX model being fit to the data. A value of None
+    _model: VARMAX
+        The underlying VARMAX model being fit to the data. A value of None
         indicates that no model is currently fit to the data.
     _is_fit: bool
         Indicates if the model has been fit to the training data.
 
     """
-    def __init__(self, data_handler, lags, p, d, q):
-        super().__init__("TraceARIMAX", data_handler, lags)
+    def __init__(self, data_handler, lags, p, q):
+        super().__init__("TraceVARMAX", data_handler, lags)
         self._p = p
-        self._d = d
         self._q = q
 
     def get_params(self):
-        """Returns the order for the ARIMA component of the model.
+        """Returns the order for the VARMA component of the model.
 
-        The order is the three element tuple `(p, d, q)` representing the
-        autoregressive component, the degree of differencing, and the moving
-        average component, respectively.
+        The order is the two element tuple `(p, q)` representing the
+        autoregressive component and the moving average component,
+        respectively.
 
         Returns
         -------
         tuple
-            A three element tuple of integers representing the order of the
+            A two element tuple of integers representing the order of the
             ARIMA component of the model.
 
         """
-        return self._p, self._d, self._q
+        return self._p, self._q
 
     def get_model_title(self):
         """A title describing the model.
@@ -86,7 +79,7 @@ class TraceARIMAX(MLBase):
     def _fit(self, train_features, train_target):
         """Fits the model based on `train_features` and `train_target`.
 
-        An ARIMAX model is built to predict the target variable with data
+        A VARMAX model is built to predict the target variables with data
         given by `train_target` based on the features with data given by
         `train_features`.
 
@@ -102,9 +95,7 @@ class TraceARIMAX(MLBase):
         None
 
         """
-        model = SARIMAX(
-            train_target, train_features,
-            order=self.get_params(), simple_differencing=False)
+        model = VARMAX(train_target, train_features, order=self.get_params())
         self._model = model.fit(disp=False)
         self._is_fit = True
 
@@ -118,8 +109,8 @@ class TraceARIMAX(MLBase):
 
         Returns
         -------
-        np.array
-            A numpy array containing the predictions up to the end of the
+        pd.DataFrame
+            A pandas DataFrame containing the predictions up to the end of the
             testing period.
 
         """
@@ -141,9 +132,9 @@ class TraceARIMAX(MLBase):
 
         Returns
         -------
-        np.array, np.array
-            Two numpy arrays representing the predictions for the training and
-            testing sets on `trace`.
+        pd.DataFrame, pd.DataFrame
+            Two pandas DataFrames arrays representing the predictions for the
+            training and testing sets on `trace`.
 
         """
         preds = self._get_predictions(test_features)
@@ -163,19 +154,20 @@ class TraceARIMAX(MLBase):
         ----------
         train_features: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
-        train_target: pd.Series
-            A pandas Series representing the target variable for the
+        train_target: pd.DataFrame
+            A pandas DataFrame representing the target variable for the
             training set.
         test_features: pd.DataFrame
             A pandas Dataframe representing the features for the testing set.
         test_target: pd.Series
-            A pandas Series representing the target variable for the testing
-            set.
+            A pandas DataFrame representing the target variable for the
+            testing set.
 
         Returns
         -------
-        tuple
-            A tuple of eight floats. The first two represent the mean absolute
+        dictionary
+            A dictionary with a tuple for each model variable. Each tuple
+            consists of eight floats. The first two represent the mean absolute
             percentage error for the training and testing sets, respectively.
             The next three represent the one-sided mean absolute scaled error for
             under predictions, the proportion of under predictions, and the
@@ -188,14 +180,17 @@ class TraceARIMAX(MLBase):
         self._fit(train_features, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
             train_features, test_features)
-        return utils.calculate_evaluation_metrics(
-            train_target, train_preds, test_target, test_preds)
+        return utils.calculate_multivariate_evaluation_metrics(
+            train_target, train_preds, test_target,
+            test_preds, self._data_handler.get_target_variables())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title):
         """Plots the target time series of `trace_df` vs its model prediction.
 
-        The plot of the time series vs its predictions is divided into two
-        subplots: one for the training set and another for the testing set.
+        The plot of the time series vs its predictions for each model
+        variable. Each variable is plotted in a row and the row is divided
+        into two subplots: one for the training set and another for the
+        testing set.
 
         Parameters
         ----------
@@ -209,9 +204,13 @@ class TraceARIMAX(MLBase):
         None
 
         """
-        fig, (ax1, ax2) = plt.subplots(2)
+        var_count = len(self._data_handler.get_target_variables())
+        fig, axes = plt.subplots(var_count, 2, figsize=(20, 10*var_count))
+        trace_df = self.get_model_data_for_trace(trace)
         X_train, y_train, X_test, y_test = self.split_data(trace_df)
-        preds_train, preds_test = self._get_train_and_test_predictions(
+        train_preds, test_preds = self._get_train_and_test_predictions(
             X_train, X_test)
-        utils.plot_train_and_test_predictions_on_axes(
-            y_train, preds_train, y_test, preds_test, (ax1, ax2), title)
+        utils.plot_multivariate_train_and_test_predictions(
+            y_train, train_preds, y_test, test_preds,
+            axes, self._data_handler.get_target_variables(),
+            self.get_plot_title())

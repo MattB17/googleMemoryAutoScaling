@@ -13,8 +13,8 @@ from MemoryAutoScaling.DataHandling import MLDataHandler
 ARIMA_p = [p for p in range(4)]
 ARIMA_d = [d for d in range(2)]
 ARIMA_q = [q for q in range(4)]
-FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS, specs.MAX_MEM_TS)
-TARGET_COL = specs.MAX_MEM_TS
+FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS, [specs.MAX_MEM_TS])
+TARGET_COL = [specs.MAX_MEM_TS]
 
 
 def build_arimax_models_for_traces(traces_lst, results_lst, train_prop):

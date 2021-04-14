@@ -185,17 +185,17 @@ class TraceVARMA(StatisticalModel):
             axes, self._model_vars, self.get_plot_title())
 
     def _fit(self, train_data):
-            """Fits the model based on training data `train_data`.
+        """Fits the model based on training data `train_data`.
 
-            Parameters
-            ----------
-            train_data: pd.DataFrame
-                A pandas DataFrame representing the data used for training.
+        Parameters
+        ----------
+        train_data: pd.DataFrame
+            A pandas DataFrame representing the data used for training.
 
-            Returns
-            -------
-            None
+        Returns
+        -------
+        None
 
-            """
-            model = VARMAX(train_data, order=self.get_params())
-            self._model = model.fit(disp=False)
+        """
+        model = VARMAX(train_data, order=self.get_params())
+        self._model = model.fit(disp=False)

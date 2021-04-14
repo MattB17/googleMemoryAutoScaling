@@ -672,7 +672,7 @@ def update_model_stats_for_trace(trace, model, model_results, cutoff):
 
     """
     try:
-        results = handle_stats_for_model(trace, model, model_results, cutoff)
+        return handle_stats_for_model(trace, model, model_results, cutoff)
     except:
         return model_results
 

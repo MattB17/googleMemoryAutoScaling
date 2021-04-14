@@ -20,8 +20,8 @@ class MLDataHandler:
         training set.
     feature_vars: list
         A list of strings representing the names of features.
-    target_var: str
-        A string representing the name of the target variable.
+    target_vars: list
+        A list of strings representing the names of the target variables.
 
     Attributes
     ----------
@@ -29,14 +29,25 @@ class MLDataHandler:
         The proportion of data to be used in the training set.
     _feature_vars: list
         The names of the feature variables.
-    _target_var: list
-        The name of the target variable.
+    _target_vars: list
+        The names of the target variables.
 
     """
-    def __init__(self, train_prop, feature_vars, target_var):
+    def __init__(self, train_prop, feature_vars, target_vars):
         self._train_prop = train_prop
         self._feature_vars = feature_vars
-        self._target_var = target_var
+        self._target_vars = target_vars
+
+    def get_target_variables(self):
+        """The target variables for the handler.
+
+        Returns
+        -------
+        list
+            A list of strings representing the target variables.
+
+        """
+        return self._target_vars
 
     def get_train_and_test_sets(self, data):
         """Splits `data` into a training and testing set.
@@ -55,7 +66,7 @@ class MLDataHandler:
             in the testing set.
 
         """
-        data = data[self._feature_vars + [self._target_var]]
+        data = data[self._feature_vars + self._target_vars]
         train_cutoff = utils.get_train_cutoff(data, self._train_prop)
         return data[:train_cutoff], data[train_cutoff:]
 
@@ -70,12 +81,35 @@ class MLDataHandler:
 
         Returns
         -------
-        pd.DataFrame, pd.Series, pd.DataFrame, pd.Series
-            A pandas DataFrame and Series representing the training set values
-            of the features and target variable, respectively. The second
-            DataFrame and Series represent the same split for the testing set.
+        pd.Object, pd.Object, pd.Object, pd.Object
+            Two pandas objects representing the training set values of the
+            features and target variables, respectively. The second pair of
+            pandas objects represent the same split for the testing set.
 
         """
         train_df, test_df = self.get_train_and_test_sets(data)
-        return (train_df[self._feature_vars], train_df[self._target_var],
-                test_df[self._feature_vars], test_df[self._target_var])
+        y_train, y_test = self._get_train_and_test_targets(train_df, test_df)
+        return (train_df[self._feature_vars], y_train,
+                test_df[self._feature_vars], y_test)
+
+    def _get_train_and_test_targets(self, train_df, test_df):
+        """Retrieves the target data for the training and testing sets.
+
+        Parameters
+        ----------
+        train_df: pd.DataFrame
+            A pandas DataFrame containing the data for the training set.
+        test_df: pd.DataFrame
+            A pandas DataFrame containing the data for the testing set.
+
+        Returns
+        -------
+        pd.Object, pd.Object
+            Two pandas objects representing the data for the target variables
+            for the training and testing sets, respectively.
+
+        """
+        if len(self._target_vars) == 1:
+            return (train_df[self._target_vars[0]],
+                    test_df[self._target_vars[0]])
+        return train_df[self._target_vars], test_df[self._target_vars]
