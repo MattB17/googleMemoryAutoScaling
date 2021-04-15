@@ -96,12 +96,13 @@ def perform_trace_modelling(traces, model_func, train_prop):
 
     Returns
     -------
-    list
-        A list of lists in which each list contains the trace ID and model
-        results for that trace, for each trace in `traces`.
+    dict
+        A dictionary of lists in which the keys are strings representing the
+        id of a trace and the values correspond to model results for the
+        trace.
 
     """
-    results = mp.Manager().list()
+    results = mp.Manager().dict()
     procs = []
     cores, traces_per_core = get_cores_and_traces_per_core(len(traces))
     for core_num in range(cores):
@@ -109,7 +110,7 @@ def perform_trace_modelling(traces, model_func, train_prop):
         procs.append(mp.Process(target=model_func,
                                 args=(core_traces, results, train_prop)))
     initialize_and_join_processes(procs)
-    return list(results)
+    return dict(results)
 
 def build_traces_from_files(trace_files, traces_lst, min_length, agg_window):
     """Builds a list of traces from `trace_files`.

@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
+from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling import parallel, specs, utils
 from MemoryAutoScaling.DataHandling import TraceHandler
 
@@ -932,46 +933,33 @@ def log_modeling_progress(trace_idx, trace_count, verbose=True):
         print("Process {0}: {1} of {2} traces modeled".format(
             os.getpid(), trace_idx + 1, trace_count))
 
-def run_models_for_all_traces(modeling_func, model_params, model_name):
-    """Models all traces using `modeling_func` with `model_name`.
+def get_results_list_from_trace_model_results(trace_model_results):
+    """Converts `trace_model_results` to a results list
 
-    A series of models are run on each trace, where the models are specified
-    by the parameters in `model_params`. `modeling_func` is used to run the
-    models on a batch of traces and this function is parallelized to cover all
-    traces.
+    A results list is a list of lists containing a list for each trace.
+    These lists consist of the trace id followed by list representations of
+    the `ModelResults` in `trace_model_results` associated with the trace.
 
     Parameters
     ----------
-    modeling_func: function
-        The function used to perform the modelling on a batch of traces. The
-        function takes three arguments: a list of `Trace` objects on which the
-        models are run, a list to which results are saved, and a float
-        specifying the proportion of data in the training set.
-    model_params: list
-        A list containing the model parameters for the models.
-    model_name: str
-        A string specifying the name of the model.
+    trace_model_results: dict
+        A dictionary in which each key is a string representing the id of a
+        trace. The corresponding value is a list of `ModelResults`
+        corresponding to the model results for that trace.
 
     Returns
     -------
-    None
-
-    Side Effect
-    -----------
-    The results of the modelling procedure is saved to a csv file containing
-    one row per trace. The file is output to a file named `<name>_results.csv`
-    where `<name>` is `model_name`.
+    list
+        A list of lists representing the results list.
 
     """
-    traces, output_dir, train_prop = get_model_build_input_params()
-    results = parallel.perform_trace_modelling(
-        traces, modeling_func, train_prop)
-    cols = get_col_list_for_params(
-        model_params, model_name,
-        ["train_mase", "test_mase", "prop_under_preds",
-        "max_under_pred", "prop_over_preds", "avg_over_pred"])
-    output_model_results(
-        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+    results_lst = []
+    for trace_id in trace_model_results.keys():
+        trace_lst = [trace_id]
+        for model_results in trace_model_results[trace_id]:
+            trace_lst.extend(model_results.to_list())
+        results_lst.append(model_results.to_list())
+    return results_lst
 
 def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     """Models all traces using `modeling_func` with `model_name`.
@@ -1008,6 +996,7 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     traces, output_dir, train_prop = get_model_build_input_params()
     results = parallel.perform_trace_modelling(
         traces, modeling_func, train_prop)
+    results_lst = get_results_list_from_trace_model_results(results)
     cols = get_col_list_for_params(
         range(1, models_count + 1), model_name, specs.MODELING_COLS)
     output_model_results(
