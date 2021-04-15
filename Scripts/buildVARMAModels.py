@@ -8,20 +8,20 @@ from itertools import product
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Statistical import TraceVARMA
 
-VARMA_p = [p for p in range(4)]
-VARMA_q = [q for q in range(4)]
+VARMA_p = [p for p in range(2)]
+VARMA_q = [q for q in range(2)]
 param_pairs = list(product(VARMA_p, VARMA_q))
 bad_val_idx = param_pairs.index((0, 0))
 param_pairs = [param_pairs[i] for i in range(len(param_pairs))
                if i != bad_val_idx]
 
-def build_varma_models_for_traces(traces_lst, result_lst, train_prop):
+def build_varma_models_for_traces(traces_lst, result_dict, train_prop):
     varma_params_lst = [{'model_vars': specs.MULTI_VAR_COLS,
                          'p': p, 'q': q, 'train_prop': train_prop}
                         for p, q in param_pairs]
     analysis.get_best_multivariate_model_results_for_traces(
         TraceVARMA, varma_params_lst, traces_lst,
-        result_lst, specs.MODELS_COUNT)
+        result_dict, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":

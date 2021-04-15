@@ -119,10 +119,12 @@ class ModelResults:
             `other_model_results`. Otherwise, False
 
         """
+        other_results = other_model_results.get_model_results()
+        under_mase_diff = (other_results['under_mase'] -
+                           self._results_dict['under_mase'])
+        mase_diff = (other_results['test_mase'] -
+                     self._results_dict['test_mase'])
         w = specs.OVERALL_MASE_WEIGHT
-        curr_mase = (self.get_model_results()['test_mase'] +
-                     (w * self.get_model_results()['under_mase']))
-        other_mase = \
-            (other_model_results.get_model_results()['test_mase'] +
-             (w * other_model_results.get_model_results()['under_mase']))
-        return curr_mase < other_mase
+        return ((under_mase_diff >= 0 and mase_diff >= 0) or
+                (mase_diff >= 0 and (w * mase_diff) > -under_mase_diff) or
+                (under_mase_diff >= 0 and under_mase_diff >= -w * mase_diff))

@@ -149,8 +149,8 @@ class TraceVARMA(StatisticalModel):
         self._fit(train_df)
         preds_train, preds_test = self._get_predictions(len(test_df))
         return parallel.get_multivariate_model_results(
-            model.get_params(), train_df, train_preds, test_df,
-            preds_test, self._data_handler.get_target_variables())
+            self.get_params(), train_df, preds_train, test_df,
+            preds_test, self._model_vars)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its prediction.
