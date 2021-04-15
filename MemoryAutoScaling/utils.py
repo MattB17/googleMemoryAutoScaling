@@ -816,7 +816,7 @@ def get_over_prediction_stats(actuals, predicteds):
     """
     over_preds = np.array(get_over_predictions(actuals, predicteds))
     over_mase = get_one_sided_mean_absolute_scaled_error(
-        actuals, predicteds, True)
+        actuals, predicteds, False)
     over_prop, over_avg = get_over_pred_vals(
         over_preds, len(predicteds))
     return over_mase, over_prop, over_avg

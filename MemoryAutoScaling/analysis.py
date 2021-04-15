@@ -109,35 +109,6 @@ def build_models_from_params_list(time_series_model, params_lst):
     return [time_series_model(**params) for params in params_lst]
 
 
-def get_model_stats_for_trace(data_trace, models):
-    """Gets statistics from `models` for `data_trace`.
-
-    For each model in `models`, the model is fit to `data_trace` and
-    the mean absolute scaled error on the test set is computed.
-
-    Parameters
-    ----------
-    data_trace: Trace
-        A `Trace` representing the data trace from which the statistics
-        will be calculated.
-    models: list
-        A list of `TimeSeriesModel` objects that will be fit to `data_trace`.
-
-    Returns
-    -------
-    list
-        A list containing the ID of `data_trace` followed by the mean squared
-        error on the training and test set, respectively, for each model in
-        `models`.
-
-    """
-    trace_stats = [data_trace.get_trace_id()]
-    for model in models:
-        model_stats = list(model.run_model_pipeline_for_trace(data_trace))
-        trace_stats.extend(model_stats)
-    return trace_stats
-
-
 def read_modelling_input_params():
     """Reads the input parameters for modelling from standard input.
 
@@ -240,57 +211,6 @@ def get_col_list_for_params(params, model_name, model_cols):
                 for param, model_col in product(params, model_cols)]
     return ["{0}_{1}".format(model_col, model_name)
             for model_col in model_cols]
-
-
-def model_traces_and_evaluate(model, model_params, traces,
-                              results_lst, verbose=True):
-    """Fits `model` to `traces` and evaluates the performance.
-
-    A separate `model` is built for each parameter set in `model_params` and
-    fit to the `Trace` objects in `traces`. The models are then evaluated, and
-    the results are saved in `results_lst`.
-
-    Parameters
-    ----------
-    model: TimeSeriesModel.class
-        A `TimeSeriesModel` class reference specifying the type of model to
-        be built.
-    model_params: list
-        A list of dictionaries where each dictionary corresponds to the set
-        of parameters to build a model of type `model`.
-    traces: list
-        A list of `Trace` objects specifying the traces to be modelled.
-    results_lst: mp.Manager.list
-        A multiprocessor list representing the list to which model results are
-        saved.
-    verbose: bool
-        A boolean indicating whether the log will be printed.
-
-    Returns
-    -------
-    None
-
-    """
-    models = build_models_from_params_list(model, model_params)
-    trace_count = len(traces)
-    for idx in range(trace_count):
-        results_lst.append(get_model_stats_for_trace(traces[idx], models))
-        log_modeling_progress(idx, trace_count, verbose)
-
-
-def is_better_model(new_mase, new_under_mase, old_mase, old_under_mase):
-    """Determines if the new model performs better than the old model.
-
-    The new model performs better than the old model if the weighted
-    difference of the MASEs is positive.
-
-    """
-    under_mase_diff = old_under_mase - new_under_mase
-    mase_diff = old_mase - new_mase
-    w = specs.OVERALL_MASE_WEIGHT
-    return ((under_mase_diff >= 0 and mase_diff >= 0) or
-            (under_mase_diff >= 0 and under_mase_diff >= -w * mase_diff) or
-            (mase_diff >= 0 and w * mase_diff > -under_mase_diff))
 
 
 def update_with_new_model_results(model_results, new_model_results):
@@ -828,6 +748,42 @@ def get_results_list_from_trace_model_results(trace_model_results):
         results_lst.append(trace_lst)
     return results_lst
 
+def process_and_output_model_results(model_results, models_count,
+                                     model_name, output_dir):
+    """Processes `model_results` and outputs them to `output_dir`.
+
+    Parameters
+    ----------
+    model_results: dict
+        A dictionary in which each key is a string representing the id of a
+        trace. The corresponding value is a list of `ModelResults`
+        corresponding to the model results for that trace.
+    models_count: int
+        An integer representing the number of best models kept for each trace.
+    model_name: str
+        A string specifying the name of the model.
+    output_dir: str
+        A string specifying the directory to which the model results will be
+        output.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    The results in `model_results` are saved to a csv file containing one row
+    per trace. The file is output to a file named `<name>_results.csv` in
+    `output_dir`, where `<name>` is `model_name`.
+
+    """
+    results = get_results_list_from_trace_model_results(model_results)
+    cols = get_col_list_for_params(
+        range(1, models_count + 1), model_name, specs.MODELING_COLS)
+    output_model_results(
+        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+
+
 def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     """Models all traces using `modeling_func` with `model_name`.
 
@@ -861,13 +817,10 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
 
     """
     traces, output_dir, train_prop = get_model_build_input_params()
-    results = parallel.perform_trace_modelling(
+    model_results = parallel.perform_trace_modelling(
         traces, modeling_func, train_prop)
-    results = get_results_list_from_trace_model_results(results)
-    cols = get_col_list_for_params(
-        range(1, models_count + 1), model_name, specs.MODELING_COLS)
-    output_model_results(
-        results, ["id"] + cols, output_dir, "{}_results".format(model_name))
+    process_and_output_model_results(
+        model_results, models_count, model_name, output_dir)
 
 def unnest_results_dicts(results_dicts, model_vars):
     """Unnests `results_dicts` using `model_vars`.
