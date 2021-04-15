@@ -209,7 +209,7 @@ def get_multivariate_model_results(model_params, train_df, train_preds,
     """
     results_dict = {}
     for model_var in model_vars:
-        results_dict[model_var] = ModelResults(model_params,
+        results_dict[model_var] = ModelResults.from_data(model_params,
             train_df[model_var].values, train_preds[model_var].values,
             test_df[model_var].values, test_preds[model_var].values)
     return results_dict

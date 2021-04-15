@@ -277,144 +277,6 @@ def model_traces_and_evaluate(model, model_params, traces,
         results_lst.append(get_model_stats_for_trace(traces[idx], models))
         log_modeling_progress(idx, trace_count, verbose)
 
-def insert_model_results_at_index(results_lst, model_results, idx):
-    """Inserts model results into `results_lst` based on `idx`.
-
-    `model_results` are inserted into `results_lst` starting at position
-    `n * idx + 1` where `n` is the length of `model_results`.
-
-    Parameters
-    ----------
-    results_lst: list
-        A list of results for which the model results are inserted.
-    model_results: list
-        A list containing the model results.
-    idx: int
-        An integer used to mark where the model results will be inserted.
-
-    Returns
-    -------
-    list
-        The list obtained from `results_lst` after inserting the model results.
-
-    """
-    n = len(model_results)
-    for i in range(n):
-        results_lst.insert((n * idx) + i + 1, model_results[i])
-    return results_lst
-
-def insert_multivariate_model_results_at_index(results, model_results, idx):
-    """Inserts model results into `results` based on `idx`.
-
-    `model_results` are inserted into `results` starting at position
-    `n * idx` where `n` is the length of `model_results`.
-
-    Parameters
-    ----------
-    results: list
-        A list of results for which the model results are inserted.
-    model_results: list
-        A list containing the model results.
-    idx: int
-        An integer used to mark where the model results will be inserted.
-
-    Returns
-    -------
-    list
-        The list obtained from `results` after inserting the model results.
-
-    """
-    n = len(model_results)
-    for i in range(n):
-        results_lst.insert((n * idx) + i, model_results[i])
-    return results_lst
-
-def insert_multivariate_model_results_at_index(results, model_results, idx):
-    """Inserts the model results into `results` based on `idx`.
-
-    For each model variable, the model results for that variable, specified
-    in `model_results` are inserted into the corresponding results of
-    `results` starting at position `n * idx + 1` where `n` is the length
-    of the results in `model_results`.
-
-    Parameters
-    ----------
-    results: dict
-        A dictionary of results for which the model results are inserted.
-    model_results: dict
-        A dictionary containing the model results.
-    idx: int
-        An integer used to mark where the model results will be inserted.
-
-    Returns
-    -------
-    dict
-        The dict obtained from `results` after inserting the model results.
-
-    """
-    for model_var in results.keys():
-        results[model_var] = insert_multivariate_model_results_at_index(
-            results[model_var], model_results[model_var], idx)
-    return results
-
-def extend_model_results_up_to_cutoff(results_lst, model_results, cutoff):
-    """Extends `results_lst` with the model results up to `cutoff`.
-
-    If `results_lst` has less than `cutoff` elements then it is extended with
-    the model results given by `model_results`.
-
-    Parameters
-    ----------
-    results_lst: list
-        The list containing model results that is being extended.
-    model_results: list
-        A list containing the model results.
-    cutoff: int
-        An integer used to decide if `results_lst` should be extended. If the
-        length of `results_lst` is below `cutoff` then it is extended with the
-        model results.
-
-    Returns
-    -------
-    list
-        The list obtained `results_lst` after possibly extending with the
-        model results.
-
-    """
-    if len(results_lst) < cutoff:
-        results_lst.extend(model_results)
-    return results_lst
-
-def extend_multivariate_model_results_up_to_cutoff(results, model_results,
-                                                   cutoff):
-    """Extends `results` with the model results up to `cutoff`.
-
-    If each list in `results` has less than `cutoff` elements then it is
-    extended with the model results given by `model_results`.
-
-    Parameters
-    ----------
-    results: dictionary
-        The dictionary containing model results that is being extended.
-    model_results: list
-        A dictionary containing the model results.
-    cutoff: int
-        An integer used to decide if `results` should be extended. If the
-        length of each list in `results` is below `cutoff` then it is extended
-        with the model results.
-
-    Returns
-    -------
-    dict
-        The dictionary obtained from `results` after possibly extending with the
-        model results.
-
-    """
-    for model_var in results.keys():
-        results[model_var] = extend_model_results_up_to_cutoff(
-            results[model_var], model_results[model_var], cutoff)
-    return results
-
 
 def is_better_model(new_mase, new_under_mase, old_mase, old_under_mase):
     """Determines if the new model performs better than the old model.
@@ -431,43 +293,33 @@ def is_better_model(new_mase, new_under_mase, old_mase, old_under_mase):
             (mase_diff >= 0 and w * mase_diff > -under_mase_diff))
 
 
-def update_with_model_results(results_lst, model_results, cutoff):
-    """Updates `results_lst` with the model results.
+def update_with_new_model_results(model_results, new_model_results):
+    """Updates `model_results` with `new_model_results`.
 
-    If `results_lst` has fewer than `cutoff` entries or the test MASE is lower
-    than the test MASE of a model already contained in `results_lst`, then
-    the model results are inserted into `results_lst`.
+    `new_model_results` is inserted into its appropriate place in the sorted
+    list `model_results`, based on the ranking metric defined on
+    `ModelResults`.
 
     Parameters
     ----------
-    results_lst: list
-        The list containing model results that is being updated.
     model_results: list
-        A list containing model results where the third element is the mean
-        squared error for the test set.
-    cutoff: int
-        An integer used to decide if `results_lst` should be extended. If the
-        length of `results_lst` is below `cutoff` then it is extended with the
-        model results.
+        The list of `ModelResults` that is being updated.
+    new_model_results: ModelResults
+        A `ModelResults` object representing the most recent model results
 
     Returns
     -------
     list
-        The list obtained `results_lst` after possibly extending or inserting
-        the model results.
+        The list obtained `model_results` inserting `new_model_results`.
 
     """
-    model_count = (len(results_lst) - 1) // len(model_results)
-    for idx in range(model_count):
-        old_model_idx = 2 + (len(model_results) * idx)
-        is_better = is_better_model(
-            model_results[2], model_results[3],
-            results_lst[old_model_idx + 1], results_lst[old_model_idx + 2])
-        if is_better:
-            return insert_model_results_at_index(
-                results_lst, model_results, idx)
-    return extend_model_results_up_to_cutoff(
-        results_lst, model_results, cutoff)
+    for idx in range(len(model_results)):
+        old_model_results = model_results[idx]
+        if new_model_results.is_better(old_model_results):
+            model_results.insert(idx, new_model_results)
+            return model_results
+    model_results.append(new_model_results)
+    return model_results
 
 def update_with_multivariate_model_results(results, model_results, cutoff):
     """Updates `results` with the model results.
@@ -558,36 +410,37 @@ def truncate_dict(raw_dict, cutoff):
     return raw_dict
 
 
-def handle_stats_for_model(trace, model, trace_results, cutoff):
-    """Handles the stats for `model` built on `trace`.
+def handle_results_for_model(trace, model, model_results, cutoff):
+    """Handles the model results for `model` built on `trace`.
 
     `trace` is modeled using `model` and the results are added to
-    `trace_results` if it has fewer than `cutoff` entries or if the results
+    `model_results` if it has fewer than `cutoff` entries or if the results
     for the model are better than the results of at least one model contained
-    in `trace_results`.
+    in `model_results`.
 
     Parameters
     ----------
     trace: Trace
         The `Trace` object being modeled.
-    model: TimeSeriesModel
-        A `TimeSeriesModel` to be fit to `trace`.
-    trace_results: list
-        A list containing results for modelling done on the trace.
+    model: TraceModel
+        A `TraceModel` to be fit to `trace`.
+    model_results: list
+        A list of `ModelResults` objects for the results of models built on
+        the trace.
     cutoff: int
-        An integer representing the maximum length of `trace_results`.
+        An integer representing the maximum length of `model_results`.
 
     Returns
     -------
     list
-        A list obtained from `trace_results` after handling the results of
+        A list obtained from `model_results` after handling the results of
         modeling `trace` with `model`.
 
     """
-    model_results = list(model.run_model_pipeline_for_trace(trace))
-    trace_results = update_with_model_results(
-        trace_results, [model.get_params()] + model_results, cutoff)
-    return truncate_list(trace_results, cutoff)
+    new_model_results = model.run_model_pipeline_for_trace(trace)
+    model_results = update_with_new_model_results(
+        model_results, new_model_results)
+    return truncate_list(model_results, cutoff)
 
 def initialize_multivariate_results(model_results, trace):
     """Initializes the multivariate results using `model_results` for `trace`.
@@ -646,18 +499,18 @@ def handle_stats_for_multivariate_model(trace, model, results, cutoff):
     return truncate_dict(results, cutoff)
 
 
-def update_model_stats_for_trace(trace, model, model_results, cutoff):
-    """Updates the stats for `model` built on `trace`.
+def update_model_results_for_trace(trace, model, model_results, cutoff):
+    """Updates `model_results` for `model` built on `trace`.
 
     `trace` is modeled using `model` and the results are added to
-    `trace_results` if it has fewer than `cutoff` entries or if the results
+    `model_results` if it has fewer than `cutoff` entries or if the results
     for the model are better than the results of at least one model contained
-    in `trace_results`.
+    in `model_results`.
 
     Parameters
     ----------
-    model: TimeSeriesModel
-        A `TimeSeriesModel` to be fit to `trace`.
+    model: TraceModel
+        A `TraceModel` to be fit to `trace`.
     trace: Trace
         The `Trace` object being modeled.
     trace_results: list
@@ -668,12 +521,12 @@ def update_model_stats_for_trace(trace, model, model_results, cutoff):
     Returns
     -------
     list
-        A list obtained from `trace_results` after handling the results of
+        A list obtained from `model_results` after handling the results of
         modeling `trace` with `model`.
 
     """
     try:
-        return handle_stats_for_model(trace, model, model_results, cutoff)
+        return handle_results_for_model(trace, model, model_results, cutoff)
     except:
         return model_results
 
@@ -709,31 +562,30 @@ def update_multivariate_model_stats_for_trace(trace, model, results, cutoff):
     except:
         return results
 
-def pad_list(lst, pad_val, pad_len):
-    """Pads `lst` with `pad_val` to length `pad_len`.
+def pad_model_results(model_results_lst, pad_len):
+    """Pads `model_results_lst` with to length `pad_len`.
 
-    If the length of `lst` is already greater or equal to `pad_len` then
-    `lst` is not modified.
+    `model_results_lst` is padded with null `ModelResults` up to `pad_len`.
 
     Parameters
     ----------
-    lst: list
-        The list being padded.
-    pad_val: float
-        The value used to pad `lst`.
+    model_results_lst: list
+        The list of `ModelResults` objects being padded.
     pad_len: int
-        An integer representing the length to which `lst` should be padded.
+        An integer representing the length to which `model_results_lst`
+        should be padded.
 
     Returns
     -------
     list
-        The list obtained from `lst` after padding with `pad_val` up to length
-        `pad_len`.
+        The list obtained from `model_results_lst` after padding with null
+        `ModelResults` objects up to length `pad_len`.
 
     """
-    if len(lst) < pad_len:
-        lst += [pad_val for _ in range(pad_len - len(lst))]
-    return lst
+    if len(model_results_lst) < pad_len:
+        model_results_lst += [build_null_model_results() for _
+                              in range(pad_len - len(model_results_lst))]
+    return model_results_lst
 
 def pad_dict(raw_dict, pad_val, pad_len):
     """Pads each list in `raw_dict` with `pad_val` to length `pad_len`.
@@ -763,10 +615,10 @@ def pad_dict(raw_dict, pad_val, pad_len):
     return raw_dict
 
 
-def get_best_models_for_trace(trace, models, models_count):
-    """Gets statistics for the best models in `models` for `trace`.
+def compute_best_results_for_trace(trace, models, models_count):
+    """Gets `ModelResults` for the best models of `models` for `trace`.
 
-    The best models in `models` are the `models_count` models with the lowest
+    The best models of `models` are the `models_count` models with the lowest
     test MASE when built on `trace`.
 
     Parameters
@@ -774,7 +626,7 @@ def get_best_models_for_trace(trace, models, models_count):
     trace: Trace
         The `Trace` object being modeled.
     models: list
-        A list of `TimeSeriesModel` objects representing the models being fit
+        A list of `TraceModel` objects representing the models being fit
         to `trace` and from which the best models are chosen.
     models_count: int
         An integer representing the number of models to include in the results.
@@ -786,12 +638,26 @@ def get_best_models_for_trace(trace, models, models_count):
         `models_count` best models from `models` fit to `trace`.
 
     """
-    best_results = [trace.get_trace_id()]
-    cutoff = (len(specs.MODELING_COLS) * models_count) + 1
+    best_results = []
     for model in models:
-        best_results = update_model_stats_for_trace(
-            trace, model, best_results, cutoff)
-    return pad_list(best_results, np.nan, cutoff)
+        best_results = update_model_results_for_trace(
+            trace, model, best_results, models_count)
+    return pad_model_results(best_results, models_count)
+
+def build_null_model_results():
+    """Builds null model results.
+
+    A null model results object is a `ModelResults` object in which all values
+    are null.
+
+    Returns
+    -------
+    ModelResults
+        A null `ModelResults` object.
+
+    """
+    results_dict = {results_col: np.nan for results_col in specs.RESULTS_COLS}
+    return ModelResults(tuple(), results_dict)
 
 def get_best_multivariate_models_for_trace(trace, models, models_count):
     """Gets stats for the best multivariate models in `models` for `trace`.
@@ -826,26 +692,26 @@ def get_best_multivariate_models_for_trace(trace, models, models_count):
             **pad_dict(best_results_dict, np.nan, cutoff)}
 
 def get_best_model_results_for_traces(model, model_params, traces,
-                                      result_lst, models_count, verbose=True):
+                                      result_dict, models_count, verbose=True):
     """Gets the `models_count` best model results for the traces of `traces`.
 
     For each trace in `traces` a `model` object is built for each set of model
     parameters in `model_params` and the results of the best `models_count`
-    models are saved in `result_lst`. If fewer than `models_count` models are
+    models are saved in `result_dict`. If fewer than `models_count` models are
     fitted to the trace, then the result is padded with `np.nan`.
 
     Parameters
     ----------
-    model: TimeSeriesModel.class
-        A `TimeSeriesModel` class specifying the model to be built.
+    model: TraceModel.class
+        A `TraceModel` class specifying the model to be built.
     model_params: list
         A list of dictionaries specifying the model parameters for each model
         to be built.
     traces: list
         A list of `Trace` objects specifying the traces to which models are
         fit.
-    result_lst: list
-        The list to which the model results for each trace are saved.
+    result_dict: dict
+        The dictionary to which the model results for each trace are saved.
     models_count: int
         An integer representing the number of model results to save. The
         results for the `models_count` best models for each trace will be
@@ -862,8 +728,9 @@ def get_best_model_results_for_traces(model, model_params, traces,
     models = build_models_from_params_list(model, model_params)
     trace_count = len(traces)
     for idx in range(trace_count):
-        result_lst.append(
-            get_best_models_for_trace(traces[idx], models, models_count))
+        model_results = compute_best_results_for_trace(
+            traces[idx], models, models_count)
+        result_dict[traces[idx].get_trace_id()] = model_results
         log_modeling_progress(idx, trace_count, verbose)
 
 def get_best_multivariate_model_results_for_traces(
@@ -958,7 +825,7 @@ def get_results_list_from_trace_model_results(trace_model_results):
         trace_lst = [trace_id]
         for model_results in trace_model_results[trace_id]:
             trace_lst.extend(model_results.to_list())
-        results_lst.append(model_results.to_list())
+        results_lst.append(trace_lst)
     return results_lst
 
 def run_best_models_for_all_traces(modeling_func, models_count, model_name):
@@ -996,7 +863,7 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     traces, output_dir, train_prop = get_model_build_input_params()
     results = parallel.perform_trace_modelling(
         traces, modeling_func, train_prop)
-    results_lst = get_results_list_from_trace_model_results(results)
+    results = get_results_list_from_trace_model_results(results)
     cols = get_col_list_for_params(
         range(1, models_count + 1), model_name, specs.MODELING_COLS)
     output_model_results(

@@ -113,7 +113,7 @@ class SequentialModel(TraceModel):
         trace_ts = self.get_model_data_for_trace(trace)
         y_train, y_test = self.split_data(trace_ts)
         preds_train, preds_test = self._get_predictions(trace_ts)
-        return ModelResults(
+        return ModelResults.from_data(
             self.get_params(), y_train, preds_train, y_test, preds_test)
 
     def plot_trace_vs_prediction(self, trace):

@@ -136,7 +136,7 @@ class TraceARIMA(StatisticalModel):
         train_ts, test_ts = self.split_data(trace_ts)
         self._fit(train_ts)
         preds_train, preds_test = self._get_predictions(len(test_ts))
-        return ModelResults(
+        return ModelResults.from_data(
             self.get_params(), train_ts, preds_train, test_ts, preds_test)
 
     def plot_trace_vs_prediction(self, trace):
