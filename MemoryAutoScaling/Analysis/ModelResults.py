@@ -2,7 +2,7 @@
 of training a model on a `Trace`.
 
 """
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import specs, utils
 
 
 class ModelResults:
@@ -51,3 +51,18 @@ class ModelResults:
 
         """
         return self._results_dict
+
+    def to_list(self):
+        """Converts the model results to a list.
+
+        Returns
+        -------
+        list
+            A 9-element list consisting of the model parameters and 8 floats
+            representing the model results.
+
+        """
+        model_lst = [self._model_params]
+        for result in specs.RESULTS_COLS:
+            model_lst.append(self._results_dict[result])
+        return model_lst

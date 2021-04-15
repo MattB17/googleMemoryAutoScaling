@@ -31,6 +31,7 @@ AVG_STATS_COLS = ["ts", "max", "std", "median", "range"]
 MODELING_COLS = ["params", "train_mase", "test_mase",
                  "under_mase", "prop_under_preds", "max_under_pred",
                  "over_mase", "prop_over_preds", "avg_over_pred"]
+RESULTS_COLS = [col for col in MODELING_COLS if col != "params"]
 
 
 def get_trace_columns():
