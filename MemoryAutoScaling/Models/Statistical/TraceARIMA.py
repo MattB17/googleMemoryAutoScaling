@@ -6,8 +6,8 @@ be applied to make the time series stationary. `q` is the moving average
 component, refering to the number of lagged forecast errors used in the model.
 
 """
-from sklearn.metrics import mean_squared_error
 from MemoryAutoScaling import utils
+from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
@@ -127,23 +127,17 @@ class TraceARIMA(StatisticalModel):
 
         Returns
         -------
-        tuple
-            A tuple of eight floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
-            The next three represent the one-sided mean absolute scaled error for
-            under predictions, the proportion of under predictions, and the
-            magnitude of the maximum under prediction, respectively. The last
-            three represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude of
-            the average over prediction.
+        ModelResults
+            A `ModelResults` object containing the results of building the
+            model on `trace`.
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
         train_ts, test_ts = self.split_data(trace_ts)
         self._fit(train_ts)
         preds_train, preds_test = self._get_predictions(len(test_ts))
-        return utils.calculate_evaluation_metrics(
-            train_ts, preds_train, test_ts, preds_test)
+        return ModelResults(
+            self.get_params(), train_ts, preds_train, test_ts, preds_test)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its prediction.

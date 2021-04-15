@@ -6,6 +6,7 @@ import pandas as pd
 import multiprocessing as mp
 from MemoryAutoScaling import specs
 from MemoryAutoScaling.DataHandling import Trace
+from MemoryAutoScaling.Analysis import ModelResults
 
 
 def get_cores_and_traces_per_core(trace_count):
@@ -172,3 +173,42 @@ def build_all_traces_from_files(trace_files, min_length, agg_window):
                              min_length, agg_window)))
     initialize_and_join_processes(procs)
     return list(results)
+
+
+def get_multivariate_model_results(model_params, train_df, train_preds,
+                                   test_df, test_preds, model_vars):
+    """Calculates the model results for `model_vars`.
+
+    A separate `ModelResults` object is built for each variable in
+    `model_vars` based on the actual and predicted values in the training
+    and test sets.
+
+    Parameters
+    ----------
+    model_params: tuple
+        A tuple specifying the parameters of the trained model.
+    train_df: pd.DataFrame
+        A pandas DataFrame containing the target data for the training set.
+    train_preds: pd.DataFrame
+        A pandas DataFrame containing the predictions for the training set.
+    test_df: pd.DataFrame
+        A pandas DataFrame containing the target data for the testing set.
+    test_preds: pd.DataFrame
+        A pandas DataFrame containing the predictions for the testing set.
+    model_vars: list
+        A list of strings with the names of the variables being modeled.
+
+    Returns
+    -------
+    dict
+        A dictionary of model results. The keys are the variable names
+        specified in `model_vars` and the corresponding value is a
+        `ModelResults` object corresponding to the results for that variable.
+
+    """
+    results_dict = {}
+    for model_var in model_vars:
+        results_dict[model_var] = ModelResults(model_params,
+            train_df[model_var].values, train_preds[model_var].values,
+            test_df[model_var].values, test_preds[model_var].values)
+    return results_dict

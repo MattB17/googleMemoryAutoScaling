@@ -2,6 +2,7 @@
 of training a model on a `Trace`.
 
 """
+from MemoryAutoScaling import utils
 
 
 class ModelResults:
@@ -22,9 +23,11 @@ class ModelResults:
         The modeling results.
 
     """
-    def __init__(self, model_params, results_dict):
+    def __init__(self, model_params, y_train,
+                 train_preds, y_test, test_preds):
         self._model_params = model_params
-        self._results_dict = results_dict
+        self._results_dict = utils.calculate_evaluation_metrics(
+            y_train, train_preds, y_test, test_preds)
 
     def get_model_params(self):
         """The model parameters associated with the results.

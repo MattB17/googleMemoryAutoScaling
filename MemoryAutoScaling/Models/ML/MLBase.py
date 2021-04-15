@@ -7,6 +7,7 @@ import numpy as np
 from abc import abstractmethod
 from MemoryAutoScaling import utils
 from MemoryAutoScaling.Models import TraceModel
+from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 
@@ -137,26 +138,14 @@ class MLBase(TraceModel):
 
         Returns
         -------
-        tuple
-            A tuple of eight floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
-            The next three represent the one-sided mean absolute scaled error for
-            under predictions, the proportion of under predictions, and the
-            magnitude of the maximum under prediction, respectively. The last
-            three represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude of
-            the average over prediction.
+        ModelResults
+            A `ModelResults` object containing the results of building the
+            model on `trace`.
 
         """
         raw_data = self.get_model_data_for_trace(trace)
         X_train, y_train, X_test, y_test = self.split_data(raw_data)
-        try:
-            return self._run_model_pipeline(X_train, y_train, X_test, y_test)
-        except Exception as e:
-            print(e)
-            print(raw_data)
-            print(trace.get_trace_df())
-            return tuple([np.nan for _ in range(8)])
+        return self._run_model_pipeline(X_train, y_train, X_test, y_test)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its predictions.
@@ -221,15 +210,9 @@ class MLBase(TraceModel):
 
         Returns
         -------
-        tuple
-            A tuple of eight floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
-            The next three represent the one-sided mean absolute scaled error for
-            under predictions, the proportion of under predictions, and the
-            magnitude of the maximum under prediction, respectively. The last
-            three represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude of
-            the average over prediction.
+        ModelResults
+            A `ModelResults` object containing the results of building the
+            model on `trace`.
 
         """
         pass

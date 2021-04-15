@@ -6,6 +6,7 @@ to predict the current value but do not store any state.
 from abc import abstractmethod
 from MemoryAutoScaling import utils
 from MemoryAutoScaling.Models import TraceModel
+from MemoryAutoScaling.Analysis import ModelResults
 
 
 class SequentialModel(TraceModel):
@@ -104,22 +105,16 @@ class SequentialModel(TraceModel):
 
         Returns
         -------
-        tuple
-            A tuple of eight floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
-            The next three represent the one-sided mean absolute scaled error for
-            under predictions, the proportion of under predictions, and the
-            magnitude of the maximum under prediction, respectively. The last
-            three represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude of
-            the average over prediction.
+        ModelResults
+            A `ModelResults` object containing the results of building the
+            model on `trace`.
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
         y_train, y_test = self.split_data(trace_ts)
         preds_train, preds_test = self._get_predictions(trace_ts)
-        return utils.calculate_evaluation_metrics(
-            y_train, preds_train, y_test, preds_test)
+        return ModelResults(
+            self.get_params(), y_train, preds_train, y_test, preds_test)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its predictions.

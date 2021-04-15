@@ -4,9 +4,7 @@ by all time series models.
 
 """
 from abc import ABC, abstractmethod
-from MemoryAutoScaling import utils
-import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
+from MemoryAutoScaling.Analysis import ModelResults
 
 class TraceModel(ABC):
     """Implements the functionality of a generic trace model.
@@ -104,15 +102,9 @@ class TraceModel(ABC):
 
         Returns
         -------
-        tuple
-            A tuple of eight floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
-            The next three represent the one-sided mean absolute scaled error for
-            under predictions, the proportion of under predictions, and the
-            magnitude of the maximum under prediction, respectively. The last
-            three represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude of
-            the average over prediction.
+        ModelResults
+            A `ModelResults` object containing the results of building the
+            model on `trace`.
 
         """
         pass

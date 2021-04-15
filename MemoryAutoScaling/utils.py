@@ -846,15 +846,15 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
 
     Returns
     -------
-    tuple
-        A tuple of eight floats. The first two represent the mean absolute
-        percentage error for the training and testing sets, respectively.
-        The next three represent the one-sided mean absolute scaled error for
-        under predictions, the proportion of under predictions, and the
-        magnitude of the maximum under prediction, respectively. The last
-        three represent the one-sided mean absolute scaled error for over
-        predictions, the proportion of over predictions, and the magnitude of
-        the average over prediction.
+    dict
+        A dictionary containing the evaluation metrics. Keys are strings
+        representing the names of the evaluation metric and the corresponding
+        value is a float. These metrics are the mean absolute scaled error
+        for the training and testing sets, the one-sided mean absolute scaled
+        error for under predictions, the proportion of under predictions, the
+        magnitude of the maximum under prediction, the one-sided mean absolute
+        scaled error for over predictions, the proportion of over predictions,
+        and the magnitude of the average over prediction.
 
     """
     train_mase, test_mase = calculate_train_and_test_mase(
@@ -863,51 +863,7 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
         list(y_test), list(preds_test))
     over_mase, prop_over_preds, avg_over_pred = get_over_prediction_stats(
         list(y_test), list(preds_test))
-    return (train_mase, test_mase, under_mase, prop_under_preds,
-            max_under_pred, over_mase, prop_over_preds, avg_over_pred)
-
-def calculate_multivariate_evaluation_metrics(train_df, train_preds, test_df,
-                                              test_preds, model_vars):
-    """Calculates the evaluation metrics for the training and testing sets.
-
-    The evaluation metrics consist of the mean absolute scaled error for
-    the training set, the mean absolute scaled error for the testing set,
-    the number of under predictions for the testing set, and the magnitude of
-    the maximum under prediction for the testing set. They are calculated
-    for each variable specified in `model_vars`.
-
-    Parameters
-    ----------
-    train_df: pd.DataFrame
-        A pandas DataFrame containing the target data for the training set.
-    train_preds: pd.DataFrame
-        A pandas DataFrame containing the predictions for the training set.
-    test_df: pd.DataFrame
-        A pandas DataFrame containing the target data for the testing set.
-    test_preds: pd.DataFrame
-        A pandas DataFrame containing the predictions for the testing set.
-    model_vars: list
-        A list of strings with the names of the variables being modeled.
-
-    Returns
-    -------
-    dict
-        A dictionary of tuples where each tuple represents the evaluation
-        metrics for one of the model variables specified in `model_vars`.
-        Each tuple consists of eight floats. The first two represent the mean
-        absolute percentage error for the training and testing sets,
-        respectively. The next three represent the one-sided mean absolute
-        scaled error for under predictions, the proportion of under
-        predictions, and the magnitude of the maximum under prediction,
-        respectively. The last three represent the one-sided mean absolute
-        scaled error for over predictions, the proportion of over predictions,
-        and the magnitude of the average over prediction.
-
-    """
-    results_dict = {}
-    for model_var in model_vars:
-        model_results = calculate_evaluation_metrics(
-            train_df[model_var].values, train_preds[model_var].values,
-            test_df[model_var].values, test_preds[model_var].values)
-        results_dict[model_var] = model_results
-    return results_dict
+    return {"train_mase": train_mase, "test_mase": test_mase,
+            "under_mase": under_mase, "prop_under_preds": prop_under_preds,
+            "max_under_pred": max_under_pred, "over_mase": over_mase,
+            "prop_over_preds": prop_over_preds, "avg_over_pred": avg_over_pred}

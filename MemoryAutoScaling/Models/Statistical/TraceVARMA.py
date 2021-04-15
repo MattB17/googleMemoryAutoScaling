@@ -6,7 +6,7 @@ the moving average component, referring to the number of lagged forecast
 errors used in the model.
 
 """
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import parallel, utils
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.varmax import VARMAX
 
@@ -139,24 +139,18 @@ class TraceVARMA(StatisticalModel):
         Returns
         -------
         dict
-            A dictionary of tuples where each tuple represents the metrics for
-            one of the time series being modeled. Each tuple consists of
-            8 floats. The first two represent the mean absolute percentage
-            error for the training and testing sets, respectively. The next
-            three represent the one-sided mean absolute scaled error for under
-            predictions, the proportion of under predictions, and the magnitude
-            of the maximum under prediction, respectively. The last three
-            represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude
-            of the average over prediction.
+            A dictionary of model results. The keys are strings representing
+            the modeled variables and the corresponding value is a
+            `ModelResults` object representing the results for that variable.
 
         """
         trace_df = self.get_model_data_for_trace(trace)
         train_df, test_df = self.split_data(trace_df)
         self._fit(train_df)
         preds_train, preds_test = self._get_predictions(len(test_df))
-        return utils.calculate_multivariate_evaluation_metrics(
-            train_df, preds_train, test_df, preds_test, self._model_vars)
+        return parallel.get_multivariate_model_results(
+            model.get_params(), train_df, train_preds, test_df,
+            preds_test, self._data_handler.get_target_variables())
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its prediction.

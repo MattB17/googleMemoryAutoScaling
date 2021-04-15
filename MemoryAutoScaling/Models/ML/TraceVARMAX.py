@@ -3,8 +3,9 @@ the VARMAX model. VARMAX models are the combination of a VARMA model and
 a regression model on explanatory features.
 
 """
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import parallel, utils
 from MemoryAutoScaling.Models.ML import MLBase
+from MemoryAutoScaling.Analysis import ModelResults
 from statsmodels.tsa.statespace.varmax import VARMAX
 
 
@@ -165,23 +166,17 @@ class TraceVARMAX(MLBase):
 
         Returns
         -------
-        dictionary
-            A dictionary with a tuple for each model variable. Each tuple
-            consists of eight floats. The first two represent the mean absolute
-            percentage error for the training and testing sets, respectively.
-            The next three represent the one-sided mean absolute scaled error for
-            under predictions, the proportion of under predictions, and the
-            magnitude of the maximum under prediction, respectively. The last
-            three represent the one-sided mean absolute scaled error for over
-            predictions, the proportion of over predictions, and the magnitude of
-            the average over prediction.
+        dict
+            A dictionary of model results. The keys are strings representing
+            the modeled variables and the corresponding value is a
+            `ModelResults` object representing the results for that variable.
 
         """
         self._fit(train_features, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
             train_features, test_features)
-        return utils.calculate_multivariate_evaluation_metrics(
-            train_target, train_preds, test_target,
+        return parallel.get_multivariate_model_results(
+            model.get_params(), train_target, train_preds, test_target,
             test_preds, self._data_handler.get_target_variables())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title):
