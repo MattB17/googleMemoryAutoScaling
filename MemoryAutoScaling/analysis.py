@@ -241,6 +241,60 @@ def update_with_new_model_results(model_results, new_model_results):
     model_results.append(new_model_results)
     return model_results
 
+def insert_multivariate_results(model_results_dict, new_results_dict, idx):
+    """Inserts `new_results_dict` into `model_results_dict` at `idx`.
+
+    Parameters
+    ----------
+    model_results_dict: dict
+        A dictionary containing lists of `ModelResults`. Each key is a string
+        representing a modeled variable and the corresponding value is a list
+        of `ModelResults` objects for that variable.
+    new_results_dict: dict
+        A dictionary of `ModelResults`. Each key is a string representing a
+        modeled variable and the corresponding value is an associated
+        `ModelResults` object.
+    idx: int
+        An integer representing the index to which the `ModelResults` of
+        `new_results_dict` will be inserted into the lists of
+        `model_results_dict`.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `model_results_dict` after inserting
+        `new_results_dict` at `idx`.
+
+    """
+    for model_var in model_results_dict.keys():
+        model_results_dict[model_var].insert(idx, new_results_dict[model_var])
+    return model_results_dict
+
+def append_multivariate_results(model_results_dict, new_results_dict):
+    """Appends `new_results_dict` into `model_results_dict`.
+
+    Parameters
+    ----------
+    model_results_dict: dict
+        A dictionary containing lists of `ModelResults`. Each key is a string
+        representing a modeled variable and the corresponding value is a list
+        of `ModelResults` objects for that variable.
+    new_results_dict: dict
+        A dictionary of `ModelResults`. Each key is a string representing a
+        modeled variable and the corresponding value is an associated
+        `ModelResults` object.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `model_results_dict` after inserting
+        `new_results_dict` at `idx`.
+
+    """
+    for model_var in model_results_dict.keys():
+        model_results_dict[model_var]append(new_results_dict[model_var])
+    return model_results_dict
+
 def update_with_new_multivariate_model_results(model_results_dict,
                                                new_results_dict):
     """Updates `model_results_dict` with the new model results.
@@ -269,13 +323,9 @@ def update_with_new_multivariate_model_results(model_results_dict,
     for idx in range(len(model_results_dict[specs.MAX_MEM_TS])):
         old_model_results =  model_results_dict[specs.MAX_MEM_TS][idx]
         if new_model_results.is_better(old_model_results):
-            for model_var in model_results_dict.keys():
-                model_results_dict[model_var].insert(
-                    idx, new_results_dict[model_var])
-            return model_results_dict
-    for model_var in model_results_dict.keys():
-        model_results_dict[model_var].append(new_results_dict[model_var])
-    return model_results_dict
+            return insert_multivariate_results(
+                model_results_dict, new_results_dict, idx)
+    return append_multivariate_results(model_results_dict, new_results_dict)
 
 def truncate_list(lst, cutoff):
     """Truncates `lst` if it is longer than `cutoff`.
@@ -358,6 +408,29 @@ def handle_results_for_model(trace, model, model_results, cutoff):
         model_results, new_model_results)
     return truncate_list(model_results, cutoff)
 
+
+def initialize_multivariate_results(model_results_dict):
+    """Initializes the multivariate results from `model_results_dict`.
+
+    Parameters
+    ----------
+    model_results_dict: dict
+        A dictionary of `ModelResults`. The keys are strings representing
+        one of the variables being modelled. The corresponding value is a
+        `ModelResults` object associated with that variable.
+
+    Returns
+    -------
+    dict
+        A dictionary of model results in which the keys are strings
+        representing the model variables specified in `model_results_dict`
+        and the corresponding value is a 1-element list containing the
+        associate `ModelResults` object from `model_results_dict`.
+
+    """
+    return {model_var: [model_results] for model_var, model_results
+            in model_results_dict.items()}
+
 def handle_results_for_multivariate_model(trace, model, model_results, cutoff):
     """Handles the model results for `model` built on `trace`.
 
@@ -386,9 +459,7 @@ def handle_results_for_multivariate_model(trace, model, model_results, cutoff):
     """
     new_model_results_dict = model.run_model_pipeline_for_trace(trace)
     if model_results == {}:
-        model_results = {model_var: [model_results]
-                         for model_var, model_results
-                         in new_model_results_dict.items()}
+        model_results = initialize_multivariate_results(new_model_results_dict)
     else:
         model_results = update_with_new_multivariate_model_results(
             model_results, new_model_results_dict)
