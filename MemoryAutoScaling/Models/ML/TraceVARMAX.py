@@ -3,7 +3,7 @@ the VARMAX model. VARMAX models are the combination of a VARMA model and
 a regression model on explanatory features.
 
 """
-from MemoryAutoScaling import parallel, utils
+from MemoryAutoScaling import parallel, plotting
 from MemoryAutoScaling.Models.ML import MLBase
 from MemoryAutoScaling.Analysis import ModelResults
 from statsmodels.tsa.statespace.varmax import VARMAX
@@ -205,7 +205,7 @@ class TraceVARMAX(MLBase):
         X_train, y_train, X_test, y_test = self.split_data(trace_df)
         train_preds, test_preds = self._get_train_and_test_predictions(
             X_train, X_test)
-        utils.plot_multivariate_train_and_test_predictions(
+        plotting.plot_multivariate_train_and_test_predictions(
             y_train, train_preds, y_test, test_preds,
             axes, self._data_handler.get_target_variables(),
             self.get_plot_title())

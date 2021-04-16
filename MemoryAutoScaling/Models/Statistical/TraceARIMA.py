@@ -6,7 +6,7 @@ be applied to make the time series stationary. `q` is the moving average
 component, refering to the number of lagged forecast errors used in the model.
 
 """
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import plotting, utils
 from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -160,7 +160,7 @@ class TraceARIMA(StatisticalModel):
         trace_ts = self.get_model_data_for_trace(trace)
         train_ts, test_ts = self.split_data(trace_ts)
         preds_train, preds_test = self._get_predictions(len(test_ts))
-        utils.plot_train_and_test_predictions_on_axes(
+        plotting.plot_train_and_test_predictions_on_axes(
             train_ts, preds_train, test_ts, preds_test,
             (ax1, ax2), self.get_plot_title())
 

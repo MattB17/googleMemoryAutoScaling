@@ -3,7 +3,7 @@ the ARIMAX model. ARIMAX models are the combination of an ARIMA model and
 a regression model on explanatory features.
 
 """
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import plotting
 from MemoryAutoScaling.Models.ML import MLBase
 from MemoryAutoScaling.Analysis import ModelResults
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -208,5 +208,5 @@ class TraceARIMAX(MLBase):
         X_train, y_train, X_test, y_test = self.split_data(trace_df)
         preds_train, preds_test = self._get_train_and_test_predictions(
             X_train, X_test)
-        utils.plot_train_and_test_predictions_on_axes(
+        plotting.plot_train_and_test_predictions_on_axes(
             y_train, preds_train, y_test, preds_test, (ax1, ax2), title)

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import utils, plotting
 import statsmodels.tsa.api as smt
 from statsmodels.tsa.stattools import adfuller, grangercausalitytests
 
@@ -142,8 +142,8 @@ class TraceAnalyzer:
         """
         plt.figure(figsize=(20, 8))
         plt.plot(data_trace, color=self._plot_color, linewidth=3)
-        utils.setup_trace_plot(len(data_trace), self._tick_interval,
-                               "{} Trace".format(self._analysis_title))
+        plotting.setup_trace_plot(len(data_trace), self._tick_interval,
+                                  "{} Trace".format(self._analysis_title))
 
     def plot_deviations_from_average(self, data_trace):
         """Plots the deviations of `data_trace` from its average across time.
@@ -167,8 +167,8 @@ class TraceAnalyzer:
         plt.plot(np.zeros(len(data_trace)), color="red", linewidth=1)
         plt.plot(data_trace - np.mean(data_trace),
                  color=self._plot_color, linewidth=3)
-        utils.setup_trace_plot(len(data_trace), self._tick_interval,
-                               "{} Trace - Deviations From Average".format(
+        plotting.setup_trace_plot(len(data_trace), self._tick_interval,
+                                  "{} Trace - Deviations From Average".format(
                                     self._analysis_title))
 
     def plot_auto_correlations(self, data_trace, lags):
@@ -195,7 +195,7 @@ class TraceAnalyzer:
         ts_axis = plt.subplot2grid(layout, (0, 0), colspan=2)
         acf_axis = plt.subplot2grid(layout, (1, 0))
         pacf_axis = plt.subplot2grid(layout, (1, 1))
-        utils.plot_autocorrelations_for_data(
+        plotting.plot_autocorrelations_for_data(
             data_trace, ts_axis, acf_axis, pacf_axis, lags, self._plot_color)
         plt.suptitle("{} Trace".format(self._analysis_title))
         plt.show()
@@ -230,11 +230,11 @@ class TraceAnalyzer:
         pacf_axis = plt.subplot2grid(layout, (2, 0))
         diff_pacf_axis = plt.subplot2grid(layout, (2, 1))
 
-        utils.plot_autocorrelations_for_data(
+        plotting.plot_autocorrelations_for_data(
             data_trace, ts_axis, acf_axis, pacf_axis, lags, self._plot_color)
 
         diffs = utils.get_differenced_trace(data_trace, 1)
-        utils.plot_autocorrelations_for_data(
+        plotting.plot_autocorrelations_for_data(
             diffs, diff_axis, diff_acf_axis, diff_pacf_axis, lags, "red")
 
         plt.suptitle(
@@ -265,7 +265,7 @@ class TraceAnalyzer:
         plt.plot(utils.get_differenced_trace(data_trace, 1),
                  color="red", linewidth=3, label="Differenced")
         plt.legend()
-        utils.setup_trace_plot(
+        plotting.setup_trace_plot(
             len(data_trace), self._tick_interval,
             "{} Trace And 1 Level Differencing".format(self._analysis_title))
 

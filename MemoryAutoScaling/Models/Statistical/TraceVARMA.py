@@ -6,7 +6,7 @@ the moving average component, referring to the number of lagged forecast
 errors used in the model.
 
 """
-from MemoryAutoScaling import parallel, utils
+from MemoryAutoScaling import parallel, plotting, utils
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.varmax import VARMAX
 
@@ -174,7 +174,7 @@ class TraceVARMA(StatisticalModel):
         trace_df = self.get_model_data_for_trace(trace)
         train_df, test_df = self.split_data(trace_df)
         preds_train, preds_test = self._get_predictions(len(test_df))
-        utils.plot_multivariate_train_and_test_predictions(
+        plotting.plot_multivariate_train_and_test_predictions(
             train_df, preds_train, test_df, preds_test,
             axes, self._model_vars, self.get_plot_title())
 

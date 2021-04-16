@@ -4,7 +4,7 @@ to predict the current value but do not store any state.
 
 """
 from abc import abstractmethod
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import plotting, utils
 from MemoryAutoScaling.Models import TraceModel
 from MemoryAutoScaling.Analysis import ModelResults
 
@@ -178,5 +178,5 @@ class SequentialModel(TraceModel):
         fig, (ax1, ax2) = plt.subplots(2)
         y_train, y_test = self.split_data(time_series)
         preds_train, preds_test = self._get_predictions(time_series)
-        utils.plot_train_and_test_predictions_on_axes(
+        plotting.plot_train_and_test_predictions_on_axes(
             y_train, preds_train, y_test, preds_test, (ax1, ax2), title)

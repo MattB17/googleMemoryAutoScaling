@@ -4,7 +4,7 @@ providing the basic framework used by all machine learning models.
 
 """
 from abc import abstractmethod
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import plotting
 from MemoryAutoScaling.Models.ML import MLBase
 from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.DataHandling import MLDataHandler
@@ -220,5 +220,5 @@ class MLModel(MLBase):
         X_train, y_train, X_test, y_test = self.split_data(trace_df)
         preds_train, preds_test = self._get_train_and_test_predictions(
             train_features, test_features)
-        utils.plot_train_and_test_predictions_on_axes(
+        plotting.plot_train_and_test_predictions_on_axes(
             y_train, preds_train, y_test, preds_test, (ax1, ax2), title)
