@@ -17,14 +17,14 @@ FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS, [specs.MAX_MEM_TS])
 TARGET_COL = [specs.MAX_MEM_TS]
 
 
-def build_arimax_models_for_traces(traces_lst, results_lst, train_prop):
+def build_arimax_models_for_traces(traces_lst, results_dict, train_prop):
     data_handler = MLDataHandler(train_prop, FEATURE_COLS, TARGET_COL)
     arimax_params_lst = [{'data_handler': data_handler, 'lags': specs.LAGS,
                           'p': p, 'd': d, 'q': q}
                           for p, d, q in product(ARIMA_p, ARIMA_d, ARIMA_q)]
     analysis.get_best_model_results_for_traces(
         TraceARIMAX, arimax_params_lst, traces_lst,
-        results_lst, specs.MODELS_COUNT)
+        results_dict, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":

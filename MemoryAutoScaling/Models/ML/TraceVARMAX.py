@@ -176,7 +176,7 @@ class TraceVARMAX(MLBase):
         train_preds, test_preds = self._get_train_and_test_predictions(
             train_features, test_features)
         return parallel.get_multivariate_model_results(
-            model.get_params(), train_target, train_preds, test_target,
+            self.get_params(), train_target, train_preds, test_target,
             test_preds, self._data_handler.get_target_variables())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title):

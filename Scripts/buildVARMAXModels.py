@@ -20,14 +20,14 @@ FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS, specs.MULTI_VAR_COLS)
 TARGET_COLS = specs.MULTI_VAR_COLS
 
 
-def build_varmax_models_for_traces(traces_lst, results_lst, train_prop):
+def build_varmax_models_for_traces(traces_lst, results_dict, train_prop):
     data_handler = MLDataHandler(train_prop, FEATURE_COLS, TARGET_COLS)
     varmax_params_lst = [{"data_handler": data_handler, "lags": specs.LAGS,
                           "p": p, "q": q}
                           for p, q in param_pairs]
     analysis.get_best_multivariate_model_results_for_traces(
         TraceVARMAX, varmax_params_lst, traces_lst,
-        results_lst, specs.MODELS_COUNT)
+        results_dict, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":

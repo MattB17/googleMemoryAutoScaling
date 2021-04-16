@@ -14,7 +14,7 @@ ESTIMATORS = [10, 50, 100]
 DEPTHS = [1, 2]
 
 
-def build_xgb_models_for_traces(trace_lst, results_lst, train_prop):
+def build_xgb_models_for_traces(trace_lst, results_dict, train_prop):
     data_handler = MLDataHandler(train_prop, FEATURE_COLS, TARGET_COL)
     xgb_params_lst = [{'data_handler': data_handler,
                        'lags': specs.LAGS,
@@ -24,7 +24,7 @@ def build_xgb_models_for_traces(trace_lst, results_lst, train_prop):
                       for learning_rate, n_estimators, depth
                       in product(LEARNING_RATES, ESTIMATORS, DEPTHS)]
     analysis.get_best_model_results_for_traces(
-        TraceXGB, xgb_params_lst, trace_lst, results_lst, specs.MODELS_COUNT)
+        TraceXGB, xgb_params_lst, trace_lst, results_dict, specs.MODELS_COUNT)
 
 
 if __name__ == "__main__":

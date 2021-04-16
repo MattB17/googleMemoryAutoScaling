@@ -453,8 +453,11 @@ def update_multivariate_model_results_for_trace(trace, model,
         results of modeling `trace` with `model`.
 
     """
-    return handle_results_for_multivariate_model(
-        trace, model, model_results, cutoff)
+    try:
+        return handle_results_for_multivariate_model(
+            trace, model, model_results, cutoff)
+    except:
+        return model_results
 
 
 def build_null_model_results():
