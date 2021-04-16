@@ -292,7 +292,7 @@ def append_multivariate_results(model_results_dict, new_results_dict):
 
     """
     for model_var in model_results_dict.keys():
-        model_results_dict[model_var]append(new_results_dict[model_var])
+        model_results_dict[model_var].append(new_results_dict[model_var])
     return model_results_dict
 
 def update_with_new_multivariate_model_results(model_results_dict,
@@ -1011,6 +1011,29 @@ def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
     process_and_output_multivariate_results(
         model_results, models_count, model_name, model_vars, output_dir)
 
+
+def get_cdf_values(dist_vals):
+    """Computes the cumulative distribution function values for `dist_vals`.
+
+    Parameters
+    ----------
+    dist_vals: np.array
+        A numpy array representing values drawn from a distribution.
+
+    Returns
+    -------
+    np.array, np.array
+        Two numpy arrays representing the x values and y values of the cumulative
+        distribution function, respectively.
+
+    """
+    dist_vals[np.isnan(dist_vals)] = 0
+    x_vals = np.sort(dist_vals)
+    pdf = x_vals / np.sum(x_vals)
+    cdf = np.cumsum(pdf)
+    return x_vals, cdf
+
+
 def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):
     """Plots the cumulative distribution of `dist_vals`.
 
@@ -1033,9 +1056,6 @@ def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):
     None
 
     """
-    dist_vals[np.isnan(dist_vals)] = 0
-    x_vals = np.sort(dist_vals)
-    pdf = x_vals / np.sum(x_vals)
-    cdf = np.cumsum(pdf)
+    x_vals, cdf = get_cdf_values(dist_vals)
     ax.plot(x_vals, cdf, color=color)
-    ax.set_title("{0} of Maximum Memory vs {1}".format(desc, title))
+    ax.set_title("{0} - {1}".format(desc, title))
