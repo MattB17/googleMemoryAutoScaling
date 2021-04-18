@@ -1010,3 +1010,22 @@ def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
         traces, modeling_func, train_prop)
     process_and_output_multivariate_results(
         model_results, models_count, model_name, model_vars, output_dir)
+
+
+def build_model_results_from_results_dict(model_results_dict):
+    """Builds a `ModelResults` object from `model_results_dict`.
+
+    Parameters
+    ----------
+    model_results_dict: pd.DataFrame
+        A pandas DataFrame containing the model results for a trace.
+
+    Returns
+    -------
+    ModelResults
+        The `ModelResults` object obtained from `model_results_dict`.
+
+    """
+    results_dict = {k: v for k, v in model_results_dict.items()
+                    if k not in ["id", "params"]}
+    return ModelResults(model_results_dict['params'], results_dict)

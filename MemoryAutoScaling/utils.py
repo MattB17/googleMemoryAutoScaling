@@ -678,3 +678,29 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
             "under_mase": under_mase, "prop_under_preds": prop_under_preds,
             "max_under_pred": max_under_pred, "over_mase": over_mase,
             "prop_over_preds": prop_over_preds, "avg_over_pred": avg_over_pred}
+
+
+def process_model_results_df(model_results_df):
+    """Processes `model_results_df`.
+
+    `model_results_df` is processed by renaming columns in order to compare
+    the model results against other model results.
+
+    Parameters
+    ----------
+    model_results_df: pd.DataFrame
+        A pandas DataFrame containing the results of the modeling process
+        for each trace.
+
+    Returns
+    -------
+    pd.DataFrame
+        The pandas DataFrame obtained from `model_results_df` after
+        processing.
+
+    """
+    processed_df = copy.deepcopy(model_results_df)
+    cols = ["id"] + ["_".join(col.split("_")[:-1]) for col
+                     in processed_df.columns if col != "id"]
+    processed_df.columns = cols
+    return processed_df
