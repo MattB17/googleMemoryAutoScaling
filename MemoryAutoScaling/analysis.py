@@ -1204,4 +1204,37 @@ def output_best_model_results_dict(best_results_dict, output_dir):
          for trace_id, model_dict in best_results_dict.items()]
     cols = ["id", "model", "params"] + specs.RESULTS_COLS
     output_model_results(
-        best_results_lst, cols, output_dir, "best_model_results") 
+        best_results_lst, cols, output_dir, "best_model_results")
+
+
+def output_best_model_results_from_model_results_dfs(model_results_dfs,
+                                                     output_dir):
+    """Outputs the best model results based on `model_results_dfs`.
+
+    For each trace, the best `ModelResults` is used across all the model
+    results DataFrame in `model_results_dfs`.
+
+    Parameters
+    ----------
+    model_results_dfs: dict
+        A dictionary of model results DataFrames where the keys are strings
+        representing the names of the model to which the DataFrame refers to.
+        Each dataframe contains the results of the corresponding model fit on
+        each trace.
+    output_dir: str
+        A string representing the name of the output directory to which the
+        results are output.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    A file named `best_model_results.csv` is saved to `output_dir` containing
+    the best model results for each trace from `model_results_dfs`.
+
+    """
+    model_results_dict = get_best_model_results_dict_from_results_dfs(
+        model_results_dfs)
+    output_best_model_results_dict(model_results_dict, output_dir)
