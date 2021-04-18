@@ -1029,3 +1029,108 @@ def build_model_results_from_results_dict(model_results_dict):
     results_dict = {k: v for k, v in model_results_dict.items()
                     if k not in ["id", "params"]}
     return ModelResults(model_results_dict['params'], results_dict)
+
+
+def model_results_df_to_dict(model_results_df, model_name):
+    """Converts `model_results_df` to a dictionary representation.
+
+    The dictionary representation has a key for every trace in
+    `model_results_df`. The corresponding value is a dictionary with two
+    key-value pairs: one identifying the model as `model_name` and the other
+    containing a `ModelResults` object summarizing the model results for that
+    trace based on the data in `model_results_df`.
+
+    Parameters
+    ----------
+    model_results_df: pd.DataFrame
+        A pandas DataFrame containing the model results for all traces for the
+        model specified by `model_name`.
+    model_name: str
+        A string representing the name of the model.
+
+    Returns
+    -------
+    dict
+        A dictionary representation of `model_results_df`.
+
+    """
+    model_results_dict = {}
+    results_df = utils.process_model_results_df(model_results_df)
+    for row_dict in results_df.to_dict(orient='records'):
+        model_results = build_model_results_from_results_dict(row_dict)
+        model_results_dict[row_dict['id']] = {'model': model_name,
+                                              'results': model_results}
+    return model_results_dict
+
+
+def update_best_model_results_dict(best_results_dict,
+                                   new_results_df, model_name):
+    """Updates `best_results_dict` with the results from `new_results_df`.
+
+    For each record in `new_results_df`, the corresponding trace is updated
+    in `best_results_dict` if the model results in `new_results_df` are better
+    than the model results in `best_results_dict` for that trace.
+
+    Parameters
+    ----------
+    best_results_dict: dict
+        A dictionaru containing the best model results for each trace. The
+        keys are strings representing trace IDs. The corresponding value is
+        a dictionary with 2 key-value pairs: one specifying the name of the
+        best model and the other specifying the `ModelResults` object
+        associated with the model.
+    new_results_df: pd.DataFrame
+        A pandas DataFrame with new model results which is being used to
+        update `best_results_dict`.
+    model_name: str
+        A string representing the name of the model which generated the results
+        in `new_results_df`.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `best_results_dict` after updating based
+        on the data in `new_results_df`.
+
+    """
+    results_df = utils.process_model_results_df(new_results_df)
+    for row_dict in results_df.to_dict(orient='records'):
+        model_results = build_model_results_from_results_dict(row_dict)
+        old_results = best_results_dict[row_dict['id']]['results']
+        if model_results.is_better(old_results):
+            best_results_dict[row_dict['id']] = {'model': model_name,
+                                                 'results': model_results}
+    return best_results_dict
+
+
+def get_best_model_results_dict_from_results_dfs(model_results_dfs):
+    """Gets a dictionary of the best model results from `model_results_dfs`.
+
+    A dictionary containing the best `ModelResults` object for each trace
+    is built from the model results dataframes in `model_results_dfs`. The
+    keys are strings representing trace IDs and the corresponding value is
+    a dictionary of 2 key-value pairs: specifying the name of the best model
+    and the associated `ModelResults` for that trace.
+
+    Parameters
+    ----------
+    model_results_dfs: dict
+        A dictionary of model results DataFrames where the keys are strings
+        representing the names of the model to which the DataFrame refers to.
+        Each dataframe contains the results of the corresponding model fit on
+        each trace.
+
+    Returns
+    -------
+    dict
+        The dictionary of the best `ModelResults` for each trace obtained from
+        `model_results_dfs`.
+
+    """
+    model_names = list(model_results_dfs.keys())
+    best_results_dict = model_results_df_to_dict(
+        model_results_dfs[model_names[0]], model_names[0])
+    for model_name in model_names[1:]:
+        best_results_dict = update_best_model_results_dict(
+            best_results_dict, model_results_dfs[model_name], model_name)
+    return best_results_dict
