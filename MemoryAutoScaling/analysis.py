@@ -1063,6 +1063,47 @@ def model_results_df_to_dict(model_results_df, model_name):
     return model_results_dict
 
 
+def get_best_model_dict_for_trace(best_results_dict, row_dict, model_name):
+    """Gets the best model dict from `best_results_dict` and `row_dict`.
+
+    For the trace in `row_dict`, if the trace is not in `best_results_dict`
+    then the results from `row_dict` are used as the best results for the
+    trace. Otherwise, the best `ModelResults` for the trace is the better
+    `ModelResults` object between `best_results_dict` and `row_dict`. The
+    dictionary has the model name of the best model and the corresponding
+    `ModelResults` object.
+
+    Parameters
+    ----------
+    best_results_dict: dict
+        A dictionary containing the best model results for each trace. The
+        keys are strings representing trace IDs. The corresponding value is
+        a dictionary with 2 key-value pairs: one specifying the name of the
+        best model and the other specifying the `ModelResults` object
+        associated with the model.
+    row_dict: dict
+        A dictionary specifying the model results for a model of type
+        `model_name` built on a trace.
+    model_name: str
+        A string specifying the type of model to which the results in row_dict
+        refer.
+
+    Returns
+    -------
+    dict
+        The dictionary of best results for the trace based on `row_dict` and
+        `best_results_dict`.
+
+    """
+    model_results = build_model_results_from_results_dict(row_dict)
+    if row_dict['id'] not in best_results_dict:
+        return {'model': model_name, 'results': model_results}
+    old_results = best_results_dict[row_dict['id']]['results']
+    if model_results.is_better(old_results):
+        return {'model': model_name, 'results': model_results}
+    return best_results_dict[row_dict['id']]
+
+
 def update_best_model_results_dict(best_results_dict,
                                    new_results_df, model_name):
     """Updates `best_results_dict` with the results from `new_results_df`.
@@ -1074,7 +1115,7 @@ def update_best_model_results_dict(best_results_dict,
     Parameters
     ----------
     best_results_dict: dict
-        A dictionaru containing the best model results for each trace. The
+        A dictionary containing the best model results for each trace. The
         keys are strings representing trace IDs. The corresponding value is
         a dictionary with 2 key-value pairs: one specifying the name of the
         best model and the other specifying the `ModelResults` object
@@ -1095,11 +1136,8 @@ def update_best_model_results_dict(best_results_dict,
     """
     results_df = utils.process_model_results_df(new_results_df)
     for row_dict in results_df.to_dict(orient='records'):
-        model_results = build_model_results_from_results_dict(row_dict)
-        old_results = best_results_dict[row_dict['id']]['results']
-        if model_results.is_better(old_results):
-            best_results_dict[row_dict['id']] = {'model': model_name,
-                                                 'results': model_results}
+        best_results_dict[row_dict['id']] = get_best_model_dict_for_trace(
+            best_results_dict, row_dict, model_name)
     return best_results_dict
 
 
@@ -1134,3 +1172,36 @@ def get_best_model_results_dict_from_results_dfs(model_results_dfs):
         best_results_dict = update_best_model_results_dict(
             best_results_dict, model_results_dfs[model_name], model_name)
     return best_results_dict
+
+
+def output_best_model_results_dict(best_results_dict, output_dir):
+    """Outputs `best_results_dict` to a `csv` file.
+
+    Parameters
+    ----------
+    best_results_dict: dict
+        A dictionary containing the best model results for each trace. The
+        keys are strings representing trace IDs. The corresponding value is
+        a dictionary with 2 key-value pairs: one specifying the name of the
+        best model and the other specifying the `ModelResults` object
+        associated with the model.
+    output_dir: str
+        A string representing the name of the output directory to which the
+        results are output.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    A file named `best_model_results.csv` is saved to `output_dir` containing
+    the results from `best_results_dict`.
+
+    """
+    best_results_lst = [
+        [trace_id, model_dict['model']] + model_dict['results'].to_list()
+         for trace_id, model_dict in best_results_dict.items()]
+    cols = ["id", "model", "params"] + specs.RESULTS_COLS
+    output_model_results(
+        best_results_lst, cols, output_dir, "best_model_results") 
