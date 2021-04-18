@@ -6,7 +6,6 @@ __pycache__/
 input_data/
 output_data/
 .ipynb_checkpoints/
-Notebooks/
 build/
 dist/
 test_output/
