@@ -1202,9 +1202,9 @@ def output_best_model_results_dict(best_results_dict, output_dir):
     best_results_lst = [
         [trace_id, model_dict['model']] + model_dict['results'].to_list()
          for trace_id, model_dict in best_results_dict.items()]
-    cols = ["id", "model", "params"] + specs.RESULTS_COLS
-    output_model_results(
-        best_results_lst, cols, output_dir, "best_model_results")
+    cols = ["{}_best".format(col_name) for col_name in specs.MODELING_COLS]
+    output_model_results(best_results_lst, ["id", "model"] + cols,
+                         output_dir, "best_model_results")
 
 
 def output_best_model_results_from_model_results_dfs(model_results_dfs,
@@ -1238,3 +1238,42 @@ def output_best_model_results_from_model_results_dfs(model_results_dfs,
     model_results_dict = get_best_model_results_dict_from_results_dfs(
         model_results_dfs)
     output_best_model_results_dict(model_results_dict, output_dir)
+
+
+def get_percentiles_df_for_model_results(model_results_dict,
+                                         model_names_lst, analysis_col):
+    """The percentile dataframe for `analysis_col` in `model_results_dict`.
+
+    The percentile dataframe is a pandas DataFrame containing the 1, 25, 50,
+    75, and 99 percentile values for `analysis_col` for each model in
+    `model_names_lst` based on the data in `model_results_dict`.
+
+    Parameters
+    ----------
+    model_results_dict: dict
+        A dictionary of model results DataFrames where the keys are strings
+        representing the names of the model to which the DataFrame refers to.
+        Each dataframe contains the results of the corresponding model fit on
+        each trace.
+    model_names_lst: list
+        A list of strings representing the names of models for which the
+        corresponding model results dataframe appears in `model_results_dict`.
+    analysis_col: str
+        A string representing the name of the column in the model results
+        dataframes for which the percentiles are calculated.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame representing the percentile dataframe for
+        `analysis_col` based on the data in `model_results_dict`.
+
+    """
+    results_lst = []
+    for model_name in model_names_lst:
+        col_name = "{0}_{1}".format(analysis_col, model_name)
+        results_lst.append(list(np.percentile(
+            model_results_dict[model_name][col_name].values,
+            [1, 25, 50, 75, 99])))
+    return pd.DataFrame(results_lst, index=model_names_lst,
+                        columns=["P1", "P25", "Median", "P75", "P99"])
