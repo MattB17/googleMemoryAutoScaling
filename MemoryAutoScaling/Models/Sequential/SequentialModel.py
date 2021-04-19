@@ -21,6 +21,10 @@ class SequentialModel(TraceModel):
     train_prop: float
         A float in the range [0, 1] representing the proportion of
         observations in the training set. The default value is 0.7.
+    max_mem: bool
+        A boolean indicating if the target value is maximum memory. The
+        default value is True, indicating that maximum memory usage is
+        the target variable. Otherwise, maximum CPU usage is used.
 
     Attributes
     ----------
@@ -28,11 +32,16 @@ class SequentialModel(TraceModel):
         The initial prediction for the model.
     _train_prop: float
         Represents the percent of data in the training set.
+    _max_mem: bool
+        A boolean indicating the target variable. True indicates that maximum
+        memory usage is the target variable. Otherwise, maximum CPU usage is
+        used as the target.
 
     """
-    def __init__(self, initial_pred, train_prop=0.7):
+    def __init__(self, initial_pred, train_prop=0.7, max_mem=True):
         self._initial_pred = initial_pred
         self._train_prop = train_prop
+        self._max_mem = max_mem
 
     def split_data(self, model_data):
         """Splits `model_data` into the training and testing set.
@@ -68,7 +77,9 @@ class SequentialModel(TraceModel):
             usage of the trace.
 
         """
-        return trace.get_maximum_memory_time_series()
+        if self._max_mem:
+            return trace.get_maximum_memory_time_series()
+        return trace.get_maximum_cpu_time_series()
 
     def get_predictions_for_trace(self, trace):
         """Gets predictions for the training and testing set for `trace`.
