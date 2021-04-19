@@ -109,14 +109,41 @@ def build_models_from_params_list(time_series_model, params_lst):
     return [time_series_model(**params) for params in params_lst]
 
 
-def read_modelling_input_params():
+def read_univariate_modelling_input_params():
     """Reads the input parameters for modelling from standard input.
 
     The input paramters consist of the input directory containing the
     trace files, the output directory for modelling results, a string
     identifying files to read from the input directory, an integer
-    representing the minimum length for a trace to be modelled, and a float
-    representing the proportion of data in the training set.
+    representing the minimum length for a trace to be modelled, a float
+    representing the proportion of data in the training set, an integer
+    representing for how many successive periods to aggregate data, and
+    a boolean value indicating the target variable.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the input parameters.
+
+    """
+    return {"input_dir": sys.argv[1],
+            "output_dir": sys.argv[2],
+            "file_id": sys.argv[3],
+            "min_trace_length": int(sys.argv[4]),
+            "train_prop": float(sys.argv[5]),
+            "aggregation_window": int(sys.argv[6]),
+            "max_mem": bool(sys.argv[7])}
+
+
+def read_multivariate_modelling_input_params():
+    """Reads the input parameters for modelling from standard input.
+
+    The input paramters consist of the input directory containing the
+    trace files, the output directory for modelling results, a string
+    identifying files to read from the input directory, an integer
+    representing the minimum length for a trace to be modelled, a float
+    representing the proportion of data in the training set, and an integer
+    representing for how many successive periods to aggregate data.
 
     Returns
     -------
@@ -132,8 +159,30 @@ def read_modelling_input_params():
             "aggregation_window": int(sys.argv[6])}
 
 
-def get_model_build_input_params():
-    """Gets the set of parameters to build models for the traces.
+def get_traces_from_input_params(input_params):
+    """Gets the collection of traces based on `input_params`.
+
+    Parameters
+    ----------
+    input_params: dict
+        A dictionary containing the input parameters used to construct the
+        traces. The dictionary has keys 'input_dir', 'file_id',
+        'min_trace_length', and 'aggregation_window'.
+
+    Returns
+    -------
+    list
+        A list of `Trace` objects constructed based on `input_params`.
+
+    """
+    trace_handler = TraceHandler(
+        input_params['input_dir'], input_params['file_id'],
+        input_params['min_trace_length'], input_params['aggregation_window'])
+    return trace_handler.run_processing_pipeline()
+
+
+def get_univariate_model_build_input_params():
+    """Gets the set of parameters to build univariate models for the traces.
 
     Reads the input arguments from the system input and uses these to setup
     the input parameters for model building. These input parameters are
@@ -142,19 +191,40 @@ def get_model_build_input_params():
 
     Returns
     -------
-    list, str, float
-        A list of `Trace` objects representing the traces to be modeled, a
-        string representing the output directory for model results, and a
-        float in the range [0, 1] representing the proportion of observations
-        in the training set.
+    dict
+        A dictionary containing a list of traces, the output directory for
+        model results, a float representing the proportion of records in the
+        training set, and a boolean indicating which target variable to use
+        for modeling.
 
     """
-    params = read_modelling_input_params()
-    trace_handler = TraceHandler(
-        params['input_dir'], params['file_id'],
-        params['min_trace_length'], params["aggregation_window"])
-    traces = trace_handler.run_processing_pipeline()
-    return traces, params['output_dir'], params['train_prop']
+    params = read_univariate_modelling_input_params()
+    return {'traces': get_traces_from_input_params(params),
+            'output_dir': params['output_dir'],
+            'train_prop': params['train_prop'],
+            'max_mem': params['max_mem']}
+
+
+def get_multivariate_model_build_input_params():
+    """Gets the set of parameters to build multivariate models for the traces.
+
+    Reads the input arguments from the system input and uses these to setup
+    the input parameters for model building. These input parameters are
+    the collection of traces to be modeled, an output directory for model
+    results, and the proportion of records in the training set.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the list of traces to be modeled, the output
+        directory for modeling results, and a float representing the
+        proportion of records to use in the training set.
+
+    """
+    params = read_multivariate_modelling_input_params()
+    return {"traces": get_traces_from_input_params(params),
+            "output_dir": params['output_dir'],
+            "train_prop": params['train_prop']}
 
 
 def output_model_results(results, col_list, output_dir, file_name):
@@ -963,11 +1033,11 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     where `<name>` is `model_name`.
 
     """
-    traces, output_dir, train_prop = get_model_build_input_params()
+    model_params = get_multivariate_model_build_input_params()
     model_results = parallel.perform_trace_modelling(
-        traces, modeling_func, train_prop)
+        model_params['traces'], modeling_func, model_params['train_prop'])
     process_and_output_model_results(
-        model_results, models_count, model_name, output_dir)
+        model_results, models_count, model_name, model_params['output_dir'])
 
 
 def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
@@ -1005,11 +1075,12 @@ def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
     where `<name>` is `model_name`.
 
     """
-    traces, output_dir, train_prop = get_model_build_input_params()
+    model_params = get_multivariate_model_build_input_params()
     model_results = parallel.perform_trace_modelling(
-        traces, modeling_func, train_prop)
+        model_params['traces'], modeling_func, model_params['train_prop'])
     process_and_output_multivariate_results(
-        model_results, models_count, model_name, model_vars, output_dir)
+        model_results, models_count, model_name,
+        model_vars, model_params['output_dir'])
 
 
 def build_model_results_from_results_dict(model_results_dict):
