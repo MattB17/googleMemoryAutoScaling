@@ -8,11 +8,8 @@ from MemoryAutoScaling.Analysis import TraceAnalyzer
 from MemoryAutoScaling.DataHandling import Trace, TraceHandler
 
 
-CAUSAL_COLS = ["{}_ts".format(col_name) for col_name
-               in [specs.AVG_MEM_COL, specs.MAX_CPU_COL, specs.AVG_CPU_COL]]
-
-
-def run_trace_stats(traces, results_lst, causal_lags):
+def run_trace_stats(traces, results_lst, causal_lags,
+                    causal_cols, output_target):
     analyzer = TraceAnalyzer("whitegrid", "seaborn-dark", 10, "blue", "Raw Data")
     trace_count = len(traces)
     for idx in range(trace_count):
@@ -26,13 +23,13 @@ def run_trace_stats(traces, results_lst, causal_lags):
             utils.get_differenced_trace(
                 trace.get_maximum_memory_time_series(), 2))
         trace_df = trace.get_lagged_df(specs.LAGS)
-        corr_series = trace_df.corr()[specs.MAX_MEM_TS]
+        corr_series = trace_df.corr()[output_target]
         trace_stats = ([trace.get_trace_id(), p_val, p_val_diff, p_val_diff2]
                         + list(corr_series))
-        for causal_col in CAUSAL_COLS:
+        for causal_col in causal_cols:
             try:
                 granger = analyzer.test_for_causality(
-                    trace_df, [specs.MAX_MEM_TS, causal_col], specs.LAGS)
+                    trace_df, [output_target, causal_col], specs.LAGS)
                 for lag in specs.LAGS:
                     trace_stats.extend(
                         analysis.get_granger_pvalues_at_lag(granger, lag))
@@ -50,6 +47,7 @@ if __name__ == "__main__":
     file_id = sys.argv[3]
     min_trace_length = int(sys.argv[4])
     aggregation_window = int(sys.argv[5])
+    max_mem = (sys.argv[6].lower() == "true")
 
     handler = TraceHandler(
         input_dir, file_id, min_trace_length, aggregation_window)
@@ -59,11 +57,15 @@ if __name__ == "__main__":
     cores, traces_per_core = parallel.get_cores_and_traces_per_core(
         len(traces))
 
+    input_target, output_target = specs.get_input_and_output_target(max_mem)
+    causal_cols = specs.get_causal_cols(input_target)
+
     for core_num in range(cores):
         core_traces = parallel.get_traces_for_core(
             traces, traces_per_core, core_num)
-        procs.append(mp.Process(target=run_trace_stats,
-                                args=(core_traces, stat_results, specs.LAGS)))
+        stats_args = (core_traces, stat_results, specs.LAGS,
+                      causal_cols, output_target)
+        procs.append(mp.Process(target=run_trace_stats, args=stats_args))
     parallel.initialize_and_join_processes(procs)
 
     stat_df = pd.DataFrame(list(stat_results))
@@ -71,7 +73,7 @@ if __name__ == "__main__":
         "corr_{}".format(col_name)
         for col_name in
         specs.get_trace_columns() + specs.get_lagged_trace_columns(specs.LAGS)]
-    stat_cols += analysis.get_all_granger_col_names(CAUSAL_COLS, specs.LAGS)
+    stat_cols += analysis.get_all_granger_col_names(causal_cols, specs.LAGS)
     stat_df.columns = stat_cols
     stat_df.to_csv(
         os.path.join(output_dir, "trace_stats.csv"), sep=",", index=False)

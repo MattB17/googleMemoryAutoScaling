@@ -55,6 +55,53 @@ def get_target_variable(max_mem):
     return MAX_MEM_TS if max_mem else MAX_CPU_TS
 
 
+def get_input_and_output_target(max_mem):
+    """Returns the input and output target variables based on `max_mem`.
+
+    The input target variable is the name of the target variable in the raw
+    trace data. The output target variable is the name of the target variable
+    after pre-processing and is used in the modeling procedure. If `max_mem`
+    is True, Maximum Memory Usage is used as the target variable. Otherwise,
+    the target variable is Maximum CPU Usage.
+
+    Parameters
+    ----------
+    max_mem: bool
+        A boolean value indicating whether maximum memory usage is the target
+        variable.
+
+    Returns
+    -------
+    str, str
+        Two strings representing the input and output target variables,
+        respectively.
+
+    """
+    if max_mem:
+        return MAX_MEM_COL, MAX_MEM_TS
+    return MAX_CPU_COL, MAX_CPU_TS
+
+
+def get_causal_cols(target_variable):
+    """Gets the columns used to calculate causation against `target_variable`.
+
+    Parameters
+    ----------
+    target_variable: str
+        The name of the target variable.
+
+    Returns
+    -------
+    list
+        A list of strings representing the columns for which causation
+        p-values will be calculated against `target_variable`.
+
+    """
+    raw_causal_cols = [col_name for col_name in RAW_TIME_SERIES_COLS
+                       if col_name != target_variable]
+    return ["{}_ts".format(col_name) for col_name in raw_causal_cols]
+
+
 def get_trace_columns():
     """The columns in a trace dataframe.
 
