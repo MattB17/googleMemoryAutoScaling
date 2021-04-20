@@ -14,9 +14,11 @@ ARIMA_d = [d for d in range(2)]
 ARIMA_q = [q for q in range(4)]
 
 
-def build_arima_models_for_traces(traces_lst, results_dict, train_prop):
+def build_arima_models_for_traces(traces_lst, results_dict,
+                                  train_prop, max_mem):
     arima_params_lst = [{'train_prop': train_prop,
-                        'p': p, 'd': d, 'q': q}
+                        'p': p, 'd': d, 'q': q,
+                        'max_mem': max_mem}
                         for p, d, q in product(ARIMA_p, ARIMA_d, ARIMA_q)]
     analysis.get_best_model_results_for_traces(
         TraceARIMA, arima_params_lst, traces_lst,

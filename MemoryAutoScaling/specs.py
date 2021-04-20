@@ -34,6 +34,27 @@ MODELING_COLS = ["params", "train_mase", "test_mase",
 RESULTS_COLS = [col for col in MODELING_COLS if col != "params"]
 
 
+def get_target_variable(max_mem):
+    """Returns the target variable based on `max_mem`.
+
+    If `max_mem` is True, Maximum Memory Usage is the target variable.
+    Otherwise, it is Maximum CPU Usage.
+
+    Parameters
+    ----------
+    max_mem: bool
+        A boolean value indicating whether maximum memory usage is the target
+        variable.
+
+    Returns
+    -------
+    str
+        A string representing the name of the target variable.
+
+    """
+    return MAX_MEM_TS if max_mem else MAX_CPU_TS
+
+
 def get_trace_columns():
     """The columns in a trace dataframe.
 

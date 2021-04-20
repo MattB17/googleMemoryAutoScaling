@@ -132,7 +132,7 @@ def read_univariate_modelling_input_params():
             "min_trace_length": int(sys.argv[4]),
             "train_prop": float(sys.argv[5]),
             "aggregation_window": int(sys.argv[6]),
-            "max_mem": bool(sys.argv[7])}
+            "max_mem": (sys.argv[7].lower() == "true")}
 
 
 def read_multivariate_modelling_input_params():
@@ -1033,9 +1033,10 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     where `<name>` is `model_name`.
 
     """
-    model_params = get_multivariate_model_build_input_params()
+    model_params = get_univariate_model_build_input_params()
+    model_args = (model_params['train_prop'], model_params['max_mem'])
     model_results = parallel.perform_trace_modelling(
-        model_params['traces'], modeling_func, model_params['train_prop'])
+        model_params['traces'], modeling_func, model_args)
     process_and_output_model_results(
         model_results, models_count, model_name, model_params['output_dir'])
 
@@ -1076,8 +1077,9 @@ def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
 
     """
     model_params = get_multivariate_model_build_input_params()
+    model_args = (model_params['train_prop'],)
     model_results = parallel.perform_trace_modelling(
-        model_params['traces'], modeling_func, model_params['train_prop'])
+        model_params['traces'], modeling_func, model_args)
     process_and_output_multivariate_results(
         model_results, models_count, model_name,
         model_vars, model_params['output_dir'])

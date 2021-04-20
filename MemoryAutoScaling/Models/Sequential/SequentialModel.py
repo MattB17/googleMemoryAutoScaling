@@ -4,7 +4,7 @@ to predict the current value but do not store any state.
 
 """
 from abc import abstractmethod
-from MemoryAutoScaling import plotting, utils
+from MemoryAutoScaling import plotting, specs, utils
 from MemoryAutoScaling.Models import TraceModel
 from MemoryAutoScaling.Analysis import ModelResults
 
@@ -42,6 +42,17 @@ class SequentialModel(TraceModel):
         self._initial_pred = initial_pred
         self._train_prop = train_prop
         self._max_mem = max_mem
+
+    def get_target_variable(self):
+        """The target variable for the model.
+
+        Returns
+        -------
+        str
+            A string indicating the target variable for the model.
+
+        """
+        return specs.get_target_variable(self._max_mem)
 
     def split_data(self, model_data):
         """Splits `model_data` into the training and testing set.
