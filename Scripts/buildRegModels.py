@@ -7,12 +7,12 @@ from MemoryAutoScaling.Models.ML import TraceRegression
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS)
-TARGET_COL = [specs.MAX_MEM_TS]
 REG_VALS = [0.0, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0]
 
 
-def build_reg_models_for_traces(trace_lst, results_dict, train_prop):
-    data_handler = MLDataHandler(train_prop, FEATURE_COLS, TARGET_COL)
+def build_reg_models_for_traces(trace_lst, results_dict, train_prop, max_mem):
+    target_col = specs.get_target_variable(max_mem)
+    data_handler = MLDataHandler(train_prop, FEATURE_COLS, [target_col])
     reg_params_lst = [{"data_handler": data_handler,
                        'lags': specs.LAGS, 'reg_val': reg_val}
                        for reg_val in REG_VALS]

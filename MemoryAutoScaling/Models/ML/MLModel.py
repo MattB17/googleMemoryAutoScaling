@@ -46,6 +46,17 @@ class MLModel(MLBase):
     def __init__(self, model_name, data_handler, lags):
         super().__init__(model_name, data_handler, lags)
 
+    def get_target_variable(self):
+        """The target variable for the model.
+
+        Returns
+        -------
+        str
+            A string indicating the target variable for the model.
+
+        """
+        return self._data_handler.get_target_variables()[0]
+
     def split_data(self, data):
         """Splits data into features and targets for the train and test sets.
 

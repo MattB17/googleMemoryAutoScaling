@@ -44,7 +44,7 @@ class StatisticalModel(TraceModel):
             and testing sets of `trace`, respectively.
 
         """
-        trace_data = self.get_model_data_for_trace
+        trace_data = self.get_model_data_for_trace(trace)
         train_data, test_data = self.split_data(trace_data)
         return self._get_predictions(len(test_data))
 

@@ -25,6 +25,10 @@ class TraceExponentialSmoothing(SequentialModel):
     train_prop: float
         A float in the range [0, 1], representing the proportion of data
         in the training set. The default is 0.7.
+    max_mem: bool
+        A boolean indicating if the target value is maximum memory. The
+        default value is True, indicating that maximum memory usage is
+        the target variable. Otherwise, maximum CPU usage is used.
 
     Attributes
     ----------
@@ -34,11 +38,15 @@ class TraceExponentialSmoothing(SequentialModel):
         The initial prediction for a new, unseen trace.
     _train_prop: float
         The proportion of data in the training set.
+    _max_mem: bool
+        A boolean indicating the target variable. True indicates that maximum
+        memory usage is the target variable. Otherwise, maximum CPU usage is
+        used as the target.
 
     """
-    def __init__(self, alpha, initial_pred, train_prop=0.7):
+    def __init__(self, alpha, initial_pred, train_prop=0.7, max_mem=True):
         self._alpha = alpha
-        super().__init__(initial_pred, train_prop)
+        super().__init__(initial_pred, train_prop, max_mem)
 
     def get_params(self):
         """The parameters of the model.

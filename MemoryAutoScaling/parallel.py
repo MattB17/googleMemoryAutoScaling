@@ -79,20 +79,21 @@ def initialize_and_join_processes(procs):
     for proc in procs:
         proc.join()
 
-def perform_trace_modelling(traces, model_func, train_prop):
+
+def perform_trace_modelling(traces, model_func, model_args):
     """Performs the modelling procedure on `traces` according to `model_func`.
 
     Parameters
     ----------
     traces: list
-        A list of `Trace` objects to be modelled
+        A list of `Trace` objects to be modelled.
     model_func: function
         A function specifying how modelling should be carried out for a
-        collection of traces. The function takes three parameters: a list
-        of `Trace` objects, a list to store model results, and a float in the
-        range [0, 1] representing the proportion of data in the training set.
-    train_prop: float
-        A float representing the proportion of data in the training set.
+        collection of traces. The function takes a list of traces to be
+        processed, a dictionary to store modeling results, and the set of
+        arguments specified in `model_args`.
+    model_args: tuple
+        A tuple containing the arguments used for `model_func`.
 
     Returns
     -------
@@ -108,9 +109,10 @@ def perform_trace_modelling(traces, model_func, train_prop):
     for core_num in range(cores):
         core_traces = get_traces_for_core(traces, traces_per_core, core_num)
         procs.append(mp.Process(target=model_func,
-                                args=(core_traces, results, train_prop)))
+                                args=(core_traces, results, *model_args)))
     initialize_and_join_processes(procs)
     return dict(results)
+
 
 def build_traces_from_files(trace_files, traces_lst, min_length, agg_window):
     """Builds a list of traces from `trace_files`.

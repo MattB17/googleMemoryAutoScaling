@@ -6,7 +6,7 @@ be applied to make the time series stationary. `q` is the moving average
 component, refering to the number of lagged forecast errors used in the model.
 
 """
-from MemoryAutoScaling import plotting, utils
+from MemoryAutoScaling import plotting, specs, utils
 from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -28,6 +28,10 @@ class TraceARIMA(StatisticalModel):
     train_prop: float
         A float in the range [0, 1] representing the proportion of data
         in the training set. The default value is 0.7
+    max_mem: bool
+        A boolean indicating if the target value is maximum memory. The
+        default value is True, indicating that maximum memory usage is
+        the target variable. Otherwise, maximum CPU usage is used.
 
     Attributes
     ----------
@@ -41,13 +45,29 @@ class TraceARIMA(StatisticalModel):
         The integrated component of the model.
     _q: int
         The moving average component of the model.
+    _max_mem: bool
+        A boolean indicating the target variable. True indicates that maximum
+        memory usage is the target variable. Otherwise, maximum CPU usage is
+        used as the target.
 
     """
-    def __init__(self, p, d, q, train_prop=0.7):
+    def __init__(self, p, d, q, train_prop=0.7, max_mem=True):
         super().__init__(train_prop)
         self._p = p
         self._d = d
         self._q = q
+        self._max_mem = max_mem
+
+    def get_target_variable(self):
+        """The target variable for the model.
+
+        Returns
+        -------
+        str
+            A string indicating the target variable for the model.
+
+        """
+        return specs.get_target_variable(self._max_mem)
 
     def get_params(self):
         """Returns the order for the ARIMA model.
@@ -110,7 +130,9 @@ class TraceARIMA(StatisticalModel):
             for each time interval.
 
         """
-        return trace.get_maximum_memory_time_series()
+        if self._max_mem:
+            return trace.get_maximum_memory_time_series()
+        return trace.get_maximum_cpu_time_series()
 
     def run_model_pipeline_for_trace(self, trace):
         """Runs the full modeling pipeline on `trace`.

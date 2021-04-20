@@ -57,6 +57,17 @@ class TraceARIMAX(MLBase):
         self._d = d
         self._q = q
 
+    def get_target_variable(self):
+        """The target variable for the model.
+
+        Returns
+        -------
+        str
+            A string indicating the target variable for the model.
+
+        """
+        return self._data_handler.get_target_variables()[0]
+
     def get_params(self):
         """Returns the order for the ARIMA component of the model.
 
