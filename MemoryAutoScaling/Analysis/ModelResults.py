@@ -14,6 +14,12 @@ class ModelResults:
         A tuple containing the model parameters.
     results_dict: dict
         A dictionary containing the modeling results.
+    harvest_stats_dicts: dict
+        A dictionary of `HarvestStats` objects representing the harvest
+        statistics calculated for the trace based on the model predictions.
+        The keys are floats representing the buffer percentage and the
+        corresponding key is a `HarvestStats` object representing the harvest
+        stats for that trace based on the model predictions and buffer.
 
     Attributes
     ----------
@@ -21,11 +27,14 @@ class ModelResults:
         The model parameters.
     _results_dict: dict
         The modeling results.
+    _harvest_stats_dicts: dict
+        A dictionary of `HarvestStats` for the model.
 
     """
-    def __init__(self, model_params, results_dict):
+    def __init__(self, model_params, results_dict, harvest_stats_dicts):
         self._model_params = model_params
         self._results_dict = results_dict
+        self._harvest_stats_dicts = harvest_stats_dicts
 
     @classmethod
     def from_data(cls, model_params, y_train,
@@ -57,6 +66,9 @@ class ModelResults:
         """
         results_dict = utils.calculate_evaluation_metrics(
             y_train, train_preds, y_test, test_preds)
+        harvest_stats_dicts = {
+            buffer_pct: HarvestStats(y_test, test_preds, buffer_pct)
+            for buffer_pct in specs.BUFFER_PCTS}
         return cls(model_params, results_dict)
 
     def get_model_params(self):
@@ -95,16 +107,16 @@ class ModelResults:
         model_lst = [self._model_params]
         for result in specs.RESULTS_COLS:
             model_lst.append(self._results_dict[result])
+        for buffer_pct in specs.BUFFER_PCTS:
+            model_lst.extend(self._harvest_stats_dicts[buffer_pct].to_list())
         return model_lst
 
     def is_better(self, other_model_results):
         """Checks if the model results are better than `other_model_results`.
 
         The current model results are better than `other_model_results` if
-        the weighted mean absolute scaled error is lower. The weigthed mean
-        absolute scaled error is the total mean absolute scaled error plus
-        `w` times the one-sided mean absolute scaled error of under
-        predictions, where `w` is `specs.OVERALL_MASE_WEIGHT`.
+        the `HarvestStats` at the lowest buffer percentage are better than the
+        `HarvestStats` at the same buffer percentage in `other_model_results`.
 
         Parameters
         ----------
@@ -119,12 +131,6 @@ class ModelResults:
             `other_model_results`. Otherwise, False
 
         """
-        other_results = other_model_results.get_model_results()
-        under_mase_diff = (other_results['under_mase'] -
-                           self._results_dict['under_mase'])
-        mase_diff = (other_results['test_mase'] -
-                     self._results_dict['test_mase'])
-        w = specs.OVERALL_MASE_WEIGHT
-        return ((under_mase_diff >= 0 and mase_diff >= 0) or
-                (mase_diff >= 0 and (w * mase_diff) > -under_mase_diff) or
-                (under_mase_diff >= 0 and under_mase_diff >= -w * mase_diff))
+        lowest_buffer_pct = min(specs.BUFFER_PCTS)
+        return self._harvest_stats_dicts[lowest_buffer_pct].is_better(
+            other_model_results._harvest_stats_dicts[lowest_buffer_pct])

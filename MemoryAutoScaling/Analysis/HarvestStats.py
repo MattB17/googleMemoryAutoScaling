@@ -2,6 +2,7 @@
 its actual values versus predicted values and a buffer.
 
 """
+from MemoryAutoScaling import utils
 
 
 class HarvestStats:
@@ -59,3 +60,25 @@ class HarvestStats:
 
         """
         return [self._prop_harvested, self._prop_violations]
+
+    def is_better(self, other_harvest_stats):
+        """Indicates if the stats are better than `other_harvest_stats`.
+
+        The current harvest stats are better than `other_harvest_stats` if
+        the proportion harvested is higher for the current harvest stats
+        compare to `other_harvest_stats`.
+
+        Parameters
+        ----------
+        other_harvest_stats: HarvestStats
+            The `HarvestStats` object to which the current harvest stats are
+            compared.
+
+        Returns
+        -------
+        bool
+            True if the current harvest stats are better than
+            `other_harvest_stats`. Otherwise, False.
+
+        """
+        return self._prop_harvested > other_harvest_stats._prop_harvested
