@@ -8,6 +8,7 @@ from itertools import product
 TRACE_ID_COL = "collection_id"
 START_INTERVAL_COL = "start_time"
 END_INTERVAL_COL = "end_time"
+TOTAL_MEM_COL = "assigned_memory"
 AVG_CPU_COL = "average_usage.cpus"
 MAX_CPU_COL = "maximum_usage.cpus"
 AVG_MEM_COL = "average_usage.memory"
@@ -31,6 +32,7 @@ AVG_STATS_COLS = ["ts", "max", "std", "median", "range"]
 MODELING_COLS = ["params", "train_mase", "test_mase",
                  "under_mase", "prop_under_preds", "max_under_pred",
                  "over_mase", "prop_over_preds", "avg_over_pred"]
+BUFFER_PCTS = [0.0, 0.25, 0.5, 0.75, 1.0]
 RESULTS_COLS = [col for col in MODELING_COLS if col != "params"]
 
 

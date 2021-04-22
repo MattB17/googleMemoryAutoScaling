@@ -277,7 +277,32 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window):
 
     """
     trace_df = raw_trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
+    trace_df = compute_memory_percentages_for_trace_df(trace_df)
     return build_trace_aggregate_df(trace_df, agg_window)
+
+
+def compute_memory_percentages_for_trace_df(raw_trace_df):
+    """Computes the memory percentages for `raw_trace_df`.
+
+    The memory percentages are calculated by dividing the memory columns
+    by the assigned memory.
+
+    Parameters
+    ----------
+    raw_trace_df: pd.DataFrame
+        The pandas DataFrame for which the memory percentages are computed.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame obtained from `raw_trace_df` after modifying the
+        memory statistics to report percentages.
+
+    """
+    for mem_col in [specs.AVG_MEM_COL, specs.MAX_MEM_COL]:
+        raw_trace_df[mem_col] = (raw_trace_df[mem_col] /
+                                 raw_trace_df[specs.TOTAL_MEM_COL])
+    return raw_trace_df
 
 
 def get_differenced_trace(data_trace, diff_level):
@@ -704,3 +729,47 @@ def process_model_results_df(model_results_df):
                      in processed_df.columns if col != "id"]
     processed_df.columns = cols
     return processed_df
+
+
+def calculate_harvest_stats(actual_vals, predicted_vals, buffer_pct):
+    """Calculates the harvest statistics of predicted versus actual values.
+
+    The harvest statistics are the proportion of spare resources harvested and
+    the proportion of violations. A violation occurs when the predicted value
+    from `predicted_vals` multiplied by `1 + buffer_pct` is still less than
+    the actual value. Otherwise, the resource is considered to be harvested
+    based on this predicted value. The proportion harvested is calculated as
+    the total percentage harvested based on these predictions divided by the
+    percentage harvested if we knew the actual values. The proportion of
+    violations is the proportion of time points that lead to violations.
+
+    Parameters
+    ----------
+    actual_vals: list
+        A list containing the actual values used of the resource.
+    predicted_vals: list
+        A list containing the values predicted to be used of the resource.
+    buffer_pct: float
+        A float representing the percentage of each prediction to be used as
+        a buffer. Thus, the effective prediction for each time period is the
+        original prediction multiplied by `1 + buffer_pct`.
+
+    Returns
+    -------
+    float, float
+        Two floats representing the proportion of the spare resource that was
+        harvested and the proportion of violations.
+
+    """
+    n = len(actuals)
+    actual_spare = 0.0
+    harvested_spare = 0.0
+    under_pred_count = 0
+    for idx in range(n):
+        actual_spare += (1 - actual_vals[idx])
+        buffered_pred = predicted_vals[idx] * (1 + buffer_pct)
+        if buffered_pred < actual_vals[idx]:
+            under_pred_count += 1
+        else:
+            harvested_spare += (1 - buffered_pred)
+    return (harvested_spare / actual_spare), (under_pred_count / n)
