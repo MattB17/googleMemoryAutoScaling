@@ -3,7 +3,7 @@ its actual values versus predicted values and a buffer.
 
 """
 import numpy as np
-from MemoryAutoScaling import utils
+from MemoryAutoScaling import specs, utils
 
 
 class HarvestStats:
@@ -97,16 +97,20 @@ class HarvestStats:
         """
         return [self._prop_harvested, self._prop_violations]
 
-    def is_better(self, other_harvest_stats):
-        """Indicates if the stats are better than `other_harvest_stats`.
+    def is_better(self, other_stats):
+        """Indicates if the harvest stats are better than `other_stats`.
 
-        The current harvest stats are better than `other_harvest_stats` if
-        the proportion harvested is higher for the current harvest stats
-        compare to `other_harvest_stats`.
+        The current harvest stats are better than `other_stats` in one of 3
+        scenarios: if the proportion harvested is greater and the proportion
+        of violations is lower, if the proporition of violations is lower and
+        the decrease in violations is at least `specs.HARVEST_WEIGHT` times
+        greater than the decrease in proportion harvested, or if the
+        proportion harvested is higher and is at least
+        `1 / specs.HARVEST_WEIGHT` greater than the increase in violations.
 
         Parameters
         ----------
-        other_harvest_stats: HarvestStats
+        other_stats: HarvestStats
             The `HarvestStats` object to which the current harvest stats are
             compared.
 
@@ -114,7 +118,12 @@ class HarvestStats:
         -------
         bool
             True if the current harvest stats are better than
-            `other_harvest_stats`. Otherwise, False.
+            `other_stats`. Otherwise, False.
 
         """
-        return self._prop_harvested > other_harvest_stats._prop_harvested
+        harv_diff = self._prop_harvested - other_stats._prop_harvested
+        viol_diff = other_stats._prop_violations - self._prop_violations
+        w = specs.HARVEST_WEIGHT
+        return ((harv_diff >= 0 and viol_diff >= 0) or
+                (viol_diff >= 0 and (w * viol_diff) > -harv_diff) or
+                (harv_diff >= 0 and (w * harv_diff) >= -viol_diff))
