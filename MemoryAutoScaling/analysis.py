@@ -562,10 +562,7 @@ def update_model_results_for_trace(trace, model, model_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    try:
-        return handle_results_for_model(trace, model, model_results, cutoff)
-    except:
-        return model_results
+    return handle_results_for_model(trace, model, model_results, cutoff)
 
 def update_multivariate_model_results_for_trace(trace, model,
                                                 model_results, cutoff):
@@ -601,22 +598,6 @@ def update_multivariate_model_results_for_trace(trace, model,
         return model_results
 
 
-def build_null_model_results():
-    """Builds null model results.
-
-    A null model results object is a `ModelResults` object in which all values
-    are null.
-
-    Returns
-    -------
-    ModelResults
-        A null `ModelResults` object.
-
-    """
-    results_dict = {results_col: np.nan for results_col in specs.RESULTS_COLS}
-    return ModelResults(tuple(), results_dict)
-
-
 def pad_model_results(model_results_lst, pad_len):
     """Pads `model_results_lst` with null `ModelResults` to length `pad_len`.
 
@@ -636,7 +617,7 @@ def pad_model_results(model_results_lst, pad_len):
 
     """
     if len(model_results_lst) < pad_len:
-        model_results_lst += [build_null_model_results() for _
+        model_results_lst += [ModelResults.build_null_model_results() for _
                               in range(pad_len - len(model_results_lst))]
     return model_results_lst
 
@@ -952,7 +933,8 @@ def process_and_output_model_results(model_results, models_count,
     """
     results = get_results_list_from_trace_model_results(model_results)
     cols = get_col_list_for_params(
-        range(1, models_count + 1), model_name, specs.MODELING_COLS)
+        range(1, models_count + 1), model_name,
+        ModelResults.get_model_results_cols())
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
@@ -993,7 +975,8 @@ def process_and_output_multivariate_results(
         """
         results = get_results_list_from_trace_model_dicts(model_results)
         cols = get_col_list_for_params(
-            range(1, models_count + 1), model_name, specs.MODELING_COLS)
+            range(1, models_count + 1), model_name,
+            ModelResults.get_model_results_cols())
         cols = ["id"] + ["{0}_{1}".format(col, model_var)
                          for model_var, col in product(model_vars, cols)]
         output_model_results(
@@ -1275,7 +1258,8 @@ def output_best_model_results_dict(best_results_dict, output_dir):
     best_results_lst = [
         [trace_id, model_dict['model']] + model_dict['results'].to_list()
          for trace_id, model_dict in best_results_dict.items()]
-    cols = ["{}_best".format(col_name) for col_name in specs.MODELING_COLS]
+    cols = ["{}_best".format(col_name) for col_name
+            in ModelResults.get_model_results_cols()]
     output_model_results(best_results_lst, ["id", "model"] + cols,
                          output_dir, "best_model_results")
 

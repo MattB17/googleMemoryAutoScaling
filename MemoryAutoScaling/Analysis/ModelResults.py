@@ -2,7 +2,10 @@
 of training a model on a `Trace`.
 
 """
+import numpy as np
+from itertools import product
 from MemoryAutoScaling import specs, utils
+from MemoryAutoScaling.Analysis.HarvestStats import HarvestStats
 
 
 class ModelResults:
@@ -14,7 +17,7 @@ class ModelResults:
         A tuple containing the model parameters.
     results_dict: dict
         A dictionary containing the modeling results.
-    harvest_stats_dicts: dict
+    harvest_stats_dict: dict
         A dictionary of `HarvestStats` objects representing the harvest
         statistics calculated for the trace based on the model predictions.
         The keys are floats representing the buffer percentage and the
@@ -27,14 +30,14 @@ class ModelResults:
         The model parameters.
     _results_dict: dict
         The modeling results.
-    _harvest_stats_dicts: dict
+    _harvest_stats_dict: dict
         A dictionary of `HarvestStats` for the model.
 
     """
-    def __init__(self, model_params, results_dict, harvest_stats_dicts):
+    def __init__(self, model_params, results_dict, harvest_stats_dict):
         self._model_params = model_params
         self._results_dict = results_dict
-        self._harvest_stats_dicts = harvest_stats_dicts
+        self._harvest_stats_dict = harvest_stats_dict
 
     @classmethod
     def from_data(cls, model_params, y_train,
@@ -66,10 +69,53 @@ class ModelResults:
         """
         results_dict = utils.calculate_evaluation_metrics(
             y_train, train_preds, y_test, test_preds)
-        harvest_stats_dicts = {
-            buffer_pct: HarvestStats(y_test, test_preds, buffer_pct)
+        harvest_stats_dict = {
+            buffer_pct: HarvestStats.from_predictions(
+                y_test, test_preds, buffer_pct)
             for buffer_pct in specs.BUFFER_PCTS}
-        return cls(model_params, results_dict)
+        return cls(model_params, results_dict, harvest_stats_dict)
+
+    @classmethod
+    def build_null_model_results(cls):
+        """Builds null model results.
+
+        A null model results object is a `ModelResults` object in which all
+        values are null.
+
+        Returns
+        -------
+        ModelResults
+            A null `ModelResults` object.
+
+        """
+        results_dict = {results_col: np.nan
+                        for results_col in specs.RESULTS_COLS}
+        harvest_stats_dict = {
+            buffer_pct: HarvestStats.build_null_harvest_stats()
+            for buffer_pct in specs.BUFFER_PCTS}
+        return cls(tuple(), results_dict, harvest_stats_dict)
+
+    @classmethod
+    def get_model_results_cols(self):
+        """Gets the model results columns.
+
+        These are the names of the variables of the `ModelResults` object,
+        appearing in the same order as the list representation of the model
+        results.
+
+        Returns
+        -------
+        list
+            A list of strings representing the names of the columns of the
+            `ModelResults` object.
+
+        """
+        buffer_harvest_pairs = product(
+            specs.BUFFER_PCTS, HarvestStats.get_harvest_stat_columns())
+        harvest_cols = ["{0}_{1}".format(harvest_col, buffer_pct)
+                        for buffer_pct, harvest_col in buffer_harvest_pairs]
+        return ["params"] + specs.RESULTS_COLS + harvest_cols
+
 
     def get_model_params(self):
         """The model parameters associated with the results.
@@ -108,7 +154,7 @@ class ModelResults:
         for result in specs.RESULTS_COLS:
             model_lst.append(self._results_dict[result])
         for buffer_pct in specs.BUFFER_PCTS:
-            model_lst.extend(self._harvest_stats_dicts[buffer_pct].to_list())
+            model_lst.extend(self._harvest_stats_dict[buffer_pct].to_list())
         return model_lst
 
     def is_better(self, other_model_results):
@@ -132,5 +178,5 @@ class ModelResults:
 
         """
         lowest_buffer_pct = min(specs.BUFFER_PCTS)
-        return self._harvest_stats_dicts[lowest_buffer_pct].is_better(
-            other_model_results._harvest_stats_dicts[lowest_buffer_pct])
+        return self._harvest_stats_dict[lowest_buffer_pct].is_better(
+            other_model_results._harvest_stats_dict[lowest_buffer_pct])

@@ -276,8 +276,8 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window):
         and aggregating data according to `agg_window`.
 
     """
-    trace_df = raw_trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
-    trace_df = compute_memory_percentages_for_trace_df(trace_df)
+    trace_df = compute_memory_percentages_for_trace_df(raw_trace_df)
+    trace_df = trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
     return build_trace_aggregate_df(trace_df, agg_window)
 
 
@@ -761,13 +761,13 @@ def calculate_harvest_stats(actual_vals, predicted_vals, buffer_pct):
         harvested and the proportion of violations.
 
     """
-    n = len(actuals)
+    n = len(actual_vals)
     actual_spare = 0.0
     harvested_spare = 0.0
     under_pred_count = 0
     for idx in range(n):
         actual_spare += (1 - actual_vals[idx])
-        buffered_pred = predicted_vals[idx] * (1 + buffer_pct)
+        buffered_pred = min(predicted_vals[idx] * (1 + buffer_pct), 1.0)
         if buffered_pred < actual_vals[idx]:
             under_pred_count += 1
         else:

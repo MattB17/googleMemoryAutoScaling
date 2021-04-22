@@ -2,6 +2,7 @@
 its actual values versus predicted values and a buffer.
 
 """
+import numpy as np
 from MemoryAutoScaling import utils
 
 
@@ -10,32 +11,67 @@ class HarvestStats:
 
     Parameters
     ----------
-    actuals: np.array
-        A numpy array of actual values for the trace.
-    predicteds: np.array
-        A numpy array of predicted values for the trace.
-    buffer_pct: float
-        A non-negative float denoting the percentage of each prediction which
-        will act serve as a buffer for the predictions. So `(1 + buffer_pct)`
-        is multiplied by the prediction in each period to get the prediction
-        for that period.
+    prop_harvested: float
+        A float representing the proportion of spare resources harvested.
+    prop_violations: float
+        A float representing the proportion of violations. That is, the
+        proportion of times that the prediction is lower than the actual
+        value, even after adding the buffer.
 
     Attributes
     ----------
     _prop_harvested: float
-        Represents the proportion of actual available memory that is
-        successfully harvested for the trace.
+        The proportion of spare resources harvested.
     _prop_violations: float
-        The proportion of predictions that result in violations. That is,
-        the proportion of times that the prediction is lower than the actual
-        value, even after adding the buffer.
+        The proportion of predictions that result in violations.
 
     """
-    def __init__(self, actuals, predicteds, buffer_pct):
-        prop_harvested, prop_violations = utils.calculate_harvest_stats(
-            list(actuals), list(predicteds), buffer_pct)
+    def __init__(self, prop_harvested, prop_violations):
         self._prop_harvested = prop_harvested
         self._prop_violations = prop_violations
+
+    @classmethod
+    def from_predictions(cls, actuals, predicteds, buffer_pct):
+        """Builds a `HarvestStats` object based on predictions.
+
+        Parameters
+        ----------
+        actuals: np.array
+            A numpy array of actual values for the trace.
+        predicteds: np.array
+            A numpy array of predicted values for the trace.
+        buffer_pct: float
+            A non-negative float denoting the percentage of each prediction which
+            will act serve as a buffer for the predictions. So `(1 + buffer_pct)`
+            is multiplied by the prediction in each period to get the prediction
+            for that period.
+
+        Returns
+        -------
+        HarvestStats
+            The `HarvestStats` object in which the proportion harvested and
+            the proportion of violations is calculated based on `actuals`,
+            `predicteds` and `buffer_pct`.
+
+        """
+        prop_harvested, prop_violations = utils.calculate_harvest_stats(
+            list(actuals), list(predicteds), buffer_pct)
+        return cls(prop_harvested, prop_violations)
+
+    @classmethod
+    def build_null_harvest_stats(cls):
+        """Builds a null `HarvestStats` object.
+
+        A null `HarvestStats` object has null values for both the proportion
+        harvested and the proportion of violations.
+
+        Returns
+        -------
+        HarvestStats
+            A null `HarvestStats` object.
+
+        """
+        return cls(np.nan, np.nan)
 
     @classmethod
     def get_harvest_stat_columns(cls):
