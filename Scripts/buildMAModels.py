@@ -8,7 +8,7 @@ from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Sequential import TraceMovingAverage
 
 
-MA_WINDOWS = [1, 3, 5, 7, 10]
+MA_WINDOWS = [1, 2, 3, 4, 5, 7, 10]
 
 
 def build_ma_models_for_traces(trace_lst, results_dict, train_prop, max_mem):
