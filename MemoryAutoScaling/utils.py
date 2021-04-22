@@ -10,6 +10,50 @@ import statsmodels.tsa.api as smt
 from MemoryAutoScaling import specs
 
 
+def cap_predictions_at_1(predicted_vals):
+    """Caps each value of `predicted_vals` at 1.
+
+    That is, if any value of `predicted_vals` is greater than 1 then
+    it is reset to 1. Otherwise, it is left unchanged.
+
+    Parameters
+    ----------
+    predicted_vals: np.array
+        A numpy array containing the predicted values to be capped.
+
+    Returns
+    -------
+    np.array
+        The numpy array obtained from `predicted_vals` after all of the
+        predictions have been capped at 1.
+
+    """
+    return np.array([min(1.0, predicted_val) for predicted_val
+                     in list(predicted_vals)])
+
+
+def cap_train_and_test_predictions(train_preds, test_preds):
+    """Caps the training and testing predictions.
+
+    Caps both the values of `train_preds` and `test_preds` at 1.
+
+    Parameters
+    ----------
+    train_preds: np.array
+        A numpy array representing the predictions for the train set.
+    test_preds: np.array
+        A numpy array representing the predictions for the test set.
+
+    Returns
+    -------
+    np.array, np.array
+        Two numpy arrays representing the predictions for the training and
+        testing sets, repectively, both capped at 1.
+
+    """
+    return cap_predictions_at_1(train_preds), cap_predictions_at_1(test_preds)
+
+
 def get_train_cutoff(data_trace, train_prop):
     """Calculates the index identifying the end of the training set.
 

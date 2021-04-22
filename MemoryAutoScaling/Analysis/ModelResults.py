@@ -67,6 +67,8 @@ class ModelResults:
             The `ModelResults` object containing the results for the data.
 
         """
+        train_preds, test_preds = utils.cap_train_and_test_predictions(
+            train_preds, test_preds)
         results_dict = utils.calculate_evaluation_metrics(
             y_train, train_preds, y_test, test_preds)
         harvest_stats_dict = {
