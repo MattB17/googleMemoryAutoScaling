@@ -3,7 +3,6 @@ of training a model on a `Trace`.
 
 """
 import numpy as np
-from itertools import product
 from MemoryAutoScaling import specs, utils
 from MemoryAutoScaling.Analysis.HarvestStats import HarvestStats
 
@@ -112,10 +111,7 @@ class ModelResults:
             `ModelResults` object.
 
         """
-        buffer_harvest_pairs = product(
-            specs.BUFFER_PCTS, HarvestStats.get_harvest_stat_columns())
-        harvest_cols = ["{0}_{1}".format(harvest_col, buffer_pct)
-                        for buffer_pct, harvest_col in buffer_harvest_pairs]
+        harvest_cols = HarvestStats.get_harvest_columns_for_buffers()
         return ["params"] + specs.RESULTS_COLS + harvest_cols
 
 

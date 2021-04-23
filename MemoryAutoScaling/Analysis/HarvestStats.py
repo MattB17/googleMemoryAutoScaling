@@ -3,6 +3,7 @@ its actual values versus predicted values and a buffer.
 
 """
 import numpy as np
+from itertools import product
 from MemoryAutoScaling import specs, utils
 
 
@@ -81,10 +82,27 @@ class HarvestStats:
         -------
         list
             A list of strings representing the names of the harvest
-            statistics.
+            statistics columns.
 
         """
         return ["prop_harvested", "prop_violations"]
+
+    @classmethod
+    def get_harvest_columns_for_buffers(cls):
+        """Gets the harvest statistics columns for all buffer percents.
+
+        Returns
+        -------
+        list
+            A list of strings representing the names of the harvest
+            statistics columns for all buffer percents.
+
+        """
+        buffer_harvest_pairs = product(
+            specs.BUFFER_PCTS, cls.get_harvest_stat_columns())
+        return ["{0}_{1}".format(harvest_col, buffer_pct)
+                for buffer_pct, harvest_col in buffer_harvest_pairs]
+
 
     def to_list(self):
         """A list representation of the harvest statistics.
@@ -121,9 +139,4 @@ class HarvestStats:
             `other_stats`. Otherwise, False.
 
         """
-        harv_diff = self._prop_harvested - other_stats._prop_harvested
-        viol_diff = other_stats._prop_violations - self._prop_violations
-        w = specs.HARVEST_WEIGHT
-        return ((harv_diff >= 0 and viol_diff >= 0) or
-                (viol_diff >= 0 and (w * viol_diff) > -harv_diff) or
-                (harv_diff >= 0 and (w * harv_diff) >= -viol_diff))
+        return self._prop_harvested > other_stats._prop_harvested
