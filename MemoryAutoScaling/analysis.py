@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Analysis import ModelResults, HarvestStats
 from MemoryAutoScaling import parallel, specs, utils
 from MemoryAutoScaling.DataHandling import TraceHandler
 
@@ -1071,6 +1071,30 @@ def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
         model_vars, model_params['output_dir'])
 
 
+def build_harvest_stats_dict_from_model_results(model_results_dict):
+    """A dictionary of harvest statistics from `model_results_dict`.
+
+    Parameters
+    ----------
+    model_results_dict: pd.DataFrame
+        A pandas DataFrame containing the model results for a trace.
+
+    Returns
+    -------
+    dict
+        A dictionary containing `HarvestStats` objects for the harvest
+        statistics in `model_results_dict`.
+
+    """
+    harvest_dict = {}
+    harvest_cols = HarvestStats.get_harvest_stat_columns()
+    for buffer_pct in specs.BUFFER_PCTS:
+        harvest_dict[buffer_pct] = HarvestStats(
+            model_results_dict["{0}_{1}".format(harvest_cols[0], buffer_pct)],
+            model_results_dict["{0}_{1}".format(harvest_cols[1], buffer_pct)])
+    return harvest_dict
+
+
 def build_model_results_from_results_dict(model_results_dict):
     """Builds a `ModelResults` object from `model_results_dict`.
 
@@ -1085,9 +1109,12 @@ def build_model_results_from_results_dict(model_results_dict):
         The `ModelResults` object obtained from `model_results_dict`.
 
     """
+    harvest_dict = build_harvest_stats_dict_from_model_results(
+        model_results_dict)
     results_dict = {k: v for k, v in model_results_dict.items()
                     if k not in ["id", "params"]}
-    return ModelResults(model_results_dict['params'], results_dict)
+    return ModelResults(
+        model_results_dict['params'], results_dict, harvest_dict)
 
 
 def model_results_df_to_dict(model_results_df, model_name):
