@@ -139,4 +139,8 @@ class HarvestStats:
             `other_stats`. Otherwise, False.
 
         """
+        if np.isnan(other_stats._prop_harvested):
+            return True
+        if np.isnan(self._prop_harvested):
+            return False
         return self._prop_harvested > other_stats._prop_harvested
