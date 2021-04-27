@@ -1360,3 +1360,69 @@ def get_percentiles_df_for_model_results(model_results_dict,
             [1, 25, 50, 75, 99])))
     return pd.DataFrame(results_lst, index=model_names_lst,
                         columns=["P1", "P25", "Median", "P75", "P99"])
+
+
+def standardize_counts_dict(counts_dict):
+    """Converts the numbers in `counts_dict` to percentages.
+
+    Parameters
+    ----------
+    counts_dict: dict
+        A dictionary of counts being standardized.
+
+    Returns
+    -------
+    dict
+        The dictionary obtained from `counts_dict` after converting each
+        count to a percentage.
+
+    """
+    sum = 0
+    for count_key in counts_dict.keys():
+        sum += counts_dict[count_key]
+    for count_key in counts_dict.keys():
+        counts_dict[count_key] /= sum
+    return counts_dict
+
+
+def stationary_results_from_stats_df(stats_df):
+    """Retrieves results of stationarity tests from `stats_df`.
+
+    It is assumed that `stats_df` has columns "adf_p_val", "adf_p_val_diff",
+    and "adf_p_val_diff2". The stationary results report the percent of traces
+    that are stationary after 0, 1, or 2 levels of differencing, and the traces
+    that are not stationary after 2 levels of differencing.
+
+    Parameters
+    ----------
+    stats_df: pd.DataFrame
+        The pandas DataFrame from which the stationary results are calculated.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the stationary results.
+
+    """
+    results_dict = {}
+    results_dict['diff_0'] = len(stats_df[stats_df['adf_p_val'] < 0.05])
+    results_dict['diff_1'] = len(
+        stats_df[((stats_df['adf_p_val_diff'] < 0.05) &
+                ~np.isnan(stats_df['adf_p_val_diff'])) &
+                ((stats_df['adf_p_val'] >= 0.05) |
+                np.isnan(stats_df['adf_p_val']))])
+    results_dict['diff_2'] = len(
+        stats_df[((stats_df['adf_p_val_diff2'] < 0.05) &
+                ~np.isnan(stats_df['adf_p_val_diff2'])) &
+                ((stats_df['adf_p_val_diff'] >= 0.05) |
+                np.isnan(stats_df['adf_p_val_diff'])) &
+                ((stats_df['adf_p_val'] >= 0.05) |
+                np.isnan(stats_df['adf_p_val']))])
+    results_dict['other'] = len(
+        stats_df[((stats_df['adf_p_val_diff2'] >= 0.05) |
+                np.isnan(stats_df['adf_p_val_diff2'])) &
+                ((stats_df['adf_p_val_diff'] >= 0.05) |
+                np.isnan(stats_df['adf_p_val_diff'])) &
+                ((stats_df['adf_p_val'] >= 0.05) |
+                np.isnan(stats_df['adf_p_val']))])
+    return standardize_counts_dict(results_dict)
