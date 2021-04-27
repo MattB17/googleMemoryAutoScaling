@@ -1381,9 +1381,78 @@ def standardize_counts_dict(counts_dict):
     for count_key in counts_dict.keys():
         sum += counts_dict[count_key]
     for count_key in counts_dict.keys():
-        counts_dict[count_key] /= sum
+        counts_dict[count_key] = round(counts_dict[count_key] / sum * 100, 2)
     return counts_dict
 
+
+def get_stationary_1_diff_count(stats_df):
+    """The number of stationary traces in `stats_df` after 1 differences.
+
+    Parameters
+    ----------
+    stats_df: pd.DataFrame
+        The pandas DataFrame from which the stationary results are calculated.
+
+    Returns
+    -------
+    int
+        An integer representing the number of traces that were stationary
+        after one level of differencing based on data in `stats_df`.
+
+    """
+    return len(stats_df[((stats_df['adf_p_val_diff'] < 0.05) &
+                        ~np.isnan(stats_df['adf_p_val_diff'])) &
+                        ((stats_df['adf_p_val'] >= 0.05) |
+                        np.isnan(stats_df['adf_p_val']))])
+
+
+def get_stationary_2_diff_count(stats_df):
+    """The number of stationary traces in `stats_df` after 2 differences.
+
+    Parameters
+    ----------
+    stats_df: pd.DataFrame
+        The pandas DataFrame from which the stationary results are calculated.
+
+    Returns
+    -------
+    int
+        An integer representing the number of traces that were stationary
+        after two levels of differencing based on data in `stats_df`.
+
+    """
+    return len(stats_df[((stats_df['adf_p_val_diff2'] < 0.05) &
+                        ~np.isnan(stats_df['adf_p_val_diff2'])) &
+                        ((stats_df['adf_p_val_diff'] >= 0.05) |
+                        np.isnan(stats_df['adf_p_val_diff'])) &
+                        ((stats_df['adf_p_val'] >= 0.05) |
+                        np.isnan(stats_df['adf_p_val']))])
+
+
+def get_non_stationary_count(stats_df):
+    """The number of non-stationary traces in `stats_df`.
+
+    A trace is deemed non-stationary if it is still not stationary after
+    2 levels of differencing.
+
+    Parameters
+    ----------
+    stats_df: pd.DataFrame
+        The pandas DataFrame from which the stationary results are calculated.
+
+    Returns
+    -------
+    int
+        An integer representing the number of traces that were not stationary
+        after two levels of differencing based on data in `stats_df`.
+
+    """
+    return len(stats_df[((stats_df['adf_p_val_diff2'] >= 0.05) |
+                        np.isnan(stats_df['adf_p_val_diff2'])) &
+                        ((stats_df['adf_p_val_diff'] >= 0.05) |
+                        np.isnan(stats_df['adf_p_val_diff'])) &
+                        ((stats_df['adf_p_val'] >= 0.05) |
+                        np.isnan(stats_df['adf_p_val']))])
 
 def stationary_results_from_stats_df(stats_df):
     """Retrieves results of stationarity tests from `stats_df`.
@@ -1406,23 +1475,39 @@ def stationary_results_from_stats_df(stats_df):
     """
     results_dict = {}
     results_dict['diff_0'] = len(stats_df[stats_df['adf_p_val'] < 0.05])
-    results_dict['diff_1'] = len(
-        stats_df[((stats_df['adf_p_val_diff'] < 0.05) &
-                ~np.isnan(stats_df['adf_p_val_diff'])) &
-                ((stats_df['adf_p_val'] >= 0.05) |
-                np.isnan(stats_df['adf_p_val']))])
-    results_dict['diff_2'] = len(
-        stats_df[((stats_df['adf_p_val_diff2'] < 0.05) &
-                ~np.isnan(stats_df['adf_p_val_diff2'])) &
-                ((stats_df['adf_p_val_diff'] >= 0.05) |
-                np.isnan(stats_df['adf_p_val_diff'])) &
-                ((stats_df['adf_p_val'] >= 0.05) |
-                np.isnan(stats_df['adf_p_val']))])
-    results_dict['other'] = len(
-        stats_df[((stats_df['adf_p_val_diff2'] >= 0.05) |
-                np.isnan(stats_df['adf_p_val_diff2'])) &
-                ((stats_df['adf_p_val_diff'] >= 0.05) |
-                np.isnan(stats_df['adf_p_val_diff'])) &
-                ((stats_df['adf_p_val'] >= 0.05) |
-                np.isnan(stats_df['adf_p_val']))])
+    results_dict['diff_1'] = get_stationary_1_diff_count(stats_df)
+    results_dict['diff_2'] = get_stationary_2_diff_count(stats_df)
+    results_dict['other'] = get_non_stationary_count(stats_df)
     return standardize_counts_dict(results_dict)
+
+
+def get_stationary_results_df(stats_dfs):
+    """A dataframe of stationary results from `stats_dfs`.
+
+    Parameters
+    ----------
+    stats_dfs: dict
+        A dictionary of pandas DataFrames from which the stationary results
+        are calculated.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing a summary of the stationary results from
+        `stats_dfs`.
+
+    """
+    results_dict = {'diff_0': [], 'diff_1': [], 'diff_2': [], 'other': []}
+    indices = []
+    for stats_name in stats_dfs.keys():
+        indices.append(" ".join(stats_name.split("_")).title())
+        stats_dict = stationary_results_from_stats_df(stats_dfs[stats_name])
+        results_dict['diff_0'].append("{}%".format(stats_dict['diff_0']))
+        results_dict['diff_1'].append("{}%".format(stats_dict['diff_1']))
+        results_dict['diff_2'].append("{}%".format(stats_dict['diff_2']))
+        results_dict['other'].append("{}%".format(stats_dict['other']))
+    df = pd.DataFrame(results_dict)
+    df.columns = ["Stationary", "Stationary Diff 1",
+                  "Stationary Diff 2", "Non-Stationary"]
+    df.index = indices
+    return df
