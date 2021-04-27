@@ -935,9 +935,8 @@ def process_and_output_model_results(model_results, models_count,
 
     """
     results = get_results_list_from_trace_model_results(model_results)
-    cols = get_col_list_for_params(
-        range(1, models_count + 1), model_name,
-        ModelResults.get_model_results_cols())
+    cols = get_col_list_for_params(range(1, models_count + 1), model_name,
+                                   ModelResults.get_model_results_cols())
     output_model_results(
         results, ["id"] + cols, output_dir, "{}_results".format(model_name))
 
@@ -977,13 +976,10 @@ def process_and_output_multivariate_results(
 
         """
         results = get_results_list_from_trace_model_dicts(model_results)
-        cols = get_col_list_for_params(
-            range(1, models_count + 1), model_name,
-            ModelResults.get_model_results_cols())
-        cols = ["id"] + ["{0}_{1}".format(col, model_var)
-                         for model_var, col in product(model_vars, cols)]
-        output_model_results(
-            results, cols, output_dir, "{}_results".format(model_name))
+        cols = get_col_list_for_params(range(1, models_count + 1), model_name,
+                                       ModelResults.get_model_results_cols())
+        output_model_results(results, ["id"] + cols, output_dir,
+                             "{}_results".format(model_name))
 
 
 
