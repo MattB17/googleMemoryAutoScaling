@@ -140,6 +140,25 @@ class Trace:
         max_cpu_col = "{}_ts".format(specs.MAX_CPU_COL)
         return self._trace_df[max_cpu_col].values
 
+    def get_target_time_series(self, target_col):
+        """Retrieves the time series based on `target_col`.
+
+        Parameters
+        ----------
+        target_col: str
+            A string representing the name of the target variable for which
+            the time series is retrieved from the trace.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing the time series of `target_col`.
+
+        """
+        if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self.get_maximum_memory_time_series()
+        return self.get_maximum_cpu_time_series()
+
     def get_number_of_observations(self):
         """The number of observations of the trace.
 

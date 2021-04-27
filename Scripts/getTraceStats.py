@@ -14,14 +14,12 @@ def run_trace_stats(traces, results_lst, causal_lags,
     trace_count = len(traces)
     for idx in range(trace_count):
         trace = traces[idx]
-        p_val = analyzer.test_for_stationarity(
-            trace.get_maximum_memory_time_series())
+        trace_ts = trace.get_target_time_series(output_target)
+        p_val = analyzer.test_for_stationarity(trace_ts)
         p_val_diff = analyzer.test_for_stationarity(
-            utils.get_differenced_trace(
-                trace.get_maximum_memory_time_series(), 1))
+            utils.get_differenced_trace(trace_ts, 1))
         p_val_diff2 = analyzer.test_for_stationarity(
-            utils.get_differenced_trace(
-                trace.get_maximum_memory_time_series(), 2))
+            utils.get_differenced_trace(trace_ts, 2))
         trace_df = trace.get_lagged_df(specs.LAGS)
         corr_series = trace_df.corr()[output_target]
         trace_stats = ([trace.get_trace_id(), p_val, p_val_diff, p_val_diff2]
