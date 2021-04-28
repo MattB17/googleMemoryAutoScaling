@@ -20,6 +20,8 @@ class Trace:
         The time at which the trace data ends
     ts_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
+    total_mem_ts: np.array
+        A numpy array recroding the total assigned memory for each time point.
     agg_window: int
         An integer representing the length of the aggregation window. That is,
         for every `agg_window` periods the trace data is aggregated.
@@ -34,15 +36,22 @@ class Trace:
         The time at which the trace data ends.
     _trace_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
+    _total_mem_ts: np.array
+        The total assigned memory for each time point.
+    _total_cpu_ts: np.array
+        The total assigned CPU units for each time point.
     _agg_window: int
         The aggregation window for the trace.
 
     """
-    def __init__(self, trace_id, start_time, end_time, ts_df, agg_window):
+    def __init__(self, trace_id, start_time, end_time,
+                 ts_df, total_mem_ts, agg_window):
         self._trace_id = trace_id
         self._start_time = start_time
         self._end_time = end_time
         self._trace_df = ts_df
+        self._total_mem_ts = total_mem_ts
+        self._total_cpu_ts = np.array([1.0 for _ in range(len(ts_df))])
         self._agg_window = agg_window
         print("Trace {} created".format(trace_id))
 
@@ -67,7 +76,9 @@ class Trace:
         start_time = int(trace_df[specs.START_INTERVAL_COL].to_numpy()[0])
         end_time = int(trace_df[specs.END_INTERVAL_COL].to_numpy()[-1])
         ts_df = utils.build_trace_data_from_trace_df(trace_df, agg_window)
-        return cls(trace_id, start_time, end_time, ts_df, agg_window)
+        total_mem_ts = trace_df[specs.TOTAL_MEM_COL].fillna(0).to_numpy()
+        return cls(
+            trace_id, start_time, end_time, ts_df, total_mem_ts, agg_window)
 
     def get_trace_id(self):
         """The ID of the trace.

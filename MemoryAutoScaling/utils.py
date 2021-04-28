@@ -343,9 +343,11 @@ def compute_memory_percentages_for_trace_df(raw_trace_df):
         memory statistics to report percentages.
 
     """
+    raw_trace_df[specs.TOTAL_MEM_COL] = raw_trace_df[
+        specs.TOTAL_MEM_COL].fillna(0)
     for mem_col in [specs.AVG_MEM_COL, specs.MAX_MEM_COL]:
-        raw_trace_df[mem_col] = (raw_trace_df[mem_col] /
-                                 raw_trace_df[specs.TOTAL_MEM_COL])
+        raw_trace_df[mem_col] = raw_trace_df[mem_col].divide(
+            raw_trace_df[specs.TOTAL_MEM_COL]).replace(np.inf, 0)
     return raw_trace_df
 
 
