@@ -63,12 +63,13 @@ class TraceAR(StatisticalModel):
 
         Returns
         -------
-        tuple
-            A three element tuple of integers representing the order of the
-            ARIMA model.
+        dict
+            A dictionary containing the parameters of the model. The keys are
+            strings representing the parameter names and the corresponding
+            value is the associated parameter.
 
         """
-        return (self._p, )
+        return {'p': self._p}
 
     def get_model_title(self):
         """The title for the model.

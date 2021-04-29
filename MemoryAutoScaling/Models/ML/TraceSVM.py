@@ -53,7 +53,7 @@ class TraceSVM(MLModel):
             to the regularization parameter.
 
         """
-        return (self._reg_val,)
+        return {'reg_val': self._reg_val}
 
     def get_model_title(self):
         """A title describing the model.

@@ -64,7 +64,7 @@ class TraceVARMAX(MLBase):
             ARIMA component of the model.
 
         """
-        return self._p, self._q
+        return {'p': self._p, 'q': self._q}
 
     def get_model_title(self):
         """A title describing the model.

@@ -58,7 +58,7 @@ class TraceRegression(MLModel):
             to the regularization value used in regression.
 
         """
-        return (self._reg_val,)
+        return {'reg_val': self._reg_val}
 
     def get_model_title(self):
         """A title describing the model.

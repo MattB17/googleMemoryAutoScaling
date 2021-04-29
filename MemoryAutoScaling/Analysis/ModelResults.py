@@ -12,8 +12,10 @@ class ModelResults:
 
     Parameters
     ----------
-    model_params: tuple
-        A tuple containing the model parameters.
+    model_params: dict
+        A dictionary containing the model parameters. The keys are strings
+        representing the name of the parameter and the corresponding value
+        is the associated parameter.
     results_dict: dict
         A dictionary containing the modeling results.
     harvest_stats_dict: dict
@@ -25,7 +27,7 @@ class ModelResults:
 
     Attributes
     ----------
-    _model_params: tuple
+    _model_params: dict
         The model parameters.
     _results_dict: dict
         The modeling results.
@@ -45,8 +47,10 @@ class ModelResults:
 
         Parameters
         ----------
-        model_params: tuple
-            A tuple representing the parameters of the model fit to the data.
+        model_params: dict
+            A dictionary containing the model parameters. The keys are strings
+            representing the name of the parameter and the corresponding value
+            is the associated parameter.
         y_train: np.array
             A numpy array representing actual trace values of the target
             variable for the training set.
@@ -97,7 +101,7 @@ class ModelResults:
         harvest_stats_dict = {
             buffer_pct: HarvestStats.build_null_harvest_stats()
             for buffer_pct in specs.BUFFER_PCTS}
-        return cls(tuple(), results_dict, harvest_stats_dict)
+        return cls({}, results_dict, harvest_stats_dict)
 
     @classmethod
     def get_model_results_cols(self):

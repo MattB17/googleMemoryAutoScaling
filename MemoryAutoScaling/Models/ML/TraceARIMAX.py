@@ -82,7 +82,7 @@ class TraceARIMAX(MLBase):
             ARIMA component of the model.
 
         """
-        return self._p, self._d, self._q
+        return {'p': self._p, 'd': self._d, 'q': self._q}
 
     def get_model_title(self):
         """A title describing the model.

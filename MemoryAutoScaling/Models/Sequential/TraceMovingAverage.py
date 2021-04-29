@@ -57,7 +57,8 @@ class TraceMovingAverage(SequentialModel):
             to the initial prediction and the window length.
 
         """
-        return (self._initial_pred, self._window_length)
+        return {'window_length': self._window_length,
+                'initial_pred': self._initial_pred}
 
     def get_model_title(self):
         """A title describing the model.

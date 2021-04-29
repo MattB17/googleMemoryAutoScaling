@@ -60,7 +60,7 @@ class TraceExponentialSmoothing(SequentialModel):
             corresponding to the initial prediction and the alpha value.
 
         """
-        return (self._initial_pred, self._alpha)
+        return {'alpha': self._alpha, 'initial_pred': self._initial_pred}
 
     def get_model_title(self):
         """A title describing the model.

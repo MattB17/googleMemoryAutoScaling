@@ -67,7 +67,9 @@ class TraceXGB(MLModel):
             A 3-element tuple containing the model parameters.
 
         """
-        return self._learning_rate, self._estimators, self._depth
+        return {'learning_rate': self._learning_rate,
+                'estimators': self._estimators,
+                'depth': self._depth}
 
     def get_model_title(self):
         """A title describing the model.

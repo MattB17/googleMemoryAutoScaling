@@ -83,7 +83,7 @@ class TraceARIMA(StatisticalModel):
             ARIMA model.
 
         """
-        return self._p, self._d, self._q
+        return {'p': self._p, 'd': self._d, 'q': self._q}
 
     def get_model_title(self):
         """The title for the model.
@@ -222,6 +222,7 @@ class TraceARIMA(StatisticalModel):
         None
 
         """
+        arima_order = (self._p, self._d, self._q)
         model = SARIMAX(
-            train_data, order=self.get_params(), simple_differencing=False)
+            train_data, order=arima_order, simple_differencing=False)
         self._model = model.fit(disp=False)

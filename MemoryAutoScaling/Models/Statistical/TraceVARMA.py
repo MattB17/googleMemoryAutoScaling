@@ -60,7 +60,7 @@ class TraceVARMA(StatisticalModel):
             VARMA model.
 
         """
-        return self._p, self._q
+        return {'p': self._p, 'q': self._q}
 
     def get_model_vars(self):
         """The variables being modelled.

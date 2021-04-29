@@ -19,8 +19,10 @@ class TraceModel(ABC):
 
         Returns
         -------
-        tuple
-            A tuple containing the parameters of the model.
+        dict
+            A dictionary containing the parameters of the model. The keys are
+            strings representing the parameter names and the corresponding
+            value is the associated parameter.
 
         """
         pass
