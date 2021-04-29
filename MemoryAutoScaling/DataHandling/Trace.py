@@ -139,6 +139,31 @@ class Trace:
         max_mem_col = "{}_ts".format(specs.MAX_MEM_COL)
         return self._trace_df[max_mem_col].values
 
+    def get_spare_memory_in_window(self, win_start, win_end):
+        """The spare memory in the interval from [`win_start`, `win_end`).
+
+        The spare memory at a particular time point is the difference between
+        the assigned memory and the used memory for that time point. The spare
+        for the window is the sum of these values at each point in the window,
+        excluding `win_end`.
+
+        Parameters
+        ----------
+        win_start: int
+            An integer representing the start index for the window.
+        win_end: int
+            An integer representing the end index for the window.
+
+        Returns
+        -------
+        float
+            A float representing the total spare memory for the window.
+
+        """
+        return utils.get_total_spare_during_window(
+            self._total_mem_ts, self.get_maximum_memory_time_series(),
+            win_start, win_end)
+
     def get_maximum_cpu_time_series(self):
         """The maximum CPU usage time series for the trace.
 
@@ -150,6 +175,31 @@ class Trace:
         """
         max_cpu_col = "{}_ts".format(specs.MAX_CPU_COL)
         return self._trace_df[max_cpu_col].values
+
+    def get_spare_cpu_in_window(self, win_start, win_end):
+        """The spare CPU units in the interval from [`win_start`, `win_end`).
+
+        The spare CPU units at a particular time point is the difference
+        between the assigned CPU and the used CPU for that time point. The
+        spare for the window is the sum of these values at each point in the
+        window, excluding `win_end`.
+
+        Parameters
+        ----------
+        win_start: int
+            An integer representing the start index for the window.
+        win_end: int
+            An integer representing the end index for the window.
+
+        Returns
+        -------
+        float
+            A float representing the total spare CPU units for the window.
+
+        """
+        return utils.get_total_spare_during_window(
+            self._total_cpu_ts, self.get_maximum_cpu_time_series(),
+            win_start, win_end)
 
     def get_target_time_series(self, target_col):
         """Retrieves the time series based on `target_col`.
@@ -169,6 +219,45 @@ class Trace:
         if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
             return self.get_maximum_memory_time_series()
         return self.get_maximum_cpu_time_series()
+
+    def get_spare_resource_in_window(self, target_col,
+                                     win_start_pct, win_end_pct):
+        """The spare amount of `target_col` in the window.
+
+        The spare amount of `target_col` at a particular time point is the
+        amount available minus the amount used at that time point. The total
+        spare for the window is calculated as the sum of these values over all
+        time points in the window. The window is defined by `win_start_pct`
+        and `win_end_pct`
+
+        Parameters
+        ----------
+        target_col: str
+            A string identifying the resource of interest, either memory or
+            CPU units.
+        win_start: float
+            A float representing the start point of the window. The trace
+            length multiplied by `win_start` gives the start index of the
+            window.
+        win_end: float
+            A float representing the end point of the window. The trace length
+            multiplied by `win_end` gives the end index of the window.
+
+        Returns
+        -------
+        float
+            A float representing the total spare amount of `target_col` for
+            the window.
+
+        """
+        trace_length = len(self._trace_df)
+        win_start = int(win_start_pct * trace_length)
+        win_end = int(win_end_pct * trace_length)
+        if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self.get_spare_memory_in_window(win_start, win_end)
+        return self.get_spare_cpu_in_window(win_start, win_end)
+
+
 
     def get_number_of_observations(self):
         """The number of observations of the trace.

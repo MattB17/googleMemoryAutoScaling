@@ -397,6 +397,33 @@ def extract_time_series_from_trace(trace_data, series_name):
     return impute_for_time_series(data_trace, 0)
 
 
+def get_total_spare_during_window(available, used, win_start, win_end):
+    """The total amount of spare resource during [`win_start`, `win_end`).
+
+    Parameters
+    ----------
+    available: np.array
+        A numpy array representing a time series of the amount of the resource
+        available at each time point.
+    used: np.array
+        A numpy array representing a time series of the amount of the resource
+        used at each time point.
+    win_start: int
+        An integer representing the start index for the window of interest.
+    win_end: int
+        An integer representing the end index for the window of interest.
+
+    Returns
+    -------
+    float
+        A float representing the total amount of the resource that is unused
+        during the window defined by [`win_start`, `win_end`).
+
+    """
+    spare_ts = available[win_start:win_end] - used[win_start:win_end]
+    return sum(spare_ts)
+
+
 def output_time_series_list_to_file(time_series_list, output_file):
     """Writes `time_series_list` to `output_file`.
 
