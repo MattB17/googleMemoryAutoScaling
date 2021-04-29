@@ -18,7 +18,10 @@ class TraceAR(StatisticalModel):
         An integer representing the autoregressive component of the model.
     train_prop: float
         A float in the range [0, 1] representing the proportion of data
-        in the training set. The default value is 0.7
+        in the training set. The default value is 0.6.
+    val_prop: float
+        A float in the range [0, 1] representing the proportion of data in
+        the validation set. The default value is 0.2.
     max_mem: bool
         A boolean indicating if the target value is maximum memory. The
         default value is True, indicating that maximum memory usage is
@@ -28,6 +31,8 @@ class TraceAR(StatisticalModel):
     ----------
     _train_prop: float
         The proportion of data in the training set.
+    _val_prop: float
+        The proportion of data in the validation set.
     _model: Object
         The underlying machine learning model being fit.
     _p: int
@@ -38,8 +43,8 @@ class TraceAR(StatisticalModel):
         used as the target.
 
     """
-    def __init__(self, p, train_prop=0.7, max_mem=True):
-        super().__init__(train_prop)
+    def __init__(self, p, train_prop=0.6, val_prop=0.2, max_mem=True):
+        super().__init__(train_prop, val_prop)
         self._p = p
         self._max_mem = max_mem
 
@@ -82,14 +87,20 @@ class TraceAR(StatisticalModel):
         """
         return "Trace Auto Regression {}".format(self.get_params())
 
-    def split_data(self, model_data):
+    def split_data(self, model_data, tuning=True):
         """Splits `model_data` into training and testing time series.
+
+        If `tuning` is True, `model_data` is split into training and
+        validation sets. Otherwise, it is split into training + validation
+        and testing sets.
 
         Parameters
         ----------
         model_data: np.array
             A numpy array containing the data of the time series being
             forecast.
+        tuning: bool
+            A boolean value indicating whether the split is for tuning.
 
         Returns
         -------
@@ -98,16 +109,20 @@ class TraceAR(StatisticalModel):
             test sets respectively.
 
         """
-        train_cutoff = utils.get_train_cutoff(model_data, self._train_prop)
-        return model_data[:train_cutoff], model_data[train_cutoff:]
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            data, self._train_prop, self._val_prop, tuning)
+        return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
-    def get_total_spare(self, trace):
+    def get_total_spare(self, trace, tuning=True):
         """The spare amount of the target for `trace` over the test window.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which the spare is calculated.
+        tuning: bool
+            A boolean value indicating whether the spare is being calculated
+            to tune the model or evaluate the model on the test set.
 
         Returns
         -------
@@ -117,9 +132,10 @@ class TraceAR(StatisticalModel):
 
         """
         target_ts = trace.get_target_time_series(self.get_target_variable())
-        train_cutoff = utils.get_train_cutoff(target_ts, self._train_prop)
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            target_ts, self._train_prop, self._val_prop, tuning)
         return trace.get_spare_resource_in_window(
-            self.get_target_variable(), train_cutoff, len(target_ts))
+            self.get_target_variable(), train_thresh, test_thresh)
 
     def get_model_data_for_trace(self, trace):
         """Retrieves the data for modeling from `trace`.
@@ -140,7 +156,7 @@ class TraceAR(StatisticalModel):
             return trace.get_maximum_memory_time_series()
         return trace.get_maximum_cpu_time_series()
 
-    def run_model_pipeline_for_trace(self, trace):
+    def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
 
         The modeling pipeline first obtains the data needed for modeling
@@ -152,6 +168,9 @@ class TraceAR(StatisticalModel):
         ----------
         trace: Trace
             The `Trace` being modeled.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -161,13 +180,13 @@ class TraceAR(StatisticalModel):
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
-        train_ts, test_ts = self.split_data(trace_ts)
-        total_spare = self.get_total_spare(trace)
+        train_ts, eval_ts = self.split_data(trace_ts, tuning)
+        total_spare = self.get_total_spare(trace, tuning)
         self._fit(train_ts)
-        preds_train, preds_test = self._get_predictions(len(test_ts))
+        preds_train, preds_eval = self._get_predictions(len(eval_ts))
         return ModelResults.from_data(
             self.get_params(), train_ts, preds_train,
-            test_ts, preds_test, total_spare)
+            eval_ts, preds_eval, total_spare)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its prediction.
@@ -188,7 +207,7 @@ class TraceAR(StatisticalModel):
         """
         fig, (ax1, ax2) = plt.subplots(2)
         trace_ts = self.get_model_data_for_trace(trace)
-        train_ts, test_ts = self.split_data(trace_ts)
+        train_ts, test_ts = self.split_data(trace_ts, False)
         preds_train, preds_test = self._get_predictions(len(test_ts))
         plotting.plot_train_and_test_predictions_on_axes(
             train_ts, preds_train, test_ts, preds_test,

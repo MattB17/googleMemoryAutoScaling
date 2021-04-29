@@ -18,7 +18,10 @@ class TraceVARMA(StatisticalModel):
     ----------
     train_prop: float
         A float in the range [0, 1] representing the proportion of data
-        in the training set.
+        in the training set. The default value is 0.6.
+    val_prop: float
+        A float in the range [0, 1] representing the proportion of data in
+        the validation set. The default value is 0.2.
     model_vars: list
         A list of strings representing the names of variables being modeled.
     p: int
@@ -30,6 +33,8 @@ class TraceVARMA(StatisticalModel):
     ----------
     _train_prop: float
         The proportion of data in the training set.
+    _val_prop: float
+        The proportion of data in the validation set.
     _model: Object
         The underlying machine learning model being fit.
     _model_vars: list
@@ -40,8 +45,8 @@ class TraceVARMA(StatisticalModel):
         The moving average component of the model.
 
     """
-    def __init__(self, model_vars, p, q, train_prop=0.7):
-        super().__init__(train_prop)
+    def __init__(self, model_vars, p, q, train_prop=0.6, val_prop=0.2):
+        super().__init__(train_prop, val_prop)
         self._model_vars = model_vars
         self._p = p
         self._q = q
@@ -85,7 +90,7 @@ class TraceVARMA(StatisticalModel):
         """
         return "Trace VARMA {}".format(self.get_params())
 
-    def split_data(self, model_data):
+    def split_data(self, model_data, tuning=True):
         """Splits `model_data` into training and testing sets.
 
         Parameters
@@ -94,6 +99,8 @@ class TraceVARMA(StatisticalModel):
             A pandas DataFrame containing the time series that are being
             modeled, with a separate column for each time series that is
             being modeled by the multivariate model.
+        tuning: bool
+            A boolean value indicating whether the split is for tuning.
 
         Returns
         -------
@@ -102,9 +109,10 @@ class TraceVARMA(StatisticalModel):
             test sets respectively.
 
         """
-        train_cutoff = utils.get_train_cutoff(model_data, self._train_prop)
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            data, self._train_prop, self._val_prop, tuning)
         model_data = model_data.reset_index(drop=True)
-        return model_data[:train_cutoff], model_data[train_cutoff:]
+        return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
     def get_model_data_for_trace(self, trace):
         """Retrieves the multivariate data for modeling from `trace`.
@@ -123,7 +131,31 @@ class TraceVARMA(StatisticalModel):
         """
         return trace.get_trace_df()[self._model_vars]
 
-    def run_model_pipeline_for_trace(self, trace):
+    def get_total_spare(self, trace, tuning=True):
+        """The spare amount of the target for `trace` over the test window.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which the spare is calculated.
+        tuning: bool
+            A boolean value indicating whether the spare is being calculated
+            to tune the model or evaluate the model on the test set.
+
+        Returns
+        -------
+        float
+            A float representing the total spare amount of the target
+            variable for `trace` over the test window.
+
+        """
+        target_ts = trace.get_target_time_series(self._model_vars[0])
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            target_ts, self._train_prop, self._val_prop, tuning)
+        return trace.get_spare_resource_in_window(
+            self._model_vars[0], train_thresh, test_thresh)
+
+    def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
 
         The modeling pipeline first obtains the data needed for modeling
@@ -135,6 +167,9 @@ class TraceVARMA(StatisticalModel):
         ----------
         trace: Trace
             The `Trace` being modeled.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -145,7 +180,7 @@ class TraceVARMA(StatisticalModel):
 
         """
         trace_df = self.get_model_data_for_trace(trace)
-        train_df, test_df = self.split_data(trace_df)
+        train_df, test_df = self.split_data(trace_df, tuning)
         self._fit(train_df)
         preds_train, preds_test = self._get_predictions(len(test_df))
         return parallel.get_multivariate_model_results(
@@ -172,7 +207,7 @@ class TraceVARMA(StatisticalModel):
         var_count = len(self._model_vars)
         fig, axes = plt.subplots(var_count, 2, figsize=(20, 10*var_count))
         trace_df = self.get_model_data_for_trace(trace)
-        train_df, test_df = self.split_data(trace_df)
+        train_df, test_df = self.split_data(trace_df, False)
         preds_train, preds_test = self._get_predictions(len(test_df))
         plotting.plot_multivariate_train_and_test_predictions(
             train_df, preds_train, test_df, preds_test,

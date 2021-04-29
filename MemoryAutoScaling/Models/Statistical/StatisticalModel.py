@@ -15,18 +15,24 @@ class StatisticalModel(TraceModel):
     ----------
     train_prop: float
         A float in the range [0, 1] representing the proportion of data
-        in the training set. The default value is 0.7.
+        in the training set. The default value is 0.6.
+    val_prop: float
+        A float in the range [0, 1] representing the proportion of data
+        in the validation set. The default value is 0.2.
 
     Attributes
     ----------
     _train_prop: float
         The proportion of data in the training set.
+    _val_prop: float
+        The proportion of data in the validation set.
     _model: Object
         The underlying model being fit to the trace data.
 
     """
-    def __init__(self, train_prop=0.7):
+    def __init__(self, train_prop=0.6, val_prop=0.2):
         self._train_prop = train_prop
+        self._val_prop = val_prop
         self._model = None
 
     def get_predictions_for_trace(self, trace):
@@ -45,8 +51,8 @@ class StatisticalModel(TraceModel):
 
         """
         trace_data = self.get_model_data_for_trace(trace)
-        train_data, test_data = self.split_data(trace_data)
-        return self._get_predictions(len(test_data))
+        _, pred_data = self.split_data(trace_data)
+        return self._get_predictions(len(pred_data))
 
     def get_plot_title(self, trace):
         """Gets the plot title based on `trace`.

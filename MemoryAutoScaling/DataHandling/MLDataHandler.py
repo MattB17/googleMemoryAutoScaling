@@ -76,7 +76,7 @@ class MLDataHandler:
         """
         data = data[self._feature_vars + self._target_vars]
         train_thresh, test_thresh = utils.calculate_split_thresholds(
-            data, self._train_prop, self._val_prop)
+            data, self._train_prop, self._val_prop, tuning)
         return data[:train_thresh], data[train_thresh:test_thresh]
 
     def perform_data_split(self, data):
