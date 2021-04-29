@@ -33,10 +33,12 @@ class MLDataHandler:
         The names of the target variables.
 
     """
-    def __init__(self, train_prop, feature_vars, target_vars):
-        self._train_prop = train_prop
+    def __init__(self, feature_vars, target_vars,
+                 train_prop=0.6, val_prop=0.2):
         self._feature_vars = feature_vars
         self._target_vars = target_vars
+        self._train_prop = train_prop
+        self._val_prop = val_prop
 
     def get_target_variables(self):
         """The target variables for the handler.
@@ -49,14 +51,20 @@ class MLDataHandler:
         """
         return self._target_vars
 
-    def get_train_and_test_sets(self, data):
+    def get_train_and_test_sets(self, data, tuning=True):
         """Splits `data` into a training and testing set.
+
+        If `tuning` is True, the testing and validation sets are retrieved.
+        Otherwise, the testing + validation and testing sets are retrieved.
 
         Parameters
         ----------
         data: pd.DataFrame
             A pandas DataFrame representing the time series data being split
             into the training and testing sets.
+        tuning: bool
+            A boolean value indicating whether the data will be used for
+            tuning.
 
         Returns
         -------
@@ -67,8 +75,9 @@ class MLDataHandler:
 
         """
         data = data[self._feature_vars + self._target_vars]
-        train_cutoff = utils.get_train_cutoff(data, self._train_prop)
-        return data[:train_cutoff], data[train_cutoff:]
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            data, self._train_prop, self._val_prop)
+        return data[:train_thresh], data[train_thresh:test_thresh]
 
     def perform_data_split(self, data):
         """Splits data into features and targets for the train and test sets.
