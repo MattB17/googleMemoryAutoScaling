@@ -124,7 +124,7 @@ class TraceARIMA(StatisticalModel):
 
         """
         train_thresh, test_thresh = utils.calculate_split_thresholds(
-            data, self._train_prop, self._val_prop, tuning)
+            model_data, self._train_prop, self._val_prop, tuning)
         return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
     def get_total_spare(self, trace, tuning=True):

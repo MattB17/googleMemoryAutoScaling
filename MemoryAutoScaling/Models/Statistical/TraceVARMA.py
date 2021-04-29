@@ -110,7 +110,7 @@ class TraceVARMA(StatisticalModel):
 
         """
         train_thresh, test_thresh = utils.calculate_split_thresholds(
-            data, self._train_prop, self._val_prop, tuning)
+            model_data, self._train_prop, self._val_prop, tuning)
         model_data = model_data.reset_index(drop=True)
         return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
