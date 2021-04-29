@@ -35,13 +35,16 @@ class StatisticalModel(TraceModel):
         self._val_prop = val_prop
         self._model = None
 
-    def get_predictions_for_trace(self, trace):
+    def get_predictions_for_trace(self, trace, tuning=True):
         """Gets predictions for the training and testing sets for `trace`.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -51,8 +54,8 @@ class StatisticalModel(TraceModel):
 
         """
         trace_data = self.get_model_data_for_trace(trace)
-        _, pred_data = self.split_data(trace_data)
-        return self._get_predictions(len(pred_data))
+        _, eval_data = self.split_data(trace_data, tuning)
+        return self._get_predictions(len(eval_data))
 
     def get_plot_title(self, trace):
         """Gets the plot title based on `trace`.

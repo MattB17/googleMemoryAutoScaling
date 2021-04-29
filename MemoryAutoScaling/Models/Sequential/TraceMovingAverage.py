@@ -20,7 +20,10 @@ class TraceMovingAverage(SequentialModel):
         prediction for a new trace before seeing any data for that trace.
     train_prop: float
         A float in the range [0, 1], representing the proportion of data
-        in the training set. The default is 0.7.
+        in the training set. The default is 0.6.
+    val_prop: float
+        A float in the range [0, 1] representing the proportion of data in
+        the validation set. The default value is 0.2.
     max_mem: bool
         A boolean indicating if the target value is maximum memory. The
         default value is True, indicating that maximum memory usage is
@@ -34,6 +37,8 @@ class TraceMovingAverage(SequentialModel):
         The initial prediction for a new, unseen trace
     _train_prop: float
         The proportion of data in the training set.
+    _val_prop: float
+        The proportion of data in the validation set.
     _max_mem: bool
         A boolean indicating the target variable. True indicates that maximum
         memory usage is the target variable. Otherwise, maximum CPU usage is
@@ -41,9 +46,9 @@ class TraceMovingAverage(SequentialModel):
 
     """
     def __init__(self, window_length, initial_pred,
-                 train_prop=0.7, max_mem=True):
+                 train_prop=0.6, val_prop=0.2, max_mem=True):
         self._window_length = window_length
-        super().__init__(initial_pred, train_prop, max_mem)
+        super().__init__(initial_pred, train_prop, val_prop, max_mem)
 
     def get_params(self):
         """The parameters of the model.
@@ -90,7 +95,7 @@ class TraceMovingAverage(SequentialModel):
             return np.average(data_trace)
         return np.average(data_trace[-1 * (self._window_length):])
 
-    def _get_predictions(self, trace_ts):
+    def _get_predictions(self, trace_ts, tuning=True):
         """Calculates all moving average prediction traces for `trace_ts`.
 
         For each time point in `trace_ts`, the moving average prediction
@@ -103,6 +108,9 @@ class TraceMovingAverage(SequentialModel):
         trace_ts: np.array
             A numpy array representing the data trace for which the
             predictions are calculated.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -114,26 +122,4 @@ class TraceMovingAverage(SequentialModel):
         preds = np.array([self._initial_pred for _ in range(len(trace_ts))])
         for idx in range(1, len(trace_ts)):
             preds[idx] = self.get_next_prediction(trace_ts[:idx])
-        return self.split_data(preds)
-
-    def plot_trace_vs_prediction(self, trace):
-        """Creates a plot of `trace` vs its predictions.
-
-        The plot is arranged into two subplots. The first contains the maximum
-        memory usage for the trace versus its prediction for the training set.
-        The second plot is the same but for the testing set.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` being plotted.
-
-        Returns
-        -------
-        None
-
-        """
-        trace_ts = self.get_model_data_for_trace(trace)
-        title = "Trace {0} vs Moving Average {1} Prediction".format(
-            trace.get_trace_id(), self._window_length)
-        self._plot_time_series_vs_prediction(trace_ts, title)
+        return self.split_data(preds, tuning)

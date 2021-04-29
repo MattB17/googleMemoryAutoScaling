@@ -99,7 +99,7 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def run_model_pipeline_for_trace(self, trace):
+    def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
 
         The modeling pipeline first obtains the data needed for modeling
@@ -111,6 +111,9 @@ class TraceModel(ABC):
         ----------
         trace: Trace
             The `Trace` being modeled.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -122,13 +125,16 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def plot_trace_vs_prediction(self, trace):
+    def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` being plotted.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------

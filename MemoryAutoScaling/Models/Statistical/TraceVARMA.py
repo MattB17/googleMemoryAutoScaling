@@ -180,14 +180,14 @@ class TraceVARMA(StatisticalModel):
 
         """
         trace_df = self.get_model_data_for_trace(trace)
-        train_df, test_df = self.split_data(trace_df, tuning)
+        train_df, eval_df = self.split_data(trace_df, tuning)
         self._fit(train_df)
-        preds_train, preds_test = self._get_predictions(len(test_df))
+        preds_train, preds_eval = self._get_predictions(len(eval_df))
         return parallel.get_multivariate_model_results(
-            self.get_params(), train_df, preds_train, test_df,
-            preds_test, self._model_vars)
+            self.get_params(), train_df, preds_train, eval_df,
+            preds_eval, self._model_vars)
 
-    def plot_trace_vs_prediction(self, trace):
+    def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its prediction.
 
         Each row contains two subplots, for the training and testing sets,
@@ -198,6 +198,9 @@ class TraceVARMA(StatisticalModel):
         trace: Trace
             The `Trace` object for which actual and predicted values are
             plotted.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -207,10 +210,10 @@ class TraceVARMA(StatisticalModel):
         var_count = len(self._model_vars)
         fig, axes = plt.subplots(var_count, 2, figsize=(20, 10*var_count))
         trace_df = self.get_model_data_for_trace(trace)
-        train_df, test_df = self.split_data(trace_df, False)
-        preds_train, preds_test = self._get_predictions(len(test_df))
+        train_df, eval_df = self.split_data(trace_df, tuning)
+        preds_train, preds_eval = self._get_predictions(len(eval_df))
         plotting.plot_multivariate_train_and_test_predictions(
-            train_df, preds_train, test_df, preds_test,
+            train_df, preds_train, eval_df, preds_eval,
             axes, self._model_vars, self.get_plot_title())
 
     def _fit(self, train_data):

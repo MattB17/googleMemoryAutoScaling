@@ -202,7 +202,7 @@ class TraceARIMA(StatisticalModel):
             self.get_params(), train_ts, preds_train,
             eval_ts, preds_eval, total_spare)
 
-    def plot_trace_vs_prediction(self, trace):
+    def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its prediction.
 
         The plot is divided into two subplots showing the actual values versus
@@ -213,6 +213,9 @@ class TraceARIMA(StatisticalModel):
         trace: Trace
             The `Trace` object for which actual and predicted values are
             plotted.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -221,10 +224,10 @@ class TraceARIMA(StatisticalModel):
         """
         fig, (ax1, ax2) = plt.subplots(2)
         trace_ts = self.get_model_data_for_trace(trace)
-        train_ts, test_ts = self.split_data(trace_ts, False)
-        preds_train, preds_test = self._get_predictions(len(test_ts))
+        train_ts, eval_ts = self.split_data(trace_ts, tuning)
+        preds_train, preds_eval = self._get_predictions(len(eval_ts))
         plotting.plot_train_and_test_predictions_on_axes(
-            train_ts, preds_train, test_ts, preds_test,
+            train_ts, preds_train, eval_ts, preds_eval,
             (ax1, ax2), self.get_plot_title())
 
 

@@ -20,7 +20,10 @@ class SequentialModel(TraceModel):
         the trace to make a prediction from trace data.
     train_prop: float
         A float in the range [0, 1] representing the proportion of
-        observations in the training set. The default value is 0.7.
+        observations in the training set. The default value is 0.6.
+    val_prop: float
+        A float in the range [0, 1] representing the proportion of data in
+        the validation set. The default value is 0.2.
     max_mem: bool
         A boolean indicating if the target value is maximum memory. The
         default value is True, indicating that maximum memory usage is
@@ -32,15 +35,19 @@ class SequentialModel(TraceModel):
         The initial prediction for the model.
     _train_prop: float
         Represents the percent of data in the training set.
+    _val_prop: float
+        The proportion of data in the validation set.
     _max_mem: bool
         A boolean indicating the target variable. True indicates that maximum
         memory usage is the target variable. Otherwise, maximum CPU usage is
         used as the target.
 
     """
-    def __init__(self, initial_pred, train_prop=0.7, max_mem=True):
+    def __init__(self, initial_pred, train_prop=0.6,
+                 val_prop=0.2, max_mem=True):
         self._initial_pred = initial_pred
         self._train_prop = train_prop
+        self._val_prop = val_prop
         self._max_mem = max_mem
 
     def get_target_variable(self):
@@ -54,14 +61,20 @@ class SequentialModel(TraceModel):
         """
         return specs.get_target_variable(self._max_mem)
 
-    def split_data(self, model_data):
+    def split_data(self, model_data, tuning=True):
         """Splits `model_data` into the training and testing set.
+
+        If `tuning` is True, `model_data` is split into training and
+        validation sets. Otherwise, it is split into training + validation
+        and testing sets.
 
         Parameters
         ----------
         model_data: pandas.Object
             A pandas Object (Series or DataFrame) containing the data used to
             build the trace model.
+        tuning: bool
+            A boolean value indicating whether the split is for tuning.
 
         Returns
         -------
@@ -70,16 +83,20 @@ class SequentialModel(TraceModel):
             the train-test split.
 
         """
-        train_cutoff = utils.get_train_cutoff(model_data, self._train_prop)
-        return model_data[:train_cutoff], model_data[train_cutoff:]
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            data, self._train_prop, self._val_prop, tuning)
+        return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
-    def get_total_spare(self, trace):
+    def get_total_spare(self, trace, tuning=True):
         """The spare amount of the target for `trace` over the test window.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which the spare is calculated.
+        tuning: bool
+            A boolean value indicating whether the spare is being calculated
+            to tune the model or evaluate the model on the test set.
 
         Returns
         -------
@@ -89,9 +106,10 @@ class SequentialModel(TraceModel):
 
         """
         target_ts = trace.get_target_time_series(self.get_target_variable())
-        train_cutoff = utils.get_train_cutoff(target_ts, self._train_prop)
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            target_ts, self._train_prop, self._val_prop, tuning)
         return trace.get_spare_resource_in_window(
-            self.get_target_variable(), train_cutoff, len(target_ts))
+            self.get_target_variable(), train_thresh, test_thresh)
 
     def get_model_data_for_trace(self, trace):
         """Gets the data for modeling from `trace`.
@@ -112,13 +130,16 @@ class SequentialModel(TraceModel):
             return trace.get_maximum_memory_time_series()
         return trace.get_maximum_cpu_time_series()
 
-    def get_predictions_for_trace(self, trace):
+    def get_predictions_for_trace(self, trace, tuning=True):
         """Gets predictions for the training and testing set for `trace`.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -128,9 +149,9 @@ class SequentialModel(TraceModel):
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
-        return self._get_predictions(trace_ts)
+        return self._get_predictions(trace_ts, tuning)
 
-    def run_model_pipeline_for_trace(self, trace):
+    def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
 
         The modeling pipeline first obtains the data needed for modeling
@@ -144,6 +165,9 @@ class SequentialModel(TraceModel):
         ----------
         trace: Trace
             The `Trace` being modeled.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -153,14 +177,14 @@ class SequentialModel(TraceModel):
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
-        y_train, y_test = self.split_data(trace_ts)
-        total_spare = self.get_total_spare(trace)
+        y_train, y_test = self.split_data(trace_ts, tuning)
+        total_spare = self.get_total_spare(trace, tuning)
         preds_train, preds_test = self._get_predictions(trace_ts)
         return ModelResults.from_data(
             self.get_params(), y_train, preds_train,
             y_test, preds_test, total_spare)
 
-    def plot_trace_vs_prediction(self, trace):
+    def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.
 
         The plot is arranged into two subplots. The first contains the maximum
@@ -171,6 +195,9 @@ class SequentialModel(TraceModel):
         ----------
         trace: Trace
             The `Trace` being plotted.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -180,10 +207,10 @@ class SequentialModel(TraceModel):
         trace_ts = self.get_model_data_for_trace(trace)
         title = "Trace {0} vs {1} Predictions".format(
             trace.get_trace_id(), self.get_model_title())
-        self._plot_time_series_vs_prediction(trace_ts, title)
+        self._plot_time_series_vs_prediction(trace_ts, title, tuning)
 
     @abstractmethod
-    def _get_predictions(self, trace_ts):
+    def _get_predictions(self, trace_ts, tuning=True):
         """Gets predictions for the training and testing set for `trace_ts`.
 
         Parameters
@@ -191,6 +218,9 @@ class SequentialModel(TraceModel):
         trace_ts: np.array
             A numpy array representing the time series for which predictions
             are calculated.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -201,7 +231,7 @@ class SequentialModel(TraceModel):
         """
         pass
 
-    def _plot_time_series_vs_prediction(self, time_series, title):
+    def _plot_time_series_vs_prediction(self, time_series, title, tuning=True):
         """Plots `time_series` vs its prediction according to the model.
 
         The plot of `time_series` vs its predictions is divided into two
@@ -213,6 +243,9 @@ class SequentialModel(TraceModel):
             A numpy array representing the time series being plotted.
         title: str
             A string representing the title of the plot.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -220,7 +253,7 @@ class SequentialModel(TraceModel):
 
         """
         fig, (ax1, ax2) = plt.subplots(2)
-        y_train, y_test = self.split_data(time_series)
-        preds_train, preds_test = self._get_predictions(time_series)
+        y_train, y_test = self.split_data(time_series, tuning)
+        preds_train, preds_test = self._get_predictions(time_series, tuning)
         plotting.plot_train_and_test_predictions_on_axes(
             y_train, preds_train, y_test, preds_test, (ax1, ax2), title)

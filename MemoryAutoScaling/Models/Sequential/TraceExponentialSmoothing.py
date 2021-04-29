@@ -24,7 +24,10 @@ class TraceExponentialSmoothing(SequentialModel):
         prediction for a new trace before seeing any data for that trace.
     train_prop: float
         A float in the range [0, 1], representing the proportion of data
-        in the training set. The default is 0.7.
+        in the training set. The default is 0.6.
+    val_prop: float
+        A float in the range [0, 1] representing the proportion of data in
+        the validation set. The default value is 0.2.
     max_mem: bool
         A boolean indicating if the target value is maximum memory. The
         default value is True, indicating that maximum memory usage is
@@ -38,15 +41,18 @@ class TraceExponentialSmoothing(SequentialModel):
         The initial prediction for a new, unseen trace.
     _train_prop: float
         The proportion of data in the training set.
+    _val_prop: float
+        The proportion of data in the validation set.
     _max_mem: bool
         A boolean indicating the target variable. True indicates that maximum
         memory usage is the target variable. Otherwise, maximum CPU usage is
         used as the target.
 
     """
-    def __init__(self, alpha, initial_pred, train_prop=0.7, max_mem=True):
+    def __init__(self, alpha, initial_pred, train_prop=0.6,
+                 val_prop=0.2, max_mem=True):
         self._alpha = alpha
-        super().__init__(initial_pred, train_prop, max_mem)
+        super().__init__(initial_pred, train_prop, val_prop, max_mem)
 
     def get_params(self):
         """The parameters of the model.
@@ -92,7 +98,7 @@ class TraceExponentialSmoothing(SequentialModel):
         """
         return (self._alpha * past_obs) + ((1 - self._alpha) * past_pred)
 
-    def _get_predictions(self, trace_ts):
+    def _get_predictions(self, trace_ts, tuning=True):
         """Calculates all predictions for `trace_ts`.
 
         For each time point in `trace_ts` the exponential smoothing
@@ -106,6 +112,9 @@ class TraceExponentialSmoothing(SequentialModel):
         trace_ts: np.array
             A numpy array representing the data trace for which the
             exponential smoothing predictions are calculated.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -121,4 +130,4 @@ class TraceExponentialSmoothing(SequentialModel):
             for idx in range(2, time_points):
                 preds[idx] = self.get_next_prediction(
                     trace_ts[idx - 1], preds[idx - 1])
-        return self.split_data(preds)
+        return self.split_data(preds, tuning)
