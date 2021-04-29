@@ -39,8 +39,8 @@ class ModelResults:
         self._harvest_stats_dict = harvest_stats_dict
 
     @classmethod
-    def from_data(cls, model_params, y_train,
-                  train_preds, y_test, test_preds):
+    def from_data(cls, model_params, y_train, train_preds,
+                  y_test, test_preds, total_spare):
         """Builds a `ModelResults` object from training and testing data.
 
         Parameters
@@ -59,6 +59,9 @@ class ModelResults:
         test_preds: np.array
             A numpy array representing model predictions for the trace on the
             testing set.
+        total_spare: float
+            A float representing the total amount of spare resource available
+            for the testing period.
 
         Returns
         -------
@@ -69,7 +72,7 @@ class ModelResults:
         train_preds, test_preds = utils.cap_train_and_test_predictions(
             train_preds, test_preds)
         results_dict = utils.calculate_evaluation_metrics(
-            y_train, train_preds, y_test, test_preds)
+            y_train, train_preds, y_test, test_preds, total_spare)
         harvest_stats_dict = {
             buffer_pct: HarvestStats.from_predictions(
                 y_test, test_preds, buffer_pct)

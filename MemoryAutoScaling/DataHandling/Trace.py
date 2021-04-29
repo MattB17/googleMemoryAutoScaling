@@ -258,7 +258,6 @@ class Trace:
         return self.get_spare_cpu_in_window(win_start, win_end)
 
 
-
     def get_number_of_observations(self):
         """The number of observations of the trace.
 

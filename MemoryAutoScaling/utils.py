@@ -730,13 +730,17 @@ def get_over_prediction_stats(actuals, predicteds):
         over_preds, len(predicteds))
     return over_mase, over_prop, over_avg
 
-def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
+def calculate_evaluation_metrics(y_train, preds_train,
+                                 y_test, preds_test, total_spare):
     """Calculates the evaluation metrics for the training and testing sets.
 
-    The evaluation metrics consist of the mean absolute scaled error for
-    the training set, the mean absolute scaled error for the testing set,
-    the number of under predictions for the testing set, and the magnitude of
-    the maximum under prediction for the testing set.
+    The evaluation metrics are the mean absolute scaled error for the training
+    and testing sets, the one-sided mean absolute scaled error for under
+    predictions, the proportion of under predictions, the magnitude of the
+    maximum under prediction, the one-sided mean absolute scaled error for
+    over predictions, the proportion of over predictions, the magnitude of
+    the average over prediction, and the total spare amount of the resource
+    over the testing preiod.
 
     Parameters
     ----------
@@ -752,18 +756,16 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     preds_test: np.array
         A numpy array representing predicted values of the target for the
         testing set.
+    total_spare: float
+        A float representing the total spare amount of the resource over the
+        test period.
 
     Returns
     -------
     dict
         A dictionary containing the evaluation metrics. Keys are strings
         representing the names of the evaluation metric and the corresponding
-        value is a float. These metrics are the mean absolute scaled error
-        for the training and testing sets, the one-sided mean absolute scaled
-        error for under predictions, the proportion of under predictions, the
-        magnitude of the maximum under prediction, the one-sided mean absolute
-        scaled error for over predictions, the proportion of over predictions,
-        and the magnitude of the average over prediction.
+        value is a float.
 
     """
     train_mase, test_mase = calculate_train_and_test_mase(
@@ -775,7 +777,8 @@ def calculate_evaluation_metrics(y_train, preds_train, y_test, preds_test):
     return {"train_mase": train_mase, "test_mase": test_mase,
             "under_mase": under_mase, "prop_under_preds": prop_under_preds,
             "max_under_pred": max_under_pred, "over_mase": over_mase,
-            "prop_over_preds": prop_over_preds, "avg_over_pred": avg_over_pred}
+            "prop_over_preds": prop_over_preds,
+            "avg_over_pred": avg_over_pred, "total_spare": total_spare}
 
 
 def process_model_results_df(model_results_df):
