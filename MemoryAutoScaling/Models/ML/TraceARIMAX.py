@@ -163,7 +163,7 @@ class TraceARIMAX(MLBase):
         return preds[:train_cutoff], preds[train_cutoff:]
 
     def _run_model_pipeline(self, train_features, train_target,
-                            test_features, test_target):
+                            test_features, test_target, total_spare):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `train_features` and
@@ -183,6 +183,9 @@ class TraceARIMAX(MLBase):
         test_target: pd.Series
             A pandas Series representing the target variable for the testing
             set.
+        total_spare: float
+            A float representing the total spare amount of the target variable
+            over the test period.
 
         Returns
         -------
@@ -194,8 +197,9 @@ class TraceARIMAX(MLBase):
         self._fit(train_features, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
             train_features, test_features)
-        return ModelResults.from_data(self.get_params(), train_target,
-                                      train_preds, test_target, test_preds)
+        return ModelResults.from_data(
+            self.get_params(), train_target, train_preds,
+            test_target, test_preds, total_spare)
 
     def _plot_trace_data_vs_predictions(self, trace_df, title):
         """Plots the target time series of `trace_df` vs its model prediction.

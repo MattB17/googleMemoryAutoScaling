@@ -57,25 +57,6 @@ class MLModel(MLBase):
         """
         return self._data_handler.get_target_variables()[0]
 
-    def split_data(self, data):
-        """Splits data into features and targets for the train and test sets.
-
-        Parameters
-        ----------
-        data: pd.DataFrame
-            A pandas DataFrame containing the data on which the split is
-            performed.
-
-        Returns
-        -------
-        pd.DataFrame, pd.Series, pd.DataFrame, pd.Series
-            A pandas DataFrame and Series representing the training set values
-            of the features and target variable, respectively. The second
-            DataFrame and Series represent the same split for the testing set.
-
-        """
-        return self._data_handler.perform_data_split(data)
-
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
 
@@ -174,7 +155,7 @@ class MLModel(MLBase):
         return train_preds, test_preds
 
     def _run_model_pipeline(self, train_features, train_target,
-                           test_features, test_target):
+                           test_features, test_target, total_spare):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `train_features` and
@@ -194,6 +175,9 @@ class MLModel(MLBase):
         test_target: pd.Series
             A pandas Series representing the target variable for the testing
             set.
+        total_spare: float
+            A float representing the total spare amount of the target variable
+            over the test period.
 
         Returns
         -------
@@ -206,8 +190,9 @@ class MLModel(MLBase):
         self._fit(train_features, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
             train_features, test_features)
-        return ModelResults.from_data(self.get_params(), train_target,
-                                      train_preds, test_target, test_preds)
+        return ModelResults.from_data(
+            self.get_params(), train_target, train_preds,
+            test_target, test_preds, total_spare)
 
     def _plot_trace_data_vs_predictions(self, trace_df, title):
         """Plots the target time series of `trace_df` vs its model prediction.

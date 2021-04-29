@@ -2,6 +2,7 @@
 the Borg cluster.
 
 """
+import numpy as np
 import pandas as pd
 from MemoryAutoScaling import utils
 from MemoryAutoScaling import specs
@@ -220,28 +221,23 @@ class Trace:
             return self.get_maximum_memory_time_series()
         return self.get_maximum_cpu_time_series()
 
-    def get_spare_resource_in_window(self, target_col,
-                                     win_start_pct, win_end_pct):
-        """The spare amount of `target_col` in the window.
+    def get_spare_resource_in_window(self, target_col, win_start, win_end):
+        """The spare amount of `target_col` in [`win_start`, `win_end`].
 
         The spare amount of `target_col` at a particular time point is the
         amount available minus the amount used at that time point. The total
         spare for the window is calculated as the sum of these values over all
-        time points in the window. The window is defined by `win_start_pct`
-        and `win_end_pct`
+        time points in the window, excluding `win_end`.
 
         Parameters
         ----------
         target_col: str
             A string identifying the resource of interest, either memory or
             CPU units.
-        win_start: float
-            A float representing the start point of the window. The trace
-            length multiplied by `win_start` gives the start index of the
-            window.
-        win_end: float
-            A float representing the end point of the window. The trace length
-            multiplied by `win_end` gives the end index of the window.
+        win_start: int
+            An integer representing the start index of the window.
+        win_end: int
+            An integer representing the end index of the window.
 
         Returns
         -------
@@ -250,9 +246,6 @@ class Trace:
             the window.
 
         """
-        trace_length = len(self._trace_df)
-        win_start = int(win_start_pct * trace_length)
-        win_end = int(win_end_pct * trace_length)
         if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
             return self.get_spare_memory_in_window(win_start, win_end)
         return self.get_spare_cpu_in_window(win_start, win_end)

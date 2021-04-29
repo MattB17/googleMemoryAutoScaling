@@ -113,3 +113,24 @@ class MLDataHandler:
             return (train_df[self._target_vars[0]],
                     test_df[self._target_vars[0]])
         return train_df[self._target_vars], test_df[self._target_vars]
+
+    def get_total_spare_for_target(self, trace):
+        """The spare amount of the target over the test period for `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` object for which the amount of spare units of the
+            target variable are computed over the test period.
+
+        Returns
+        -------
+        float
+            A float representing the total amount of spare units of the target
+            variable over the test period for `trace`.
+
+        """
+        target_ts = trace.get_target_time_series(self._target_vars[0])
+        train_cutoff = utils.get_train_cutoff(target_ts, self._train_prop)
+        return trace.get_spare_resource_in_window(
+            self._target_vars[0], train_cutoff, len(target_ts))

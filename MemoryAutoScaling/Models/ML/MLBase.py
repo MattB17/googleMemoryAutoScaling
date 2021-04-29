@@ -11,7 +11,6 @@ from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 
-
 class MLBase(TraceModel):
     """Used to predict future values of a time series.
 
@@ -82,6 +81,23 @@ class MLBase(TraceModel):
         """
         return self._data_handler.perform_data_split(data)
 
+    def get_total_spare(self, trace):
+        """The spare amount of the target for `trace` over the test window.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which the spare is calculated.
+
+        Returns
+        -------
+        float
+            A float representing the total spare amount of the target
+            variable for `trace` over the test window.
+
+        """
+        return self._data_handler.get_total_spare_for_target(trace)
+
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
 
@@ -145,7 +161,9 @@ class MLBase(TraceModel):
         """
         raw_data = self.get_model_data_for_trace(trace)
         X_train, y_train, X_test, y_test = self.split_data(raw_data)
-        return self._run_model_pipeline(X_train, y_train, X_test, y_test)
+        total_spare = self.get_total_spare(trace)
+        return self._run_model_pipeline(
+            X_train, y_train, X_test, y_test, total_spare)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its predictions.
@@ -187,7 +205,7 @@ class MLBase(TraceModel):
 
     @abstractmethod
     def _run_model_pipeline(self, train_features, train_target,
-                            test_features, test_target):
+                            test_features, test_target, total_spare):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `train_features` and
@@ -207,6 +225,9 @@ class MLBase(TraceModel):
         test_target: pd.Series
             A pandas Series representing the target variable for the testing
             set.
+        total_spare: float
+            A float representing the total spare amount of the target variable
+            over the test period.
 
         Returns
         -------

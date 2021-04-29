@@ -179,7 +179,7 @@ def build_all_traces_from_files(trace_files, min_length, agg_window):
 
 
 def get_multivariate_model_results(model_params, train_df, train_preds,
-                                   test_df, test_preds, model_vars):
+                                   test_df, test_preds, spare, model_vars):
     """Calculates the model results for `model_vars`.
 
     A separate `ModelResults` object is built for each variable in
@@ -198,6 +198,9 @@ def get_multivariate_model_results(model_params, train_df, train_preds,
         A pandas DataFrame containing the target data for the testing set.
     test_preds: pd.DataFrame
         A pandas DataFrame containing the predictions for the testing set.
+    spare: float
+        A float representing the total spare amount of the target variable
+        over the test period.
     model_vars: list
         A list of strings with the names of the variables being modeled.
 
@@ -213,5 +216,5 @@ def get_multivariate_model_results(model_params, train_df, train_preds,
     for model_var in model_vars:
         results_dict[model_var] = ModelResults.from_data(model_params,
             train_df[model_var].values, train_preds[model_var].values,
-            test_df[model_var].values, test_preds[model_var].values)
+            test_df[model_var].values, test_preds[model_var].values, spare)
     return results_dict
