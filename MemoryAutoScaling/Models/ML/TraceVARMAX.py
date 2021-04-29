@@ -182,7 +182,7 @@ class TraceVARMAX(MLBase):
             self.get_params(), train_target, train_preds, test_target,
             test_preds, total_spare, self._data_handler.get_target_variables())
 
-    def _plot_trace_data_vs_predictions(self, trace_df, title):
+    def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.
 
         The plot of the time series vs its predictions for each model
@@ -196,6 +196,9 @@ class TraceVARMAX(MLBase):
             A pandas DataFrame containing the trace data used for modeling.
         title: str
             A string representing the title of the plot.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -205,10 +208,10 @@ class TraceVARMAX(MLBase):
         var_count = len(self._data_handler.get_target_variables())
         fig, axes = plt.subplots(var_count, 2, figsize=(20, 10*var_count))
         trace_df = self.get_model_data_for_trace(trace)
-        X_train, y_train, X_test, y_test = self.split_data(trace_df)
-        train_preds, test_preds = self._get_train_and_test_predictions(
-            X_train, X_test)
+        X_train, y_train, X_eval, y_eval = self.split_data(trace_df, tuning)
+        train_preds, eval_preds = self._get_train_and_test_predictions(
+            X_train, X_eval)
         plotting.plot_multivariate_train_and_test_predictions(
-            y_train, train_preds, y_test, test_preds,
+            y_train, train_preds, y_eval, eval_preds,
             axes, self._data_handler.get_target_variables(),
             self.get_plot_title())

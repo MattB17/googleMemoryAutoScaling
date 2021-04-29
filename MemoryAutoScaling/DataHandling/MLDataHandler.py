@@ -17,7 +17,7 @@ class MLDataHandler:
     ----------
     train_prop: float
         A float in [0, 1] representing the proportion of data used in the
-        training set.
+        training set. The default value is 0.6.
     feature_vars: list
         A list of strings representing the names of features.
     target_vars: list
@@ -79,7 +79,7 @@ class MLDataHandler:
             data, self._train_prop, self._val_prop, tuning)
         return data[:train_thresh], data[train_thresh:test_thresh]
 
-    def perform_data_split(self, data):
+    def perform_data_split(self, data, tuning=True):
         """Splits data into features and targets for the train and test sets.
 
         Parameters
@@ -87,6 +87,9 @@ class MLDataHandler:
         data: pd.DataFrame
             A pandas DataFrame containing the data on which the split is
             performed.
+        tuning: bool
+            A boolean value indicating whether the data will be used for
+            tuning.
 
         Returns
         -------
@@ -96,34 +99,34 @@ class MLDataHandler:
             pandas objects represent the same split for the testing set.
 
         """
-        train_df, test_df = self.get_train_and_test_sets(data)
-        y_train, y_test = self._get_train_and_test_targets(train_df, test_df)
+        train_df, eval_df = self.get_train_and_test_sets(data, tuning)
+        y_train, y_eval = self._get_train_and_eval_targets(train_df, eval_df)
         return (train_df[self._feature_vars], y_train,
-                test_df[self._feature_vars], y_test)
+                eval_df[self._feature_vars], y_eval)
 
-    def _get_train_and_test_targets(self, train_df, test_df):
-        """Retrieves the target data for the training and testing sets.
+    def _get_train_and_eval_targets(self, train_df, eval_df):
+        """Retrieves the target data for the training and evaluation sets.
 
         Parameters
         ----------
         train_df: pd.DataFrame
             A pandas DataFrame containing the data for the training set.
-        test_df: pd.DataFrame
-            A pandas DataFrame containing the data for the testing set.
+        eval_df: pd.DataFrame
+            A pandas DataFrame containing the data for the evaluation set.
 
         Returns
         -------
         pd.Object, pd.Object
             Two pandas objects representing the data for the target variables
-            for the training and testing sets, respectively.
+            for the training and evaluation sets, respectively.
 
         """
         if len(self._target_vars) == 1:
             return (train_df[self._target_vars[0]],
-                    test_df[self._target_vars[0]])
-        return train_df[self._target_vars], test_df[self._target_vars]
+                    eval_df[self._target_vars[0]])
+        return train_df[self._target_vars], eval_df[self._target_vars]
 
-    def get_total_spare_for_target(self, trace):
+    def get_total_spare_for_target(self, trace, tuning=True):
         """The spare amount of the target over the test period for `trace`.
 
         Parameters
@@ -131,6 +134,9 @@ class MLDataHandler:
         trace: Trace
             The `Trace` object for which the amount of spare units of the
             target variable are computed over the test period.
+        tuning: bool
+            A boolean value indicating whether the spare is being calculated
+            to tune the model or evaluate the model on the test set.
 
         Returns
         -------
@@ -140,6 +146,7 @@ class MLDataHandler:
 
         """
         target_ts = trace.get_target_time_series(self._target_vars[0])
-        train_cutoff = utils.get_train_cutoff(target_ts, self._train_prop)
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            target_ts, self._train_prop, self._val_prop, tuning)
         return trace.get_spare_resource_in_window(
-            self._target_vars[0], train_cutoff, len(target_ts))
+            self._target_vars[0], train_thresh, test_thresh)
