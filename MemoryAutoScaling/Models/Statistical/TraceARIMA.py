@@ -115,6 +115,26 @@ class TraceARIMA(StatisticalModel):
         train_cutoff = utils.get_train_cutoff(model_data, self._train_prop)
         return model_data[:train_cutoff], model_data[train_cutoff:]
 
+    def get_total_spare(self, trace):
+        """The spare amount of the target for `trace` over the test window.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which the spare is calculated.
+
+        Returns
+        -------
+        float
+            A float representing the total spare amount of the target
+            variable for `trace` over the test window.
+
+        """
+        target_ts = trace.get_target_time_series(self.get_target_variable())
+        train_cutoff = utils.get_train_cutoff(target_ts, self._train_prop)
+        return trace.get_spare_resource_in_window(
+            self.get_target_variable(), train_cutoff, len(target_ts))
+
     def get_model_data_for_trace(self, trace):
         """Retrieves the data for modeling from `trace`.
 
@@ -156,10 +176,12 @@ class TraceARIMA(StatisticalModel):
         """
         trace_ts = self.get_model_data_for_trace(trace)
         train_ts, test_ts = self.split_data(trace_ts)
+        total_spare = self.get_total_spare(trace)
         self._fit(train_ts)
         preds_train, preds_test = self._get_predictions(len(test_ts))
         return ModelResults.from_data(
-            self.get_params(), train_ts, preds_train, test_ts, preds_test)
+            self.get_params(), train_ts, preds_train,
+            test_ts, preds_test, total_spare)
 
     def plot_trace_vs_prediction(self, trace):
         """Creates a plot of `trace` vs its prediction.
