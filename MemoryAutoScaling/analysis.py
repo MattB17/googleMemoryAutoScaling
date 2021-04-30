@@ -84,29 +84,29 @@ def get_all_granger_col_names(causal_cols, causal_lags):
             for causal_tup in product(causal_cols, causal_lst)]
 
 
-def build_models_from_params_list(time_series_model, params_lst):
-    """Builds `time_series_model` objects from the params in `params_lst`.
+def build_models_from_params_list(trace_model, params_lst):
+    """Builds `trace_model` objects from the params in `params_lst`.
 
-    A separate `time_series_model` object is built for each set of params
+    A separate `trace_model` object is built for each set of params
     in `params_lst`.
 
     Parameters
     ----------
-    time_series_model: TimeSeriesModel.class
-        A reference to a `TimeSeriesModel` class representing the models being
+    trace_model: TraceModel.class
+        A reference to a `TraceModel` class representing the models being
         created.
     params_lst: list
         A list of dictionaries in which each dictionary represents the set of
-        named parameters used to initialize a `time_series_model`.
+        named parameters used to initialize a `trace_model`.
 
     Returns
     -------
     list
-        A list of `time_series_model` objects instantiated from the parameters
+        A list of `trace_model` objects instantiated from the parameters
         in `params_lst`.
 
     """
-    return [time_series_model(**params) for params in params_lst]
+    return [trace_model(**params) for params in params_lst]
 
 
 def read_univariate_modelling_input_params():
@@ -475,7 +475,7 @@ def handle_results_for_model(trace, model, model_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    new_model_results = model.run_model_pipeline_for_trace(trace, True)
+    new_model_results = model.run_model_pipeline_for_trace(trace, tuning=True)
     model_results = update_with_new_model_results(
         model_results, new_model_results)
     return truncate_list(model_results, cutoff)
@@ -529,7 +529,8 @@ def handle_results_for_multivariate_model(trace, model, model_results, cutoff):
         of modeling `trace` with `model`.
 
     """
-    new_model_results_dict = model.run_model_pipeline_for_trace(trace)
+    new_model_results_dict = model.run_model_pipeline_for_trace(
+        trace, tuning=True)
     if model_results == {}:
         model_results = initialize_multivariate_results(new_model_results_dict)
     else:
@@ -1513,3 +1514,102 @@ def get_stationary_results_df(stats_dfs):
                   "Stationary Diff 2", "Non-Stationary"]
     df.index = indices
     return df
+
+
+def build_model_from_model_results(model, model_results, other_params):
+    """Builds a `model` object from `model_results` and `other_params`.
+
+    Parameters
+    ----------
+    model: TraceModel.class
+        A reference to a `TraceModel` class representing the model being
+        created.
+    model_results: ModelResults
+        A `ModelResults` object containing the model results used to build
+        `model`.
+    other_params: dict
+        A dictionary of other parameters used to build `model`.
+
+    Returns
+    -------
+    TraceModel
+        A `TraceModel` object of type `model` built from `model_results` and
+        `other_params`.
+
+    """
+    model_params = {**model_results.get_model_params(), **other_params}
+    return model(**model_params)
+
+
+def get_test_results_from_val_results(trace_model, val_results,
+                                      other_params, trace):
+    """The test results for `trace` based on the validation model.
+
+    The validation model is a model of type `trace_model`, which is
+    constructed based on `val_results` and `other_params`. Once constructed,
+    the model is run on trace for the test set and the model results are
+    calculated.
+
+    Parameters
+    ----------
+    trace_model: TraceModel.class
+        A reference to a `TraceModel` class representing the model built
+        from the validation results and evaluated on the test set.
+    val_results: ModelResults
+        A `ModelResults` object representing the results of running a model of
+        type `trace_model` on the validation set of `trace`.
+    other_params: dict
+        A dictionary of other parameters used to build `model`.
+    trace: Trace
+        The `Trace` object that is being modeled.
+
+    Returns
+    -------
+    ModelResults
+        A `ModelResults` object representing the results of training a model
+        of type `trace_model` on `trace` where the model is constructed based
+        on the validation results.
+
+    """
+    model_for_trace = build_model_from_model_results(
+        trace_model, val_results, other_params)
+    return model_for_trace.run_model_pipeline_for_trace(trace, tuning=False)
+
+
+def get_test_results_from_val_results_list(trace_model, val_results_lst,
+                                           other_params, trace):
+    """The test results for `trace` based on the validation models.
+
+    A validation model is a model of type `trace_model`. There is one
+    validation model for each `ModelResults` object in `val_results_lst`,
+    which is constructed based on the `ModelResults` and `other_params`.
+    Each such model is evaluated on the test set of `trace` to get a new
+    `ModelResults` object for the test set.
+
+    Parameters
+    ----------
+    trace_model: TraceModel.class
+        A reference to a `TraceModel` class representing the types of models
+        that will be built from the validation results and evaluated on the
+        test set.
+    val_results_lst: list
+        A list of `ModelResults` objects representing the results of running
+        models of type `trace_model` on the validation set of `trace`.
+    other_params: dict
+        A dictionary of other parameters used to build the models. These
+        parameters are the same across every model constructed and do not
+        depend on the validation results.
+    trace: Trace
+        The `Trace` object that is being modeled.
+
+    Returns
+    -------
+    list
+        A list of `ModelResults` objects representing the results of
+        evaluating the validation models of type `trace_model` on the test
+        set of `trace`.
+
+    """
+    return [get_test_results_from_val_results(
+                trace_model, val_results, other_params, trace)
+            for val_results in val_results_lst]
