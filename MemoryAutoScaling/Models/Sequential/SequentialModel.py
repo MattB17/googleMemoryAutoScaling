@@ -210,6 +210,8 @@ class SequentialModel(TraceModel):
         total_spare = self.get_total_spare(trace, tuning)
         preds_train, preds_test = self._get_predictions(trace_ts, tuning)
         avail_ts = self.get_available_resource_data(trace, tuning)
+        if not tuning:
+            print(len(avail_ts))
         return ModelResults.from_data(
             self.get_params(), avail_ts, y_train,
             preds_train, y_test, preds_test, total_spare)

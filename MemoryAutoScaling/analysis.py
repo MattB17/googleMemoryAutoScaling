@@ -1586,6 +1586,7 @@ def get_test_results_from_val_results(trace_model, val_results,
     """
     model_for_trace = build_model_from_model_results(
         trace_model, val_results, other_params)
+    print("Test model built")
     return model_for_trace.run_model_pipeline_for_trace(trace, tuning=False)
 
 
@@ -1625,9 +1626,6 @@ def get_test_results_from_val_results_list(trace_model, val_results_lst,
     """
     test_results_lst = []
     for val_results in val_results_lst:
-        try:
-            test_results_lst.append(get_test_results_from_val_results(
-                trace_model, val_results, other_params, trace))
-        except:
-            continue
+        test_results_lst.append(get_test_results_from_val_results(
+            trace_model, val_results, other_params, trace))
     return test_results_lst
