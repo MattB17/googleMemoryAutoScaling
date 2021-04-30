@@ -76,8 +76,9 @@ class Trace:
         trace_id = int(trace_df[specs.TRACE_ID_COL].to_numpy()[0])
         start_time = int(trace_df[specs.START_INTERVAL_COL].to_numpy()[0])
         end_time = int(trace_df[specs.END_INTERVAL_COL].to_numpy()[-1])
+        total_mem_ts = utils.aggregate_availability_time_series(
+            trace_df[specs.TOTAL_MEM_COL].values, agg_window)
         ts_df = utils.build_trace_data_from_trace_df(trace_df, agg_window)
-        total_mem_ts = trace_df[specs.TOTAL_MEM_COL].fillna(0).to_numpy()
         return cls(
             trace_id, start_time, end_time, ts_df, total_mem_ts, agg_window)
 
@@ -162,7 +163,8 @@ class Trace:
 
         """
         return utils.get_total_spare_during_window(
-            self._total_mem_ts, self.get_maximum_memory_time_series(),
+            self._total_mem_ts,
+            self._total_mem_ts * self.get_maximum_memory_time_series(),
             win_start, win_end)
 
     def get_maximum_cpu_time_series(self):
@@ -199,7 +201,8 @@ class Trace:
 
         """
         return utils.get_total_spare_during_window(
-            self._total_cpu_ts, self.get_maximum_cpu_time_series(),
+            self._total_cpu_ts,
+            self._total_cpu_ts * self.get_maximum_cpu_time_series(),
             win_start, win_end)
 
     def get_target_time_series(self, target_col):

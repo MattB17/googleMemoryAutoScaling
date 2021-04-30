@@ -4,8 +4,10 @@ models are built based on the different window lengths specified in
 `MA_WINDOWS`.
 
 """
+import pandas as pd
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Sequential import TraceMovingAverage
+pd.options.mode.chained_assignment = None
 
 
 MA_WINDOWS = [1, 2, 3, 4, 5, 7, 10]

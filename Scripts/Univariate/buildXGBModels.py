@@ -2,10 +2,12 @@
 performance on the training and testing sets.
 
 """
+import pandas as pd
 from itertools import product
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.ML import TraceXGB
 from MemoryAutoScaling.DataHandling import MLDataHandler
+pd.options.mode.chained_assignment = None
 
 FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS)
 LEARNING_RATES = [0.1, 0.3, 0.5]

@@ -4,9 +4,11 @@ based on the different values of `p`, `d`, and `q` specified in `ARIMA_p`,
 `ARIMA_d`, and `ARIMA_q`, respectively.
 
 """
+import pandas as pd
 from itertools import product
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Statistical import TraceARIMA
+pd.options.mode.chained_assignment = None
 
 
 ARIMA_p = [p for p in range(5)]

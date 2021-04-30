@@ -4,8 +4,10 @@ models are built based on the different auto regression parameters specified
 in `AR_PARAMS`.
 
 """
+import pandas as pd
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Statistical import TraceAR
+pd.options.mode.chained_assignment = None
 
 
 AR_PARAMS = [1, 2, 3, 4, 5, 7, 10]

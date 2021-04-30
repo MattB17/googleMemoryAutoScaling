@@ -2,9 +2,11 @@
 evaluates its performance on the training and testing sets.
 
 """
+import pandas as pd
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.ML import TraceSVM
 from MemoryAutoScaling.DataHandling import MLDataHandler
+pd.options.mode.chained_assignment = None
 
 FEATURE_COLS = specs.get_lagged_trace_columns(specs.LAGS)
 REG_VALS = [0.01, 0.03, 0.1, 0.3, 1.0, 3.0]

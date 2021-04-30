@@ -343,6 +343,36 @@ def impute_for_time_series(time_series, impute_val):
     return time_series
 
 
+def aggregate_availability_time_series(ts, agg_window):
+    """Aggregates the availability time series `ts` by `agg_window`.
+
+    The availability time series is aggregated by taking the starting value
+    at every `agg_window` time periods and assuming that availability amount
+    is constant for the aggregation window. That is, it is obtained by taking
+    the first value among every consecutive `agg_window` values.
+
+    Parameters
+    ----------
+    ts: np.array
+        A numpy array representing the availability time series.
+    agg_window: int
+        An integer representing the period of aggregation.
+
+    Returns
+    -------
+    np.array
+        A numpy array containing the aggregated availability numbers.
+
+    """
+    agg_ts = []
+    ts[np.isnan(ts)] = 0
+    intervals = len(ts) // agg_window
+    for idx in range(intervals):
+        interval_start = agg_window * idx
+        agg_ts.append(ts[interval_start])
+    return np.array(agg_ts)
+
+
 def build_trace_data_from_trace_df(raw_trace_df, agg_window):
     """Builds data for a `Trace` object from `raw_trace_df`.
 
@@ -364,16 +394,18 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window):
         and aggregating data according to `agg_window`.
 
     """
-    trace_df = compute_memory_percentages_for_trace_df(raw_trace_df)
+    trace_df = compute_memory_percentages_for_trace_df(
+        raw_trace_df, agg_window)
     trace_df = trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
     return build_trace_aggregate_df(trace_df, agg_window)
 
 
-def compute_memory_percentages_for_trace_df(raw_trace_df):
+def compute_memory_percentages_for_trace_df(raw_trace_df, agg_window):
     """Computes the memory percentages for `raw_trace_df`.
 
     The memory percentages are calculated by dividing the memory columns
-    by the assigned memory.
+    by the assigned memory, after aggregative the assigned memory according
+    to `agg_window`.
 
     Parameters
     ----------
@@ -387,11 +419,13 @@ def compute_memory_percentages_for_trace_df(raw_trace_df):
         memory statistics to report percentages.
 
     """
-    raw_trace_df[specs.TOTAL_MEM_COL] = raw_trace_df[
-        specs.TOTAL_MEM_COL].fillna(0)
+    agg_avail_mem = aggregate_availability_time_series(
+        raw_trace_df[specs.TOTAL_MEM_COL], agg_window)
+    agg_avail_mem = np.repeat(agg_avail_mem, agg_window)
+    raw_trace_df = raw_trace_df[:len(agg_avail_mem)]
     for mem_col in [specs.AVG_MEM_COL, specs.MAX_MEM_COL]:
-        raw_trace_df[mem_col] = raw_trace_df[mem_col].divide(
-            raw_trace_df[specs.TOTAL_MEM_COL]).replace(np.inf, 0)
+        raw_trace_df[mem_col] = pd.Series(raw_trace_df[mem_col].divide(
+            agg_avail_mem).replace(np.inf, 0))
     return raw_trace_df
 
 

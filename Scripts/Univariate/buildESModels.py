@@ -4,8 +4,10 @@ smoothing models are built based on the different alpha values specified by
 `ALPHAS`
 
 """
+import pandas as pd
 from MemoryAutoScaling import analysis, specs, utils
 from MemoryAutoScaling.Models.Sequential import TraceExponentialSmoothing
+pd.options.mode.chained_assignment = None
 
 
 ALPHAS = [0.1, 0.3, 0.5, 0.7, 0.9]
