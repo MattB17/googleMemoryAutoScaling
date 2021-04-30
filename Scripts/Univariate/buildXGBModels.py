@@ -13,9 +13,11 @@ ESTIMATORS = [10, 50, 100]
 DEPTHS = [1, 2]
 
 
-def build_xgb_models_for_traces(trace_lst, results_dict, train_prop, max_mem):
+def build_xgb_models_for_traces(trace_lst, results_dict,
+                                train_prop, val_prop, max_mem):
     target_col = specs.get_target_variable(max_mem)
-    data_handler = MLDataHandler(train_prop, FEATURE_COLS, [target_col])
+    data_handler = MLDataHandler(
+        FEATURE_COLS, [target_col], train_prop, val_prop)
     xgb_params_lst = [{'data_handler': data_handler,
                        'lags': specs.LAGS,
                        'learning_rate': learning_rate,

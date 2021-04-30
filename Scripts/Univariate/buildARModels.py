@@ -11,8 +11,10 @@ from MemoryAutoScaling.Models.Statistical import TraceAR
 AR_PARAMS = [1, 2, 3, 4, 5, 7, 10]
 
 
-def build_ar_models_for_traces(trace_lst, results_dict, train_prop, max_mem):
-    ar_params_lst = [{'p': p, 'train_prop': train_prop, 'max_mem': max_mem}
+def build_ar_models_for_traces(trace_lst, results_dict, train_prop,
+                               val_prop, max_mem):
+    ar_params_lst = [{'p': p, 'train_prop': train_prop,
+                      'val_prop': val_prop, 'max_mem': max_mem}
                      for p in AR_PARAMS]
     analysis.get_best_model_results_for_traces(
         TraceAR, ar_params_lst, trace_lst, results_dict, specs.MODELS_COUNT)

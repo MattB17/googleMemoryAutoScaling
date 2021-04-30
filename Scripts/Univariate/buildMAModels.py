@@ -11,10 +11,12 @@ from MemoryAutoScaling.Models.Sequential import TraceMovingAverage
 MA_WINDOWS = [1, 2, 3, 4, 5, 7, 10]
 
 
-def build_ma_models_for_traces(trace_lst, results_dict, train_prop, max_mem):
+def build_ma_models_for_traces(trace_lst, results_dict, train_prop,
+                               val_prop, max_mem):
     ma_params_lst = [{'window_length': ma_win,
                       'initial_pred': 0.0,
                       'train_prop': train_prop,
+                      'val_prop': val_prop,
                       'max_mem': max_mem}
                      for ma_win in MA_WINDOWS]
     analysis.get_best_model_results_for_traces(

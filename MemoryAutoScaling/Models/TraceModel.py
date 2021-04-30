@@ -40,14 +40,21 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def split_data(self, model_data):
+    def split_data(self, model_data, tuning=True):
         """Splits `model_data` into the training and testing set.
+
+        If `tuning` is True, `model_data` is split into training and
+        validation sets. Otherwise it is split into training + validation and
+        testing sets.
 
         Parameters
         ----------
         model_data: pandas.Object
             A pandas Object (Series or DataFrame) containing the data used to
             build the trace model.
+        tuning: bool
+            A boolean value indicating whether the data is being used for
+            tuning or evaluation.
 
         """
         pass
@@ -71,13 +78,16 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def get_predictions_for_trace(self, trace):
+    def get_predictions_for_trace(self, trace, tuning=True):
         """Gets predictions for the training and testing set for `trace`.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -89,7 +99,7 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def run_model_pipeline_for_trace(self, trace):
+    def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
 
         The modeling pipeline first obtains the data needed for modeling
@@ -101,6 +111,9 @@ class TraceModel(ABC):
         ----------
         trace: Trace
             The `Trace` being modeled.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -112,13 +125,16 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def plot_trace_vs_prediction(self, trace):
+    def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` being plotted.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------

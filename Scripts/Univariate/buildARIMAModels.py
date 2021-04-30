@@ -17,12 +17,12 @@ MA_PARAMS = [(0, 0, q) for q in ARIMA_q[1:]]
 AR_PARAMS = [(p, 0, 0) for p in ARIMA_p[1:]]
 ARIMA_PARAMS = [arima_tup for arima_tup in product(ARIMA_p, ARIMA_d, ARIMA_q)
                 if arima_tup not in MA_PARAMS + AR_PARAMS + [(0, 0, 0)]]
-print(ARIMA_PARAMS)
 
 
 def build_arima_models_for_traces(traces_lst, results_dict,
-                                  train_prop, max_mem):
+                                  train_prop, val_prop, max_mem):
     arima_params_lst = [{'train_prop': train_prop,
+                         'val_prop': val_prop,
                         'p': p, 'd': d, 'q': q,
                         'max_mem': max_mem}
                         for p, d, q in ARIMA_PARAMS]

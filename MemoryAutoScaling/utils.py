@@ -54,11 +54,13 @@ def cap_train_and_test_predictions(train_preds, test_preds):
     return cap_predictions_at_1(train_preds), cap_predictions_at_1(test_preds)
 
 
-def get_train_cutoff(data_trace, train_prop):
-    """Calculates the index identifying the end of the training set.
+def get_train_test_thresholds(data_trace, train_prop, test_prop):
+    """Calculates the index identifying the end of the train and test sets.
 
     That is, an index of `data_trace` is calculated based on `train_prop`
-    which identifies the training dataset of `data_trace`.
+    which identifies the training dataset of `data_trace`. And an index of
+    `data_trace` is calculated based on `test_prop` which identifies the
+    testing dataset of `data_trace`.
 
     Paraneters
     ----------
@@ -67,15 +69,57 @@ def get_train_cutoff(data_trace, train_prop):
     train_prop: float
         A float in the range [0, 1] representing the proportion of data
         in the training set.
+    test_prop: float
+        A float in the range [0, 1] representing the proportion of data
+        in the testing set.
 
     Returns
     -------
-    int
-        An integer representing the index of `data_trace` at which to cutoff for
-        the training set.
+    int, int
+        Two integers representing the indices of `data_trace` that identify
+        the end of the training and testing sets, respectively.
 
     """
-    return int(len(data_trace) * train_prop)
+    n = len(data_trace)
+    train_thresh = int(n * train_prop)
+    test_end_pct = train_prop + test_prop
+    test_thresh = n if test_end_pct >= 1.0 else int(n * test_end_pct)
+    return train_thresh, test_thresh
+
+
+def calculate_split_thresholds(data, train_prop, val_prop, tuning=True):
+    """Calculates the split thresholds for `data`.
+
+    If `tuning` is True, the split thresholds for `data` mark the end of
+    the training and validation sets, respectively. Otherwise, the split
+    thresholds mark the end of the training + validation and testing sets,
+    respectively.
+
+    Parameters
+    ----------
+    data: pd.DataFrame
+        A pandas DataFrame representing the data to be split.
+    train_prop: float
+        A float representing the proportion of the training set.
+    val_prop: float
+        A float representing the proportion of the testing set.
+    tuning: bool
+        A boolean value indicating whether the split is for tuning or
+        testing.
+
+    Returns
+    -------
+    int, int
+        Two thresholds representing the endpoint of the two subsets. If
+        `tuning` is true these thresholds represent the end of the training
+        and validation sets, respectively. Otherwise, they represent the end
+        of the training + validation and testing sets, respectively.
+
+    """
+    if tuning:
+        return get_train_test_thresholds(data, train_prop, val_prop)
+    return get_train_test_thresholds(
+        data, train_prop + val_prop, 1.0 - train_prop - val_prop)
 
 
 def aggregate_time_series(time_series, window_length):

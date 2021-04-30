@@ -114,9 +114,10 @@ class TraceARIMAX(MLBase):
         None
 
         """
+        arimax_order = (self._p, self._d, self._q)
         model = SARIMAX(
             train_target, train_features,
-            order=self.get_params(), simple_differencing=False)
+            order=arimax_order, simple_differencing=False)
         self._model = model.fit(disp=False)
         self._is_fit = True
 
@@ -201,7 +202,7 @@ class TraceARIMAX(MLBase):
             self.get_params(), train_target, train_preds,
             test_target, test_preds, total_spare)
 
-    def _plot_trace_data_vs_predictions(self, trace_df, title):
+    def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.
 
         The plot of the time series vs its predictions is divided into two
@@ -213,6 +214,9 @@ class TraceARIMAX(MLBase):
             A pandas DataFrame containing the trace data used for modeling.
         title: str
             A string representing the title of the plot.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -220,8 +224,8 @@ class TraceARIMAX(MLBase):
 
         """
         fig, (ax1, ax2) = plt.subplots(2)
-        X_train, y_train, X_test, y_test = self.split_data(trace_df)
-        preds_train, preds_test = self._get_train_and_test_predictions(
-            X_train, X_test)
+        X_train, y_train, X_eval, y_eval = self.split_data(trace_df, tuning)
+        preds_train, preds_eval = self._get_train_and_test_predictions(
+            X_train, X_eval)
         plotting.plot_train_and_test_predictions_on_axes(
-            y_train, preds_train, y_test, preds_test, (ax1, ax2), title)
+            y_train, preds_train, y_eval, preds_eval, (ax1, ax2), title)

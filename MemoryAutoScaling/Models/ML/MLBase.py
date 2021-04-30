@@ -62,7 +62,7 @@ class MLBase(TraceModel):
         """
         pass
 
-    def split_data(self, data):
+    def split_data(self, data, tuning=True):
         """Splits data into features and targets for the train and test sets.
 
         Parameters
@@ -70,6 +70,8 @@ class MLBase(TraceModel):
         data: pd.DataFrame
             A pandas DataFrame containing the data on which the split is
             performed.
+        tuning: bool
+            A boolean value indicating whether the split is for tuning.
 
         Returns
         -------
@@ -79,15 +81,18 @@ class MLBase(TraceModel):
             DataFrame and Series represent the same split for the testing set.
 
         """
-        return self._data_handler.perform_data_split(data)
+        return self._data_handler.perform_data_split(data, tuning)
 
-    def get_total_spare(self, trace):
+    def get_total_spare(self, trace, tuning=True):
         """The spare amount of the target for `trace` over the test window.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which the spare is calculated.
+        tuning: bool
+            A boolean value indicating whether the spare is being calculated
+            to tune the model or evaluate the model on the test set.
 
         Returns
         -------
@@ -96,7 +101,7 @@ class MLBase(TraceModel):
             variable for `trace` over the test window.
 
         """
-        return self._data_handler.get_total_spare_for_target(trace)
+        return self._data_handler.get_total_spare_for_target(trace, tuning)
 
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
@@ -115,13 +120,16 @@ class MLBase(TraceModel):
         """
         return trace.get_lagged_df(self._lags)
 
-    def get_predictions_for_trace(self, trace):
+    def get_predictions_for_trace(self, trace, tuning=True):
         """Gets predictions for the training and testing set for `trace`.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -131,10 +139,10 @@ class MLBase(TraceModel):
 
         """
         trace_df = self.get_model_data_for_trace(trace)
-        X_train, _, X_test, _ = self.split_data(trace_df)
-        return self._get_train_and_test_predictions(X_train, X_test)
+        X_train, _, X_eval, _ = self.split_data(trace_df, tuning)
+        return self._get_train_and_test_predictions(X_train, X_eval)
 
-    def run_model_pipeline_for_trace(self, trace):
+    def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the model pipeline on `trace`.
 
         The dataframe containing the data for modeling is obtained from
@@ -149,8 +157,9 @@ class MLBase(TraceModel):
         ----------
         trace: Trace
             A `Trace` object containing the data being modelled.
-        kwargs: dict
-            Arbitrary keyword arguments used to initialize the model.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
 
         Returns
         -------
@@ -160,18 +169,21 @@ class MLBase(TraceModel):
 
         """
         raw_data = self.get_model_data_for_trace(trace)
-        X_train, y_train, X_test, y_test = self.split_data(raw_data)
-        total_spare = self.get_total_spare(trace)
+        X_train, y_train, X_eval, y_eval = self.split_data(raw_data, tuning)
+        total_spare = self.get_total_spare(trace, tuning)
         return self._run_model_pipeline(
-            X_train, y_train, X_test, y_test, total_spare)
+            X_train, y_train, X_eval, y_eval, total_spare)
 
-    def plot_trace_vs_prediction(self, trace):
+    def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.
 
         Parameters
         ----------
         trace: Trace
             The `Trace` being plotted.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------
@@ -181,7 +193,7 @@ class MLBase(TraceModel):
         trace_df = self.get_model_data_for_trace(trace)
         title = "Trace {0} vs {1} Predictions".format(
             trace.get_trace_id(), self.get_model_title())
-        self._plot_trace_data_vs_predictions(trace_df, title)
+        self._plot_trace_data_vs_predictions(trace_df, title, tuning)
 
     @abstractmethod
     def _get_train_and_test_predictions(self, train_features, test_features):
@@ -239,7 +251,7 @@ class MLBase(TraceModel):
         pass
 
     @abstractmethod
-    def _plot_trace_data_vs_predictions(self, trace_df, title):
+    def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.
 
         The plot of the time series vs its predictions is divided into two
@@ -251,6 +263,9 @@ class MLBase(TraceModel):
             A pandas DataFrame containing the trace data used for modeling.
         title: str
             A string representing the title of the plot.
+        tuning: bool
+            A boolean value indicating whether the predictions are for the
+            validation set or the test set.
 
         Returns
         -------

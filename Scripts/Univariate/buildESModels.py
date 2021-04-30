@@ -11,10 +11,12 @@ from MemoryAutoScaling.Models.Sequential import TraceExponentialSmoothing
 ALPHAS = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 
-def build_es_models_for_traces(trace_lst, results_dict, train_prop, max_mem):
+def build_es_models_for_traces(trace_lst, results_dict,
+                               train_prop, val_prop, max_mem):
     es_params_lst = [{'alpha': alpha_val,
                       'initial_pred': 0.001,
                       'train_prop': train_prop,
+                      'val_prop': val_prop,
                       'max_mem': max_mem}
                      for alpha_val in ALPHAS]
     analysis.get_best_model_results_for_traces(

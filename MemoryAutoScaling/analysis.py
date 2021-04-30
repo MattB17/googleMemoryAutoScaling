@@ -131,8 +131,9 @@ def read_univariate_modelling_input_params():
             "file_id": sys.argv[3],
             "min_trace_length": int(sys.argv[4]),
             "train_prop": float(sys.argv[5]),
-            "aggregation_window": int(sys.argv[6]),
-            "max_mem": (sys.argv[7].lower() == "true")}
+            "val_prop": float(sys.argv[6]),
+            "aggregation_window": int(sys.argv[7]),
+            "max_mem": (sys.argv[8].lower() == "true")}
 
 
 def read_multivariate_modelling_input_params():
@@ -202,6 +203,7 @@ def get_univariate_model_build_input_params():
     return {'traces': get_traces_from_input_params(params),
             'output_dir': params['output_dir'],
             'train_prop': params['train_prop'],
+            'val_prop': params['val_prop'],
             'max_mem': params['max_mem']}
 
 
@@ -562,10 +564,7 @@ def update_model_results_for_trace(trace, model, model_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    try:
-        return handle_results_for_model(trace, model, model_results, cutoff)
-    except:
-        return model_results
+    return handle_results_for_model(trace, model, model_results, cutoff)
 
 def update_multivariate_model_results_for_trace(trace, model,
                                                 model_results, cutoff):
@@ -1015,12 +1014,12 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
     where `<name>` is `model_name`.
 
     """
-    model_params = get_univariate_model_build_input_params()
-    model_args = (model_params['train_prop'], model_params['max_mem'])
+    params = get_univariate_model_build_input_params()
+    model_args = (params['train_prop'], params['val_prop'], params['max_mem'])
     model_results = parallel.perform_trace_modelling(
-        model_params['traces'], modeling_func, model_args)
+        params['traces'], modeling_func, model_args)
     process_and_output_model_results(
-        model_results, models_count, model_name, model_params['output_dir'])
+        model_results, models_count, model_name, params['output_dir'])
 
 
 def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
