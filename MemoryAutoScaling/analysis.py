@@ -475,7 +475,7 @@ def handle_results_for_model(trace, model, model_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    new_model_results = model.run_model_pipeline_for_trace(trace)
+    new_model_results = model.run_model_pipeline_for_trace(trace, True)
     model_results = update_with_new_model_results(
         model_results, new_model_results)
     return truncate_list(model_results, cutoff)
@@ -564,7 +564,10 @@ def update_model_results_for_trace(trace, model, model_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    return handle_results_for_model(trace, model, model_results, cutoff)
+    try:
+        return handle_results_for_model(trace, model, model_results, cutoff)
+    except:
+        return model_results
 
 def update_multivariate_model_results_for_trace(trace, model,
                                                 model_results, cutoff):
