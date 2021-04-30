@@ -1586,7 +1586,6 @@ def get_test_results_from_val_results(trace_model, val_results,
     """
     model_for_trace = build_model_from_model_results(
         trace_model, val_results, other_params)
-    print("Test model built")
     return model_for_trace.run_model_pipeline_for_trace(trace, tuning=False)
 
 
