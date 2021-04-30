@@ -657,7 +657,8 @@ def pad_model_results_dict(model_results_dict, pad_len):
     return model_results_dict
 
 
-def compute_best_results_for_trace(trace, models, models_count):
+def compute_best_results_for_trace(model_type, trace, models,
+                                   models_count, fixed_params):
     """Gets `ModelResults` for the best models of `models` for `trace`.
 
     The best models of `models` are the `models_count` models with the lowest
@@ -665,6 +666,9 @@ def compute_best_results_for_trace(trace, models, models_count):
 
     Parameters
     ----------
+    model_type: TraceModel.class
+        A reference to a `TraceModel` class representing the types of the
+        models being fit to `trace`.
     trace: Trace
         The `Trace` object being modeled.
     models: list
@@ -672,6 +676,9 @@ def compute_best_results_for_trace(trace, models, models_count):
         to `trace` and from which the best models are chosen.
     models_count: int
         An integer representing the number of models to include in the results.
+    fixed_params: dict
+        A dictionary of model parameters representing the parameters that are
+        common to each model being fit to `trace`, given by `models`.
 
     Returns
     -------
@@ -684,7 +691,9 @@ def compute_best_results_for_trace(trace, models, models_count):
     for model in models:
         best_results = update_model_results_for_trace(
             trace, model, best_results, models_count)
-    return pad_model_results(best_results, models_count)
+    test_results = get_test_results_from_val_results_list(
+        model_type, best_results, fixed_params, trace)
+    return pad_model_results(test_results, models_count)
 
 def compute_best_multivariate_results_for_trace(trace, models, models_count):
     """Gets `ModelResults` for the best models of `models` for `trace`.
@@ -717,17 +726,18 @@ def compute_best_multivariate_results_for_trace(trace, models, models_count):
             trace, model, best_results_dict, models_count)
     return pad_model_results_dict(best_results_dict, models_count)
 
-def get_best_model_results_for_traces(model, model_params, traces,
-                                      result_dict, models_count, verbose=True):
+def get_best_model_results_for_traces(trace_model, model_params, traces,
+                                      result_dict, models_count,
+                                      fixed_model_params, verbose=True):
     """Gets the `models_count` best model results for the traces of `traces`.
 
-    For each trace in `traces` a `model` object is built for each set of model
-    parameters in `model_params` and the results of the best `models_count`
-    models are saved in `result_dict`.
+    For each trace in `traces` a `trace_model` object is built for each set of
+    model parameters in `model_params` and the results of the best
+    `models_count` models are saved in `result_dict`.
 
     Parameters
     ----------
-    model: TraceModel.class
+    trace_model: TraceModel.class
         A `TraceModel` class specifying the model to be built.
     model_params: list
         A list of dictionaries specifying the model parameters for each model
@@ -741,6 +751,9 @@ def get_best_model_results_for_traces(model, model_params, traces,
         An integer representing the number of model results to save. The
         results for the `models_count` best models for each trace will be
         saved.
+    fixed_model_params: dict
+        A dictionary of model parameters representing the parameters that are
+        common to each model being fit to `trace`.
     verbose: bool
         A boolean indicating whether to run in verbose mode. The default
         value is True, in which case progress is printed to the screen.
@@ -750,11 +763,11 @@ def get_best_model_results_for_traces(model, model_params, traces,
     None
 
     """
-    models = build_models_from_params_list(model, model_params)
+    models = build_models_from_params_list(trace_model, model_params)
     trace_count = len(traces)
     for idx in range(trace_count):
         model_results = compute_best_results_for_trace(
-            traces[idx], models, models_count)
+            trace_model, traces[idx], models, models_count, fixed_model_params)
         result_dict[traces[idx].get_trace_id()] = model_results
         log_modeling_progress(idx, trace_count, verbose)
 
@@ -1610,6 +1623,11 @@ def get_test_results_from_val_results_list(trace_model, val_results_lst,
         set of `trace`.
 
     """
-    return [get_test_results_from_val_results(
-                trace_model, val_results, other_params, trace)
-            for val_results in val_results_lst]
+    test_results_lst = []
+    for val_results in val_results_lst:
+        try:
+            test_results_lst.append(get_test_results_from_val_results(
+                trace_model, val_results, other_params, trace))
+        except:
+            continue
+    return test_results_lst

@@ -23,14 +23,14 @@ ARIMA_PARAMS = [arima_tup for arima_tup in product(ARIMA_p, ARIMA_d, ARIMA_q)
 
 def build_arima_models_for_traces(traces_lst, results_dict,
                                   train_prop, val_prop, max_mem):
-    arima_params_lst = [{'train_prop': train_prop,
-                         'val_prop': val_prop,
-                        'p': p, 'd': d, 'q': q,
-                        'max_mem': max_mem}
+    fixed_model_params = {'train_prop': train_prop,
+                          'val_prop': val_prop,
+                          'max_mem': max_mem}
+    arima_params_lst = [{'p': p, 'd': d, 'q': q, **fixed_model_params}
                         for p, d, q in ARIMA_PARAMS]
     analysis.get_best_model_results_for_traces(
         TraceARIMA, arima_params_lst, traces_lst,
-        results_dict, specs.MODELS_COUNT)
+        results_dict, specs.MODELS_COUNT, fixed_model_params)
 
 
 if __name__ == "__main__":

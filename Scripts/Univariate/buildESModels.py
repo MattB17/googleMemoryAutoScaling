@@ -15,15 +15,13 @@ ALPHAS = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 def build_es_models_for_traces(trace_lst, results_dict,
                                train_prop, val_prop, max_mem):
-    es_params_lst = [{'alpha': alpha_val,
-                      'initial_pred': 0.001,
-                      'train_prop': train_prop,
-                      'val_prop': val_prop,
-                      'max_mem': max_mem}
+    fixed_model_params = {'initial_pred': 0.001, 'train_prop': train_prop,
+                          'val_prop': val_prop, 'max_mem': max_mem}
+    es_params_lst = [{'alpha': alpha_val, **fixed_model_params}
                      for alpha_val in ALPHAS]
     analysis.get_best_model_results_for_traces(
         TraceExponentialSmoothing, es_params_lst, trace_lst,
-        results_dict, specs.MODELS_COUNT)
+        results_dict, specs.MODELS_COUNT, fixed_model_params)
 
 
 if __name__ == "__main__":

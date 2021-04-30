@@ -208,7 +208,7 @@ class SequentialModel(TraceModel):
         trace_ts = self.get_model_data_for_trace(trace)
         y_train, y_test = self.split_data(trace_ts, tuning)
         total_spare = self.get_total_spare(trace, tuning)
-        preds_train, preds_test = self._get_predictions(trace_ts)
+        preds_train, preds_test = self._get_predictions(trace_ts, tuning)
         avail_ts = self.get_available_resource_data(trace, tuning)
         return ModelResults.from_data(
             self.get_params(), avail_ts, y_train,

@@ -17,12 +17,12 @@ def build_svm_models_for_traces(trace_lst, results_dict,
     target_col = specs.get_target_variable(max_mem)
     data_handler = MLDataHandler(
         FEATURE_COLS, [target_col], train_prop, val_prop)
-    svm_params_lst = [{'data_handler': data_handler,
-                       'lags': specs.LAGS, 'reg_val': reg_val}
+    fixed_model_params = {'data_handler': data_handler, 'lags': specs.LAGS}
+    svm_params_lst = [{'reg_val': reg_val, **fixed_model_params}
                        for reg_val in REG_VALS]
     analysis.get_best_model_results_for_traces(
         TraceSVM, svm_params_lst, trace_lst,
-        results_dict, specs.MODELS_COUNT)
+        results_dict, specs.MODELS_COUNT, fixed_model_params)
 
 
 if __name__ == "__main__":
