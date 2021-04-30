@@ -41,8 +41,8 @@ class ModelResults:
         self._harvest_stats_dict = harvest_stats_dict
 
     @classmethod
-    def from_data(cls, model_params, y_train, train_preds,
-                  y_test, test_preds, total_spare):
+    def from_data(cls, model_params, avail_ts, y_train,
+                  train_preds, y_test, test_preds, total_spare):
         """Builds a `ModelResults` object from training and testing data.
 
         Parameters
@@ -51,6 +51,9 @@ class ModelResults:
             A dictionary containing the model parameters. The keys are strings
             representing the name of the parameter and the corresponding value
             is the associated parameter.
+        avail_ts: np.array
+            A numpy array representing the actual amount of the resource
+            available at each time point.
         y_train: np.array
             A numpy array representing actual trace values of the target
             variable for the training set.
@@ -79,7 +82,7 @@ class ModelResults:
             y_train, train_preds, y_test, test_preds, total_spare)
         harvest_stats_dict = {
             buffer_pct: HarvestStats.from_predictions(
-                y_test, test_preds, buffer_pct)
+                avail_ts, y_test, test_preds, buffer_pct)
             for buffer_pct in specs.BUFFER_PCTS}
         return cls(model_params, results_dict, harvest_stats_dict)
 

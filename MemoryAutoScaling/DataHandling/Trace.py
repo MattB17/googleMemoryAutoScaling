@@ -224,6 +224,26 @@ class Trace:
             return self.get_maximum_memory_time_series()
         return self.get_maximum_cpu_time_series()
 
+    def get_target_availability_time_series(self, target_col):
+        """Retrieves the availability time series for `target_col`.
+
+        Parameters
+        ----------
+        target_col: str
+            A string representing the name of the target variable for which
+            the time series is retrieved from the trace.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing a time series of availability for
+            `target_col`.
+
+        """
+        if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self._total_mem_ts
+        return self._total_cpu_ts
+
     def get_spare_resource_in_window(self, target_col, win_start, win_end):
         """The spare amount of `target_col` in [`win_start`, `win_end`].
 

@@ -51,6 +51,32 @@ class MLDataHandler:
         """
         return self._target_vars
 
+    def split_time_series_data(self, ts_data, tuning=True):
+        """Splits `ts_data` into two sets for the modeling process.
+
+        If `tuning` is True, `ts_data` is split into a training and
+        validation set. Otherwise, it is split into a training + validation
+        and testing set.
+
+        Parameters
+        ----------
+        ts_data: pd.Object
+            A pandas Object representing the data to be split.
+        tuning: bool
+            A boolean indicating whether the split is being done for training.
+
+        Returns
+        -------
+        pd.DataFrame, pd.DataFrame
+            Two pandas DataFrames where the first dataframe contains the
+            records in the training set and the second contains the records
+            in the testing set.
+
+        """
+        train_thresh, test_thresh = utils.calculate_split_thresholds(
+            ts_data, self._train_prop, self._val_prop, tuning)
+        return ts_data[:train_thresh], ts_data[train_thresh:test_thresh]
+
     def get_train_and_test_sets(self, data, tuning=True):
         """Splits `data` into a training and testing set.
 
@@ -75,9 +101,7 @@ class MLDataHandler:
 
         """
         data = data[self._feature_vars + self._target_vars]
-        train_thresh, test_thresh = utils.calculate_split_thresholds(
-            data, self._train_prop, self._val_prop, tuning)
-        return data[:train_thresh], data[train_thresh:test_thresh]
+        return self.split_time_series_data(data, tuning)
 
     def perform_data_split(self, data, tuning=True):
         """Splits data into features and targets for the train and test sets.

@@ -81,9 +81,9 @@ def get_train_test_thresholds(data_trace, train_prop, test_prop):
 
     """
     n = len(data_trace)
-    train_thresh = int(n * train_prop)
+    train_thresh = int(np.ceil(n * train_prop))
     test_end_pct = train_prop + test_prop
-    test_thresh = n if test_end_pct >= 1.0 else int(n * test_end_pct)
+    test_thresh = n if test_end_pct >= 1.0 else int(np.ceil(n * test_end_pct))
     return train_thresh, test_thresh
 
 
@@ -116,6 +116,8 @@ def calculate_split_thresholds(data, train_prop, val_prop, tuning=True):
         of the training + validation and testing sets, respectively.
 
     """
+    train_prop = round(train_prop, 2)
+    val_prop = round(val_prop, 2)
     if tuning:
         return get_train_test_thresholds(data, train_prop, val_prop)
     return get_train_test_thresholds(
@@ -885,7 +887,7 @@ def process_model_results_df(model_results_df):
     return processed_df
 
 
-def calculate_harvest_stats(actual_vals, predicted_vals, buffer_pct):
+def calculate_harvest_stats(avail_ts, actual_ts, predicted_ts, buffer_pct):
     """Calculates the harvest statistics of predicted versus actual values.
 
     The harvest statistics are the proportion of spare resources harvested and
@@ -899,10 +901,16 @@ def calculate_harvest_stats(actual_vals, predicted_vals, buffer_pct):
 
     Parameters
     ----------
-    actual_vals: list
-        A list containing the actual values used of the resource.
-    predicted_vals: list
-        A list containing the values predicted to be used of the resource.
+    avail_ts: np.array
+        A numpy array containing the total available amount of the
+        resource available at each time period.
+    actual_ts: np.array
+        A numpy array of actual values for the trace, representing the
+        percent of the available resource used at each time point.
+    predicted_ts: np.array
+        A numpy array of predicted values for the trace, representing the
+        percent of the available resource predicted to be used at each
+        time point.
     buffer_pct: float
         A float representing the percentage of each prediction to be used as
         a buffer. Thus, the effective prediction for each time period is the
@@ -915,15 +923,13 @@ def calculate_harvest_stats(actual_vals, predicted_vals, buffer_pct):
         harvested and the proportion of violations.
 
     """
-    n = len(actual_vals)
-    actual_spare = 0.0
-    harvested_spare = 0.0
-    under_pred_count = 0
-    for idx in range(n):
-        actual_spare += (1 - actual_vals[idx])
-        buffered_pred = min(predicted_vals[idx] * (1 + buffer_pct), 1.0)
-        if buffered_pred < actual_vals[idx]:
-            under_pred_count += 1
-        else:
-            harvested_spare += (1 - buffered_pred)
-    return (harvested_spare / actual_spare), (under_pred_count / n)
+    actual_spare_pcts = 1.0 - actual_ts
+    buffered_pred_ts = np.minimum(predicted_ts * (1 + buffer_pct), 1.0)
+    predicted_spare_pcts = 1.0 - buffered_pred_ts
+    under_pred_indices = buffered_pred_ts < actual_ts
+    predicted_spare_pcts[under_pred_indices] = 0
+    actual_spare = np.sum(actual_spare_pcts * avail_ts)
+    harvested_spare = np.sum(predicted_spare_pcts * avail_ts)
+    prop_harvested = harvested_spare / actual_spare
+    prop_violations = np.sum(under_pred_indices) / len(actual_ts)
+    return prop_harvested, prop_violations

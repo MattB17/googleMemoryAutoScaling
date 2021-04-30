@@ -66,6 +66,39 @@ class TraceVARMAX(MLBase):
         """
         return {'p': self._p, 'q': self._q}
 
+    def get_available_resource_data(self, trace, tuning=True):
+        """A time series of the available resource for `trace`.
+
+        The time series is restricted to the evaluation interval specified
+        by `tuning`. If `tuning` is True then the model is being tuned so the
+        time series is restricted to the validation set. Otherwise, it is
+        restricted to the testing set.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` object from which the available resource numbers are
+            retrieved.
+        tuning: bool
+            A boolean value indicating whether or not the model is being
+            tuned.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame representing the amount of resource savailable
+            for each time point in the evaluation window specified by `tuning`,
+            for each target_variable.
+
+        """
+        total_avail_df = pd.DataFrame(
+            {model_var: trace.get_target_availability_time_series(model_var)
+             for model_var in self._model_vars})
+        total_avail_df = total_avail_df[max(self._lags):]
+        _, avail_df = self._data_handler.split_time_series_data(
+            total_avail_df, tuning)
+        return avail_df
+
     def get_model_title(self):
         """A title describing the model.
 
@@ -143,23 +176,23 @@ class TraceVARMAX(MLBase):
         train_cutoff = len(train_features)
         return preds[:train_cutoff], preds[train_cutoff:]
 
-    def _run_model_pipeline(self, train_features, train_target,
-                            test_features, test_target, total_spare):
+    def _run_model_pipeline(self, avail_data, X_train, train_target,
+                            X_test, test_target, total_spare):
         """Runs the model pipeline on the training and testing data.
 
-        The model is instantiated and then fit on `train_features` and
-        `train_target`. Predictions are made on `test_features` and these
+        The model is instantiated and then fit on `X_train` and
+        `train_target`. Predictions are made on `X_test` and these
         predictions are compared to `test_target` using the mean absolute
         scaled error.
 
         Parameters
         ----------
-        train_features: pd.DataFrame
+        X_train: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
         train_target: pd.DataFrame
             A pandas DataFrame representing the target variable for the
             training set.
-        test_features: pd.DataFrame
+        X_test: pd.DataFrame
             A pandas Dataframe representing the features for the testing set.
         test_target: pd.Series
             A pandas DataFrame representing the target variable for the
@@ -176,12 +209,13 @@ class TraceVARMAX(MLBase):
             `ModelResults` object representing the results for that variable.
 
         """
-        self._fit(train_features, train_target)
+        self._fit(X_train, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
-            train_features, test_features)
+            X_train, X_test)
         return parallel.get_multivariate_model_results(
-            self.get_params(), train_target, train_preds, test_target,
-            test_preds, total_spare, self._data_handler.get_target_variables())
+            self.get_params(), avail_data, train_target, train_preds,
+            test_target, test_preds, total_spare,
+            self._data_handler.get_target_variables())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.

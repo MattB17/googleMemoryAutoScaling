@@ -103,6 +103,27 @@ class MLBase(TraceModel):
         """
         return self._data_handler.get_total_spare_for_target(trace, tuning)
 
+    @abstractmethod
+    def get_available_resource_data(self, trace, tuning=True):
+        """A time series of the available resource for `trace`.
+
+        The time series is restricted to the evaluation interval specified
+        by `tuning`. If `tuning` is True then the model is being tuned so the
+        time series is restricted to the validation set. Otherwise, it is
+        restricted to the testing set.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` object from which the available resource numbers are
+            retrieved.
+        tuning: bool
+            A boolean value indicating whether or not the model is being
+            tuned.
+
+        """
+        pass
+
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
 
@@ -171,8 +192,9 @@ class MLBase(TraceModel):
         raw_data = self.get_model_data_for_trace(trace)
         X_train, y_train, X_eval, y_eval = self.split_data(raw_data, tuning)
         total_spare = self.get_total_spare(trace, tuning)
+        avail_data = self.get_available_resource_data(trace, tuning)
         return self._run_model_pipeline(
-            X_train, y_train, X_eval, y_eval, total_spare)
+            avail_data, X_train, y_train, X_eval, y_eval, total_spare)
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.
@@ -216,8 +238,8 @@ class MLBase(TraceModel):
         pass
 
     @abstractmethod
-    def _run_model_pipeline(self, train_features, train_target,
-                            test_features, test_target, total_spare):
+    def _run_model_pipeline(self, avail_data, X_train, train_target,
+                            X_test, test_target, total_spare):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `train_features` and
@@ -227,12 +249,15 @@ class MLBase(TraceModel):
 
         Parameters
         ----------
-        train_features: pd.DataFrame
+        avail_data: pd.Object
+            A pandas object representing the availability of the target
+            resource(s) over time.
+        X_train: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
         train_target: pd.Series
             A pandas Series representing the target variable for the
             training set.
-        test_features: pd.DataFrame
+        X_test: pd.DataFrame
             A pandas Dataframe representing the features for the testing set.
         test_target: pd.Series
             A pandas Series representing the target variable for the testing

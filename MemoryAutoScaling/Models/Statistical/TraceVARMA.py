@@ -114,6 +114,37 @@ class TraceVARMA(StatisticalModel):
         model_data = model_data.reset_index(drop=True)
         return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
+    def get_available_resource_data(self, trace, tuning=True):
+        """A time series of the available resource for `trace`.
+
+        The time series is restricted to the evaluation interval specified
+        by `tuning`. If `tuning` is True then the model is being tuned so the
+        time series is restricted to the validation set. Otherwise, it is
+        restricted to the testing set.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` object from which the available resource numbers are
+            retrieved.
+        tuning: bool
+            A boolean value indicating whether or not the model is being
+            tuned.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame representing the amount of resource savailable
+            for each time point in the evaluation window specified by `tuning`,
+            for each target_variable.
+
+        """
+        total_avail_df = pd.DataFrame(
+            {model_var: trace.get_target_availability_time_series(model_var)
+             for model_var in self._model_vars})
+        _, avail_df = self.split_data(total_avail_df, tuning)
+        return avail_df
+
     def get_model_data_for_trace(self, trace):
         """Retrieves the multivariate data for modeling from `trace`.
 

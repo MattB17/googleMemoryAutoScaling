@@ -4,7 +4,7 @@ providing the basic framework used by all machine learning models.
 
 """
 from abc import abstractmethod
-from MemoryAutoScaling import plotting
+from MemoryAutoScaling import plotting, utils
 from MemoryAutoScaling.Models.ML import MLBase
 from MemoryAutoScaling.Analysis import ModelResults
 from MemoryAutoScaling.DataHandling import MLDataHandler
@@ -56,6 +56,36 @@ class MLModel(MLBase):
 
         """
         return self._data_handler.get_target_variables()[0]
+
+    def get_available_resource_data(self, trace, tuning=True):
+        """A time series of the available resource for `trace`.
+
+        The time series is restricted to the evaluation interval specified
+        by `tuning`. If `tuning` is True then the model is being tuned so the
+        time series is restricted to the validation set. Otherwise, it is
+        restricted to the testing set.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` object from which the available resource numbers are
+            retrieved.
+        tuning: bool
+            A boolean value indicating whether or not the model is being
+            tuned.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing the amount of the resource available
+            for each time point in the evaluation window specified by `tuning`.
+
+        """
+        total_avail_ts = trace.get_target_availability_time_series(
+            self.get_target_variable())[max(self._lags):]
+        _, avail_ts = self._data_handler.split_time_series_data(
+            total_avail_ts, tuning)
+        return avail_ts
 
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
@@ -154,23 +184,26 @@ class MLModel(MLBase):
         test_preds = self._get_predictions(test_features)
         return train_preds, test_preds
 
-    def _run_model_pipeline(self, train_features, train_target,
-                           test_features, test_target, total_spare):
+    def _run_model_pipeline(self, avail_data, X_train, train_target,
+                            X_test, test_target, total_spare):
         """Runs the model pipeline on the training and testing data.
 
-        The model is instantiated and then fit on `train_features` and
-        `train_target`. Predictions are made on `test_features` and these
+        The model is instantiated and then fit on `X_train` and
+        `train_target`. Predictions are made on `X_test` and these
         predictions are compared to `test_target` using the mean squared
         error.
 
         Parameters
         ----------
-        train_features: pd.DataFrame
+        avail_data: np.array
+            A numpy array representing a time series of the availability of
+            the target resource.
+        X_train: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
         train_target: pd.Series
             A pandas Series representing the target variable for the
             training set.
-        test_features: pd.DataFrame
+        X_test: pd.DataFrame
             A pandas Dataframe representing the features for the testing set.
         test_target: pd.Series
             A pandas Series representing the target variable for the testing
@@ -187,12 +220,12 @@ class MLModel(MLBase):
 
         """
         self._initialize()
-        self._fit(train_features, train_target)
+        self._fit(X_train, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
-            train_features, test_features)
+            X_train, X_test)
         return ModelResults.from_data(
-            self.get_params(), train_target, train_preds,
-            test_target, test_preds, total_spare)
+            self.get_params(), avail_data, train_target,
+            train_preds, test_target, test_preds, total_spare)
 
     def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.

@@ -151,6 +151,35 @@ class TraceARIMA(StatisticalModel):
         return trace.get_spare_resource_in_window(
             self.get_target_variable(), train_thresh, test_thresh)
 
+    def get_available_resource_data(self, trace, tuning=True):
+        """A time series of the available resource for `trace`.
+
+        The time series is restricted to the evaluation interval specified
+        by `tuning`. If `tuning` is True then the model is being tuned so the
+        time series is restricted to the validation set. Otherwise, it is
+        restricted to the testing set.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` object from which the available resource numbers are
+            retrieved.
+        tuning: bool
+            A boolean value indicating whether or not the model is being
+            tuned.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing the amount of the resource available
+            for each time point in the evaluation window specified by `tuning`.
+
+        """
+        total_avail_ts = trace.get_target_availability_time_series(
+            self.get_target_variable())
+        _, avail_ts = self.split_data(total_avail_ts, tuning)
+        return avail_ts
+
     def get_model_data_for_trace(self, trace):
         """Retrieves the data for modeling from `trace`.
 
@@ -198,8 +227,9 @@ class TraceARIMA(StatisticalModel):
         total_spare = self.get_total_spare(trace, tuning)
         self._fit(train_ts)
         preds_train, preds_eval = self._get_predictions(len(eval_ts))
+        avail_ts = self.get_available_resource_data(trace, tuning)
         return ModelResults.from_data(
-            self.get_params(), train_ts, preds_train,
+            self.get_params(), avail_ts, train_ts, preds_train,
             eval_ts, preds_eval, total_spare)
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
@@ -229,7 +259,6 @@ class TraceARIMA(StatisticalModel):
         plotting.plot_train_and_test_predictions_on_axes(
             train_ts, preds_train, eval_ts, preds_eval,
             (ax1, ax2), self.get_plot_title())
-
 
     def _fit(self, train_data):
         """Fits the ARIMA model based on `train_data`.
