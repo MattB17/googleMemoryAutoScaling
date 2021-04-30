@@ -229,5 +229,6 @@ class TraceVARMA(StatisticalModel):
         None
 
         """
-        model = VARMAX(train_data, order=self.get_params())
+        varma_order = (self._p, self._q)
+        model = VARMAX(train_data, order=varma_order)
         self._model = model.fit(disp=False)

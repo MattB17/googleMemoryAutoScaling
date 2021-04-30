@@ -20,8 +20,9 @@ ARIMA_PARAMS = [arima_tup for arima_tup in product(ARIMA_p, ARIMA_d, ARIMA_q)
 
 
 def build_arima_models_for_traces(traces_lst, results_dict,
-                                  train_prop, max_mem):
+                                  train_prop, val_prop, max_mem):
     arima_params_lst = [{'train_prop': train_prop,
+                         'val_prop': val_prop,
                         'p': p, 'd': d, 'q': q,
                         'max_mem': max_mem}
                         for p, d, q in ARIMA_PARAMS]

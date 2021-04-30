@@ -96,7 +96,8 @@ class TraceVARMAX(MLBase):
         None
 
         """
-        model = VARMAX(train_target, train_features, order=self.get_params())
+        varmax_order = (self._p, self._q)
+        model = VARMAX(train_target, train_features, order=varmax_order)
         self._model = model.fit(disp=False)
         self._is_fit = True
 
