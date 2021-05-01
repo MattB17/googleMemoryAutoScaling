@@ -345,37 +345,28 @@ def impute_for_time_series(time_series, impute_val):
     return time_series
 
 
-def aggregate_availability_time_series(ts, agg_window):
-    """Aggregates the availability time series `ts` by `agg_window`.
-
-    The availability time series is aggregated by taking the starting value
-    at every `agg_window` time periods and assuming that availability amount
-    is constant for the aggregation window. That is, it is obtained by taking
-    the first value among every consecutive `agg_window` values.
+def calculate_max_alloc_mem(raw_trace_df):
+    """Calculatate the maximum allocated memory over the life of the trace.
 
     Parameters
     ----------
-    ts: np.array
-        A numpy array representing the availability time series.
-    agg_window: int
-        An integer representing the period of aggregation.
+    pd.DataFrame
+        A pandas DataFrame containing the data for the trace.
 
     Returns
     -------
-    np.array
-        A numpy array containing the aggregated availability numbers.
+    float
+        A float representing the maximum allocated memory over the life of
+        the trace.
 
     """
-    agg_ts = []
-    ts[np.isnan(ts)] = 0
-    intervals = len(ts) // agg_window
-    for idx in range(intervals):
-        interval_start = agg_window * idx
-        agg_ts.append(ts[interval_start])
-    return np.array(agg_ts)
+    alloc_ts = raw_trace_df[specs.TOTAL_MEM_COL].values
+    alloc_ts[np.isnan(alloc_ts)] = 0
+    alloc_ts[np.isinf(alloc_ts)] = 0
+    return np.max(alloc_ts)
 
 
-def build_trace_data_from_trace_df(raw_trace_df, agg_window):
+def build_trace_data_from_trace_df(raw_trace_df, agg_window, alloced_mem):
     """Builds data for a `Trace` object from `raw_trace_df`.
 
     The DataFrame containing the data for a `Trace` is built. This is done
@@ -388,6 +379,8 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window):
         A pandas DataFrame containing the raw data for the trace.
     agg_window: int
         An integer representing the aggregation period.
+    alloced_mem: float
+        A float representing the memory allocated for the trace.
 
     Returns
     -------
@@ -397,12 +390,13 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window):
 
     """
     trace_df = compute_memory_percentages_for_trace_df(
-        raw_trace_df, agg_window)
+        raw_trace_df, agg_window, alloced_mem)
     trace_df = trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
     return build_trace_aggregate_df(trace_df, agg_window)
 
 
-def compute_memory_percentages_for_trace_df(raw_trace_df, agg_window):
+def compute_memory_percentages_for_trace_df(raw_trace_df, agg_window,
+                                            alloced_mem):
     """Computes the memory percentages for `raw_trace_df`.
 
     The memory percentages are calculated by dividing the memory columns
@@ -413,6 +407,8 @@ def compute_memory_percentages_for_trace_df(raw_trace_df, agg_window):
     ----------
     raw_trace_df: pd.DataFrame
         The pandas DataFrame for which the memory percentages are computed.
+    alloced_mem: float
+        A float representing the memory allocated for the trace.
 
     Returns
     -------
@@ -421,13 +417,9 @@ def compute_memory_percentages_for_trace_df(raw_trace_df, agg_window):
         memory statistics to report percentages.
 
     """
-    agg_avail_mem = aggregate_availability_time_series(
-        raw_trace_df[specs.TOTAL_MEM_COL], agg_window)
-    agg_avail_mem = np.repeat(agg_avail_mem, agg_window)
-    raw_trace_df = raw_trace_df[:len(agg_avail_mem)]
     for mem_col in [specs.AVG_MEM_COL, specs.MAX_MEM_COL]:
         raw_trace_df[mem_col] = pd.Series(raw_trace_df[mem_col].divide(
-            agg_avail_mem).replace(np.inf, 0))
+            alloced_mem).replace(np.inf, 0))
     return raw_trace_df
 
 
@@ -477,14 +469,13 @@ def extract_time_series_from_trace(trace_data, series_name):
     return impute_for_time_series(data_trace, 0)
 
 
-def get_total_spare_during_window(available, used, win_start, win_end):
+def get_total_spare_during_window(allocated, used, win_start, win_end):
     """The total amount of spare resource during [`win_start`, `win_end`).
 
     Parameters
     ----------
-    available: np.array
-        A numpy array representing a time series of the amount of the resource
-        available at each time point.
+    allocated: float
+        A float representing the amount of the resource allocated.
     used: np.array
         A numpy array representing a time series of the amount of the resource
         used at each time point.
@@ -500,7 +491,7 @@ def get_total_spare_during_window(available, used, win_start, win_end):
         during the window defined by [`win_start`, `win_end`).
 
     """
-    spare_ts = available[win_start:win_end] - used[win_start:win_end]
+    spare_ts = allocated - used[win_start:win_end]
     return sum(spare_ts)
 
 
@@ -887,7 +878,7 @@ def process_model_results_df(model_results_df):
     return processed_df
 
 
-def calculate_harvest_stats(avail_ts, actual_ts, predicted_ts, buffer_pct):
+def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
     """Calculates the harvest statistics of predicted versus actual values.
 
     The harvest statistics are the proportion of spare resources harvested and
@@ -901,9 +892,9 @@ def calculate_harvest_stats(avail_ts, actual_ts, predicted_ts, buffer_pct):
 
     Parameters
     ----------
-    avail_ts: np.array
-        A numpy array containing the total available amount of the
-        resource available at each time period.
+    avail_val: float
+        A float representing the amount of the resource allocated to the
+        trace for its duration.
     actual_ts: np.array
         A numpy array of actual values for the trace, representing the
         percent of the available resource used at each time point.
@@ -923,13 +914,13 @@ def calculate_harvest_stats(avail_ts, actual_ts, predicted_ts, buffer_pct):
         harvested and the proportion of violations.
 
     """
-    actual_spare_pcts = 1.0 - actual_ts
-    buffered_pred_ts = np.minimum(predicted_ts * (1 + buffer_pct), 1.0)
-    predicted_spare_pcts = 1.0 - buffered_pred_ts
+    actual_spare_pcts = avail_val - actual_ts
+    buffered_pred_ts = np.minimum(predicted_ts * (1 + buffer_pct), avail_val)
+    predicted_spare_pcts = avail_val - buffered_pred_ts
     under_pred_indices = buffered_pred_ts < actual_ts
     predicted_spare_pcts[under_pred_indices] = 0
-    actual_spare = np.sum(actual_spare_pcts * avail_ts)
-    harvested_spare = np.sum(predicted_spare_pcts * avail_ts)
+    actual_spare = np.sum(actual_spare_pcts * avail_val)
+    harvested_spare = np.sum(predicted_spare_pcts * avail_val)
     prop_harvested = harvested_spare / actual_spare
     prop_violations = np.sum(under_pred_indices) / len(actual_ts)
     return prop_harvested, prop_violations

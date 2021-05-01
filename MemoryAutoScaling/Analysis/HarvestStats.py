@@ -32,14 +32,14 @@ class HarvestStats:
         self._prop_violations = prop_violations
 
     @classmethod
-    def from_predictions(cls, avail_ts, actuals, predicteds, buffer_pct):
+    def from_predictions(cls, avail_val, actuals, predicteds, buffer_pct):
         """Builds a `HarvestStats` object based on predictions.
 
         Parameters
         ----------
-        avail_ts: np.array
-            A numpy array containing the total available amount of the
-            resource available at each time period.
+        avail_val: float
+            A float representing the amount of the resource allocated to the
+            trace for its duration.
         actuals: np.array
             A numpy array of actual values for the trace, representing the
             percent of the available resource used at each time point.
@@ -49,9 +49,9 @@ class HarvestStats:
             time point.
         buffer_pct: float
             A non-negative float denoting the percentage of each prediction which
-            will act serve as a buffer for the predictions. So `(1 + buffer_pct)`
-            is multiplied by the prediction in each period to get the prediction
-            for that period.
+            will act serve as a buffer for the predictions. So
+            `(1 + buffer_pct)` is multiplied by the prediction in each period
+            to get the prediction for that period.
 
         Returns
         -------
@@ -62,7 +62,7 @@ class HarvestStats:
 
         """
         prop_harvested, prop_violations = utils.calculate_harvest_stats(
-            avail_ts, actuals, predicteds, buffer_pct)
+            avail_val, actuals, predicteds, buffer_pct)
         return cls(prop_harvested, prop_violations)
 
     @classmethod

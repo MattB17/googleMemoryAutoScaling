@@ -21,8 +21,8 @@ class Trace:
         The time at which the trace data ends
     ts_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
-    total_mem_ts: np.array
-        A numpy array recroding the total assigned memory for each time point.
+    mem_alloc: float
+        A float representing the amount of memory allocated to the machine.
     agg_window: int
         An integer representing the length of the aggregation window. That is,
         for every `agg_window` periods the trace data is aggregated.
@@ -37,22 +37,22 @@ class Trace:
         The time at which the trace data ends.
     _trace_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
-    _total_mem_ts: np.array
-        The total assigned memory for each time point.
-    _total_cpu_ts: np.array
-        The total assigned CPU units for each time point.
+    _mem_alloc: float
+        The amount of memory allocated to the machine.
+    _cpu_alloc: float
+        The amount of CPU units allocated to the machine.
     _agg_window: int
         The aggregation window for the trace.
 
     """
     def __init__(self, trace_id, start_time, end_time,
-                 ts_df, total_mem_ts, agg_window):
+                 ts_df, mem_alloc, agg_window):
         self._trace_id = trace_id
         self._start_time = start_time
         self._end_time = end_time
         self._trace_df = ts_df
-        self._total_mem_ts = total_mem_ts
-        self._total_cpu_ts = np.array([1.0 for _ in range(len(ts_df))])
+        self._mem_alloc = mem_alloc
+        self._cpu_alloc = 1.0
         self._agg_window = agg_window
         print("Trace {} created".format(trace_id))
 
@@ -76,11 +76,11 @@ class Trace:
         trace_id = int(trace_df[specs.TRACE_ID_COL].to_numpy()[0])
         start_time = int(trace_df[specs.START_INTERVAL_COL].to_numpy()[0])
         end_time = int(trace_df[specs.END_INTERVAL_COL].to_numpy()[-1])
-        total_mem_ts = utils.aggregate_availability_time_series(
-            trace_df[specs.TOTAL_MEM_COL].values, agg_window)
-        ts_df = utils.build_trace_data_from_trace_df(trace_df, agg_window)
+        alloc_mem = utils.calculate_max_alloc_mem(trace_df)
+        ts_df = utils.build_trace_data_from_trace_df(
+            trace_df, agg_window, alloc_mem)
         return cls(
-            trace_id, start_time, end_time, ts_df, total_mem_ts, agg_window)
+            trace_id, start_time, end_time, ts_df, alloc_mem, agg_window)
 
     def get_trace_id(self):
         """The ID of the trace.
@@ -163,8 +163,8 @@ class Trace:
 
         """
         return utils.get_total_spare_during_window(
-            self._total_mem_ts,
-            self._total_mem_ts * self.get_maximum_memory_time_series(),
+            self._mem_alloc,
+            self._mem_alloc * self.get_maximum_memory_time_series(),
             win_start, win_end)
 
     def get_maximum_cpu_time_series(self):
@@ -201,8 +201,8 @@ class Trace:
 
         """
         return utils.get_total_spare_during_window(
-            self._total_cpu_ts,
-            self._total_cpu_ts * self.get_maximum_cpu_time_series(),
+            self._cpu_alloc,
+            self._cpu_alloc * self.get_maximum_cpu_time_series(),
             win_start, win_end)
 
     def get_target_time_series(self, target_col):
@@ -224,7 +224,7 @@ class Trace:
             return self.get_maximum_memory_time_series()
         return self.get_maximum_cpu_time_series()
 
-    def get_target_availability_time_series(self, target_col):
+    def get_amount_allocated_for_target(self, target_col):
         """Retrieves the availability time series for `target_col`.
 
         Parameters
@@ -235,14 +235,14 @@ class Trace:
 
         Returns
         -------
-        np.array
-            A numpy array representing a time series of availability for
-            `target_col`.
+        float
+            A float representing the amount of resource allocated for
+            `target_col` for the trace.
 
         """
         if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
-            return self._total_mem_ts
-        return self._total_cpu_ts
+            return self._mem_alloc
+        return self._cpu_alloc
 
     def get_spare_resource_in_window(self, target_col, win_start, win_end):
         """The spare amount of `target_col` in [`win_start`, `win_end`].
