@@ -114,36 +114,29 @@ class TraceVARMA(StatisticalModel):
         model_data = model_data.reset_index(drop=True)
         return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
+    def get_allocated_resource_amount(self, trace):
+        """The amount of the target resource allocated for `trace`.
 
         Parameters
         ----------
         trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
+            The `Trace` object from which the resource number is retrieved.
 
         Returns
         -------
-        pd.DataFrame
-            A pandas DataFrame representing the amount of resource savailable
-            for each time point in the evaluation window specified by `tuning`,
-            for each target_variable.
+        dict
+            A dictionary representing the amount of the target resource
+            allocated to `trace` over its duration, for each target variable
+            of the model. The keys are strings representing the name of the
+            target variable and the value is the associated resource
+            allocation.
 
         """
-        total_avail_df = pd.DataFrame(
-            {model_var: trace.get_target_availability_time_series(model_var)
-             for model_var in self._model_vars})
-        _, avail_df = self.split_data(total_avail_df, tuning)
-        return avail_df
+        allocated_resources = {}
+        for model_var in self._model_vars:
+            alloc_amt = trace.get_amount_allocated_for_target(model_var)
+            allocated_resources[model_var] = alloc_amt
+        return allocated_resources
 
     def get_model_data_for_trace(self, trace):
         """Retrieves the multivariate data for modeling from `trace`.
@@ -214,9 +207,10 @@ class TraceVARMA(StatisticalModel):
         train_df, eval_df = self.split_data(trace_df, tuning)
         self._fit(train_df)
         preds_train, preds_eval = self._get_predictions(len(eval_df))
+        allocated_resources = self.get_allocated_resource_amount(trace)
         return parallel.get_multivariate_model_results(
-            self.get_params(), train_df, preds_train, eval_df,
-            preds_eval, self._model_vars)
+            self.get_params(), allocated_resources, train_df,
+            preds_train, eval_df, preds_eval)
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its prediction.

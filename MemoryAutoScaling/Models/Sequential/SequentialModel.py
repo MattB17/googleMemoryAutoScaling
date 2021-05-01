@@ -111,34 +111,23 @@ class SequentialModel(TraceModel):
         return trace.get_spare_resource_in_window(
             self.get_target_variable(), train_thresh, test_thresh)
 
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
+    def get_allocated_resource_amount(self, trace):
+        """The amount of the target resource allocated for `trace`.
 
         Parameters
         ----------
         trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
+            The `Trace` object from which the resource number is retrieved.
 
         Returns
         -------
-        np.array
-            A numpy array representing the amount of the resource available
-            for each time point in the evaluation window specified by `tuning`.
+        float
+            A float representing the amount of the target resource allocated
+            to `trace` over its duration.
 
         """
-        total_avail_ts = trace.get_target_availability_time_series(
+        return trace.get_amount_allocated_for_target(
             self.get_target_variable())
-        _, avail_ts = self.split_data(total_avail_ts, tuning)
-        return avail_ts
 
     def get_model_data_for_trace(self, trace):
         """Gets the data for modeling from `trace`.
@@ -209,9 +198,9 @@ class SequentialModel(TraceModel):
         y_train, y_test = self.split_data(trace_ts, tuning)
         total_spare = self.get_total_spare(trace, tuning)
         preds_train, preds_test = self._get_predictions(trace_ts, tuning)
-        avail_ts = self.get_available_resource_data(trace, tuning)
+        avail_val = self.get_allocated_resource_amount(trace)
         return ModelResults.from_data(
-            self.get_params(), avail_ts, y_train,
+            self.get_params(), avail_val, y_train,
             preds_train, y_test, preds_test, total_spare)
 
     def plot_trace_vs_prediction(self, trace, tuning=True):

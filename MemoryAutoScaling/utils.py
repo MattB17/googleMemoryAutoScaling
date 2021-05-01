@@ -914,13 +914,13 @@ def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
         harvested and the proportion of violations.
 
     """
-    actual_spare_pcts = avail_val - actual_ts
-    buffered_pred_ts = np.minimum(predicted_ts * (1 + buffer_pct), avail_val)
-    predicted_spare_pcts = avail_val - buffered_pred_ts
-    under_pred_indices = buffered_pred_ts < actual_ts
-    predicted_spare_pcts[under_pred_indices] = 0
-    actual_spare = np.sum(actual_spare_pcts * avail_val)
-    harvested_spare = np.sum(predicted_spare_pcts * avail_val)
-    prop_harvested = harvested_spare / actual_spare
-    prop_violations = np.sum(under_pred_indices) / len(actual_ts)
+    actuals = actual_ts * avail_val
+    predicteds = np.minimum(predicted_ts * avail_val * (1.0 + buffer_pct),
+                            avail_val)
+    actual_spare_ts = avail_val - actuals
+    predicted_spare_ts = avail_val - predicteds
+    under_pred_indices = predicteds < actuals
+    predicted_spare_ts[under_pred_indices] = 0.0
+    prop_harvested = np.sum(predicted_spare_ts) / np.sum(actual_spare_ts)
+    prop_violations = np.sum(under_pred_indices) / len(actuals)
     return prop_harvested, prop_violations

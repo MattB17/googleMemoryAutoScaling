@@ -59,24 +59,23 @@ class TraceModel(ABC):
         """
         pass
 
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
+    @abstractmethod
+    def get_allocated_resource_amount(self, trace):
+        """The amount of the target resource allocated for `trace`.
 
         Parameters
         ----------
         trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
+            The `Trace` object from which the resource number is retrieved.
+
+        Returns
+        -------
+        float
+            A float representing the amount of the target resource allocated
+            to `trace` over its duration.
 
         """
+    pass
 
     @abstractmethod
     def get_model_data_for_trace(self, trace):
