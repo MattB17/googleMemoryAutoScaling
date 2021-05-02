@@ -355,8 +355,8 @@ class Trace:
             periods indicated in `lags`.
 
         """
-        trace_df = self.get_trace_df()
         max_lag = max(lags)
+        trace_df = self.get_trace_df()
         target_data = trace_df[max_lag:]
         lagged_dfs = []
         for lag in lags:
