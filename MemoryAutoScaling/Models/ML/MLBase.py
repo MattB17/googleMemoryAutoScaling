@@ -103,27 +103,6 @@ class MLBase(TraceModel):
         """
         return self._data_handler.get_total_spare_for_target(trace, tuning)
 
-    @abstractmethod
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
-
-        """
-        pass
-
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
 
@@ -192,7 +171,7 @@ class MLBase(TraceModel):
         raw_data = self.get_model_data_for_trace(trace)
         X_train, y_train, X_eval, y_eval = self.split_data(raw_data, tuning)
         total_spare = self.get_total_spare(trace, tuning)
-        avail_data = self.get_available_resource_data(trace, tuning)
+        avail_data = self.get_allocated_resource_amount(trace)
         return self._run_model_pipeline(
             avail_data, X_train, y_train, X_eval, y_eval, total_spare)
 

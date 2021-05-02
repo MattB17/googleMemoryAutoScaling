@@ -57,35 +57,23 @@ class MLModel(MLBase):
         """
         return self._data_handler.get_target_variables()[0]
 
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
+    def get_allocated_resource_amount(self, trace):
+        """The amount of the target resource allocated for `trace`.
 
         Parameters
         ----------
         trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
+            The `Trace` object from which the resource number is retrieved.
 
         Returns
         -------
-        np.array
-            A numpy array representing the amount of the resource available
-            for each time point in the evaluation window specified by `tuning`.
+        float
+            A float representing the amount of the target resource allocated
+            to `trace` over its duration.
 
         """
-        total_avail_ts = trace.get_target_availability_time_series(
-            self.get_target_variable())[max(self._lags):]
-        _, avail_ts = self._data_handler.split_time_series_data(
-            total_avail_ts, tuning)
-        return avail_ts
+        return trace.get_amount_allocated_for_target(
+            self.get_target_variable())
 
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.

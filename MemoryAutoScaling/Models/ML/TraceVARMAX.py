@@ -66,38 +66,29 @@ class TraceVARMAX(MLBase):
         """
         return {'p': self._p, 'q': self._q}
 
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
+    def get_allocated_resource_amount(self, trace):
+        """The amount of the target resource allocated for `trace`.
 
         Parameters
         ----------
         trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
+            The `Trace` object from which the resource number is retrieved.
 
         Returns
         -------
-        pd.DataFrame
-            A pandas DataFrame representing the amount of resource savailable
-            for each time point in the evaluation window specified by `tuning`,
-            for each target_variable.
+        dict
+            A dictionary representing the amount of the target resource
+            allocated to `trace` over its duration, for each target variable
+            of the model. The keys are strings representing the name of the
+            target variable and the value is the associated resource
+            allocation.
 
         """
-        total_avail_df = pd.DataFrame(
-            {model_var: trace.get_target_availability_time_series(model_var)
-             for model_var in self._model_vars})
-        total_avail_df = total_avail_df[max(self._lags):]
-        _, avail_df = self._data_handler.split_time_series_data(
-            total_avail_df, tuning)
-        return avail_df
+        allocated_resources = {}
+        for model_var in self._model_vars:
+            alloc_amt = trace.get_amount_allocated_for_target(model_var)
+            allocated_resources[model_var] = alloc_amt
+        return allocated_resources
 
     def get_model_title(self):
         """A title describing the model.

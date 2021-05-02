@@ -95,35 +95,23 @@ class TraceARIMAX(MLBase):
         """
         return "{0}-{1}".format(self.get_params(), self._model_name)
 
-    def get_available_resource_data(self, trace, tuning=True):
-        """A time series of the available resource for `trace`.
-
-        The time series is restricted to the evaluation interval specified
-        by `tuning`. If `tuning` is True then the model is being tuned so the
-        time series is restricted to the validation set. Otherwise, it is
-        restricted to the testing set.
+    def get_allocated_resource_amount(self, trace):
+        """The amount of the target resource allocated for `trace`.
 
         Parameters
         ----------
         trace: Trace
-            The `Trace` object from which the available resource numbers are
-            retrieved.
-        tuning: bool
-            A boolean value indicating whether or not the model is being
-            tuned.
+            The `Trace` object from which the resource number is retrieved.
 
         Returns
         -------
-        np.array
-            A numpy array representing the amount of the resource available
-            for each time point in the evaluation window specified by `tuning`.
+        float
+            A float representing the amount of the target resource allocated
+            to `trace` over its duration.
 
         """
-        total_avail_ts = trace.get_target_availability_time_series(
-            self.get_target_variable())[max(self._lags):]
-        _, avail_ts = self._data_handler.split_time_series_data(
-            total_avail_ts, tuning)
-        return avail_ts
+        return trace.get_amount_allocated_for_target(
+            self.get_target_variable())
 
     def _fit(self, train_features, train_target):
         """Fits the model based on `train_features` and `train_target`.
