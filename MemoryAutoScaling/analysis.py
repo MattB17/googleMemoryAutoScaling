@@ -1680,3 +1680,26 @@ def get_prop_harvested_dict_for_models(model_results_dfs):
         prop_harvested_dict[model_name] = calculate_prop_harvested_for_model(
             model_results_dfs[model_name], model_name)
     return prop_harvested_dict
+
+
+def plot_prop_harvested_by_model(model_results_dfs):
+    """Plots the proportion harvested for each model.
+
+    `model_results_dfs` contains a DataFrame for each model recording the
+    model results for each trace for that model, after tuning the parameters
+    for each trace. The proportion of the resource harvested across all
+    traces is calculated for each model and plotted.
+
+    Parameters
+    ----------
+    model_results_dfs: dict
+        A dictionary of model results DataFrames
+
+    Returns
+    -------
+    None
+
+    """
+    prop_harvested_dict = get_prop_harvested_dict_for_models(
+        model_results_dfs)
+    plotting.plot_proportions_across_models(prop_harvested_dict, "harvested")

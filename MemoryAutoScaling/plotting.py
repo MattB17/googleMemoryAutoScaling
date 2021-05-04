@@ -264,8 +264,8 @@ def plot_proportions_across_models(model_props, prop_name):
     """
     model_names = model_props.keys()
     model_props = [model_props[model_name] for model_name in model_names]
-    plt.plot(model_props)
+    plt.scatter(range(len(model_names)), model_props)
     plt.xticks(range(len(model_names)), model_names)
-    plt.xlabel("Prop {}".format(prop_name))
+    plt.ylabel("Prop {}".format(prop_name))
     plt.title("Proportion {} Across Models".format(prop_name))
     plt.show()
