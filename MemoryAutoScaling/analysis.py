@@ -1039,6 +1039,50 @@ def run_best_models_for_all_traces(modeling_func, models_count, model_name):
         model_results, models_count, model_name, params['output_dir'])
 
 
+def get_univariate_model_results(traces, modeling_func, model_args,
+                                 models_count, model_name, output_dir):
+    """Models `traces` with the univariate model from `modeling_func`.
+
+    A series of models are run on each trace, and the best `models_count` of
+    these models for each trace are recorded. `modeling_func` is used to run
+    the models on a batch of traces and this function is parallelized to cover
+    all traces. The best models are then retrieved.
+
+    Parameters
+    ----------
+    traces: list
+        A list of `Trace` objects to be modeled.
+    modeling_func: function
+        The function used to perform the modelling on a batch of traces. The
+        function takes three arguments: a list of `Trace` objects on which the
+        models are run, a list to which results are saved, and a float
+        specifying the proportion of data in the training set.
+    model_args: tuple
+        A tuple containing the arguments used for `model_func`.
+    models_count: int
+        An integer representing the number of models to record. The results
+        for the `models_count` best models for each trace are recorded.
+    model_name: str
+        A string specifying the name of the model.
+    output_dir: str
+        A string specifying the directory to which the results will be output.
+
+    Returns
+    -------
+    None
+
+    Side Effect
+    -----------
+    The results of the modelling procedure is saved to a csv file containing
+    one row per trace. The file is output to a file named `<name>_results.csv`
+    where `<name>` is `model_name`.
+
+    """
+    model_results = parallel.perform_trace_modelling(
+        traces, modeling_func, model_args)
+    process_and_output_model_results(
+        model_results, models_count, model_name, output_dir)
+
 def run_best_multivariate_models_for_all_traces(modeling_func, models_count,
                                                 model_name, model_vars):
     """Models all traces using `modeling_func` with `model_name`.
