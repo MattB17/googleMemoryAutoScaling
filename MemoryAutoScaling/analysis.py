@@ -8,7 +8,7 @@ import pandas as pd
 import multiprocessing as mp
 from itertools import product
 from MemoryAutoScaling.Analysis import ModelResults, HarvestStats
-from MemoryAutoScaling import parallel, specs, utils
+from MemoryAutoScaling import parallel, plotting, specs, utils
 from MemoryAutoScaling.DataHandling import TraceHandler
 
 

@@ -243,3 +243,29 @@ def plot_multivariate_train_and_test_predictions(
             axes[idx, 1],
             "{0} Testing Set - {1}".format(base_title, model_var))
     plt.show()
+
+
+def plot_proportions_across_models(model_props, prop_name):
+    """Plots the proportions from `model_props` across all models.
+
+    Parameters
+    ----------
+    model_props: dict
+        A dictionary of proportions across models. The keys are strings
+        representing the names of models and the associated value is a float
+        representing the proportion to be plotted for that model.
+    prop_name: str
+        A string representing the name of the proportion being plotted.
+
+    Returns
+    -------
+    None
+
+    """
+    model_names = model_props.keys()
+    model_props = [model_props[model_name] for model_name in model_names]
+    plt.plot(model_props)
+    plt.xticks(range(len(model_names)), model_names)
+    plt.xlabel("Prop {}".format(prop_name))
+    plt.title("Proportion {} Across Models".format(prop_name))
+    plt.show()
