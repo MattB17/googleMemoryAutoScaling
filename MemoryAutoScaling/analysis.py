@@ -1673,7 +1673,8 @@ def get_test_results_from_val_results_list(trace_model, val_results_lst,
             trace_model, val_results, other_params, trace))
     return test_results_lst
 
-def calculate_prop_harvested_for_model(model_results_df, model_name):
+def calculate_prop_harvested_for_model(model_results_df,
+                                       model_name, buffer_pct):
     """The proportion harvested across all traces with `model_name`.
 
     Parameters
@@ -1683,6 +1684,8 @@ def calculate_prop_harvested_for_model(model_results_df, model_name):
     model_name: str
         A string representing the name of the model to which the results
         apply.
+    buffer_pct: float
+        A float representing the buffer percentage applied to predictions.
 
     Returns
     -------
@@ -1691,13 +1694,13 @@ def calculate_prop_harvested_for_model(model_results_df, model_name):
 
     """
     spare_col = 'total_spare_{}'.format(model_name)
-    harvest_col = 'prop_harvested_0.0_{}'.format(model_name)
+    harvest_col = 'prop_harvested_{0}_{1}'.format(buffer_pct, model_name)
     spare_vals = model_results_df[spare_col].fillna(0).values
     harvested_props = model_results_df[harvest_col].fillna(0).values
     return np.sum(spare_vals * harvested_props) / np.sum(spare_vals)
 
 
-def get_prop_harvested_dict_for_models(model_results_dfs):
+def get_prop_harvested_dict_for_models(model_results_dfs, buffer_pct):
     """The proportion harvested for each model in `model_results_dfs`.
 
     For each model results DataFrame in `model_results_dfs`, the proportion
@@ -1712,6 +1715,8 @@ def get_prop_harvested_dict_for_models(model_results_dfs):
         A dictionary of model results DataFrames where the keys are strings
         representing the model name and the corresponding value is a
         DataFrame containing the associated model results.
+    buffer_pct: float
+        A float representing the buffer percentage applied to predictions.
 
     Returns
     -------
@@ -1722,11 +1727,11 @@ def get_prop_harvested_dict_for_models(model_results_dfs):
     prop_harvested_dict = {}
     for model_name in model_results_dfs.keys():
         prop_harvested_dict[model_name] = calculate_prop_harvested_for_model(
-            model_results_dfs[model_name], model_name)
+            model_results_dfs[model_name], model_name, buffer_pct)
     return prop_harvested_dict
 
 
-def plot_prop_harvested_by_model(model_results_dfs):
+def plot_prop_harvested_by_model(model_results_dfs, buffer_pct):
     """Plots the proportion harvested for each model.
 
     `model_results_dfs` contains a DataFrame for each model recording the
@@ -1738,6 +1743,8 @@ def plot_prop_harvested_by_model(model_results_dfs):
     ----------
     model_results_dfs: dict
         A dictionary of model results DataFrames
+    buffer_pct: float
+        A float representing the buffer percentage applied to predictions.
 
     Returns
     -------
@@ -1745,5 +1752,5 @@ def plot_prop_harvested_by_model(model_results_dfs):
 
     """
     prop_harvested_dict = get_prop_harvested_dict_for_models(
-        model_results_dfs)
+        model_results_dfs, buffer_pct)
     plotting.plot_proportions_across_models(prop_harvested_dict, "harvested")
