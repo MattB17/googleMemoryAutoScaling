@@ -262,6 +262,7 @@ def plot_proportions_across_models(model_props, prop_name):
     None
 
     """
+    plt.figure(figsize=(20, 10))
     model_names = model_props.keys()
     model_props = [model_props[model_name] for model_name in model_names]
     plt.scatter(range(len(model_names)), model_props)

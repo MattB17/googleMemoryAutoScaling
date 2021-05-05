@@ -3,7 +3,7 @@ future time points for a time series.
 
 """
 from MemoryAutoScaling.Models.ML import MLModel
-from sklearn.svm import SVR
+from sklearn.svm import LinearSVR
 
 
 class TraceSVM(MLModel):
@@ -75,4 +75,4 @@ class TraceSVM(MLModel):
 
         """
         super()._initialize()
-        self._model = SVR(C=self._reg_val)
+        self._model = LinearSVR(C=self._reg_val, max_iter=10000)

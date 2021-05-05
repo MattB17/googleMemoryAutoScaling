@@ -3,7 +3,7 @@ predict future time points for a time series.
 
 """
 from MemoryAutoScaling.Models.ML import MLModel
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso, LinearRegression
 
 
 class TraceRegression(MLModel):
@@ -80,4 +80,7 @@ class TraceRegression(MLModel):
 
         """
         super()._initialize()
-        self._model = Ridge(alpha=self._reg_val)
+        if self._reg_val != 0:
+            self._model = Lasso(alpha=self._reg_val)
+        else:
+            self._model = LinearRegression()
