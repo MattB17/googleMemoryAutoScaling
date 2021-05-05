@@ -65,3 +65,51 @@ class TraceUsage:
             trace_df, specs.MAX_CPU_COL)
         avg_mem = trace_df[specs.AVG_MEM_COL].fillna(0).values()
         avg_cpu = trace_df[specs.AVG_CPU_COL].fillna(0).values()
+
+    def get_allocated_mem(self):
+        """The memory allocated to the trace for its duration.
+
+        Returns
+        -------
+        float
+            A float representing the memory allocated to the trace for
+            its duration.
+
+        """
+        return self._mem_alloc
+
+    def get_allocated_cpu(self):
+        """The CPU allocated to the trace for its duration.
+
+        Returns
+        -------
+        float
+            A float representing the CPU allocated to the trace for
+            its duration.
+
+        """
+        return self._cpu_alloc
+
+    def get_avg_mem_usage(self):
+        """A time series of average memory usage for the trace.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing a time series of average memory usage
+            for the trace.
+
+        """
+        return self._avg_mem_ts
+
+    def get_avg_cpu_usage(self):
+        """A time series of average CPU usage for the trace.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing a time series of average memory usage
+            for the trace.
+
+        """
+        return self._avg_cpu_ts
