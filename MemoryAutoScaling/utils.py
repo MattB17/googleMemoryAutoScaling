@@ -888,14 +888,14 @@ def process_model_results_df(model_results_df):
 def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
     """Calculates the harvest statistics of predicted versus actual values.
 
-    The harvest statistics are the proportion of spare resources harvested and
-    the proportion of violations. A violation occurs when the predicted value
+    The harvest statistics are the amount of spare resources harvested and
+    the number of violations. A violation occurs when the predicted value
     from `predicted_vals` multiplied by `1 + buffer_pct` is still less than
     the actual value. Otherwise, the resource is considered to be harvested
-    based on this predicted value. The proportion harvested is calculated as
-    the total percentage harvested based on these predictions divided by the
-    percentage harvested if we knew the actual values. The proportion of
-    violations is the proportion of time points that lead to violations.
+    based on this predicted value. The amount harvested is the difference
+    between `avail_val` and the predictions (after adding the buffer) summed
+    over all time points in which the predicted value is greater than or
+    equal to the actual value.
 
     Parameters
     ----------
@@ -916,21 +916,16 @@ def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
 
     Returns
     -------
-    float, float
-        Two floats representing the proportion of the spare resource that was
-        harvested and the proportion of violations.
+    float, int
+        A float representing the amount harvested and an integer representing
+        the number of violations.
 
     """
-    actuals = actual_ts * avail_val
-    predicteds = np.minimum(predicted_ts * avail_val * (1.0 + buffer_pct),
-                            avail_val)
-    actual_spare_ts = avail_val - actuals
+    predicteds = np.minimum(predicted_ts * (1.0 + buffer_pct), avail_val)
+    under_pred_indices = predicteds < actual_ts
     predicted_spare_ts = avail_val - predicteds
-    under_pred_indices = predicteds < actuals
     predicted_spare_ts[under_pred_indices] = 0.0
-    prop_harvested = np.sum(predicted_spare_ts) / np.sum(actual_spare_ts)
-    prop_violations = np.sum(under_pred_indices) / len(actuals)
-    return prop_harvested, prop_violations
+    return np.sum(predicted_spare_ts), np.sum(under_pred_indices)
 
 
 def calculate_utilization_percent(alloced_amt, usage_pct_ts):

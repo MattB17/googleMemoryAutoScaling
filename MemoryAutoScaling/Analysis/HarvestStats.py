@@ -32,38 +32,54 @@ class HarvestStats:
         self._prop_violations = prop_violations
 
     @classmethod
-    def from_predictions(cls, avail_val, actuals, predicteds, buffer_pct):
-        """Builds a `HarvestStats` object based on predictions.
+    def from_predictions(cls, trace, predictions, buffer_pct,
+                         target_col, pred_start, pred_end):
+        """Builds a `HarvestStats` object from the predictions for `trace`.
+
+        `predictions` are a set of predictions of the usage of `target_col`
+        of `trace`, based on the aggregation window defined by the trace.
+        The predictions are for the period [`pred_start`, `pred_end`]. A
+        buffer of `buffer_pct` is applied to each prediction so that the true
+        predictions are `1 + buffer_pct` multiplied by `predictions`
 
         Parameters
         ----------
-        avail_val: float
-            A float representing the amount of the resource allocated to the
-            trace for its duration.
-        actuals: np.array
-            A numpy array of actual values for the trace, representing the
-            percent of the available resource used at each time point.
-        predicteds: np.array
-            A numpy array of predicted values for the trace, representing the
-            percent of the available resource predicted to be used at each
-            time point.
+        trace: Trace
+            The `Trace` object for which the predictions were generated.
+        predictions: np.array
+            A numpy array representing the predictions for which the harvest
+            statistics are calculated.
         buffer_pct: float
-            A non-negative float denoting the percentage of each prediction which
-            will act serve as a buffer for the predictions. So
-            `(1 + buffer_pct)` is multiplied by the prediction in each period
-            to get the prediction for that period.
+            A float representing the percent buffer to apply to each
+            prediction. That is each prediction is scaled up by
+            `1 + buffer_pct`.
+        target_col: str
+            A string representing the target time series for which the
+            predictions were generated.
+        pred_start: int
+            An integer representing the index of the time series at which
+            the predictions start.
+        pred_end: int
+            An integer representing the index of the time series at which
+            the predictions end.
 
         Returns
         -------
         HarvestStats
             The `HarvestStats` object in which the proportion harvested and
-            the proportion of violations is calculated based on `actuals`,
-            `predicteds` and `buffer_pct`.
+            the proportion of violations is calculated based on the
+            predictions for `target_col` of `trace`.
 
         """
-        prop_harvested, prop_violations = utils.calculate_harvest_stats(
-            avail_val, actuals, predicteds, buffer_pct)
-        return cls(prop_harvested, prop_violations)
+        actuals = trace.get_target_time_series()[pred_start: pred_end]
+        allocated_amt = trace.get_amount_allocated_for_target(target_col)
+        harvest_amt, num_violations = utils.calculate_harvest_stats(
+            allocated_amt, actuals, predictions, buffer_pct)
+        total_spare = trace.get_spare_resource_in_window(
+            target_col, pred_start, pred_end)
+        harvest_amt *= trace.get_aggregation_window()
+        return cls(harvest_amt / total_spare,
+                   num_violations / len(predictions))
 
     @classmethod
     def build_null_harvest_stats(cls):
