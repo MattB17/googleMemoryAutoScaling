@@ -345,22 +345,25 @@ def impute_for_time_series(time_series, impute_val):
     return time_series
 
 
-def calculate_max_alloc_mem(raw_trace_df):
-    """Calculatate the maximum allocated memory over the life of the trace.
+def calculate_max_allocated(raw_trace_df, resource_col):
+    """Calculatate the maximum allocated amount over the life of the trace.
 
     Parameters
     ----------
-    pd.DataFrame
+    raw_trace_df: pd.DataFrame
         A pandas DataFrame containing the data for the trace.
+    resource_col: str
+        A string representing the name of the resource for which the maximum
+        allocated amount is being calculated.
 
     Returns
     -------
     float
-        A float representing the maximum allocated memory over the life of
-        the trace.
+        A float representing the maximum allocated amount of `resource_col`
+        over the life of the trace.
 
     """
-    alloc_ts = raw_trace_df[specs.TOTAL_MEM_COL].values
+    alloc_ts = raw_trace_df[resource_col].values
     alloc_ts[np.isnan(alloc_ts)] = 0
     alloc_ts[np.isinf(alloc_ts)] = 0
     return np.max(alloc_ts)
@@ -924,3 +927,31 @@ def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
     prop_harvested = np.sum(predicted_spare_ts) / np.sum(actual_spare_ts)
     prop_violations = np.sum(under_pred_indices) / len(actuals)
     return prop_harvested, prop_violations
+
+
+def calculate_utilization_percent(alloced_amt, usage_pct_ts):
+    """Calculates the percent utilization for a trace.
+
+    The percent utilization is the total amount used over the life of the
+    trace divided by the total amount allocated over the life of the trace.
+
+    Parameters
+    ----------
+    alloced_amt: float
+        A float representing the amount of the resource allocated to the
+        trace at any given time point.
+    usage_pct_ts: np.array
+        A numpy array representring the percent utilization at each time
+        point for the trace.
+
+    Returns
+    -------
+    float
+        A float representing the percent utilization over the life of the
+        trace.
+
+    """
+    usage_ts = alloced_amt * usage_pct_ts
+    used_amt = np.sum(usage_ts)
+    assigned_amt = alloced_amt * len(usage_ts)
+    return used_amt / assigned_amt

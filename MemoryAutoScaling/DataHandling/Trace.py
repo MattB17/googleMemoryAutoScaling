@@ -4,8 +4,7 @@ the Borg cluster.
 """
 import numpy as np
 import pandas as pd
-from MemoryAutoScaling import utils
-from MemoryAutoScaling import specs
+from MemoryAutoScaling import specs, utils
 
 
 class Trace:
