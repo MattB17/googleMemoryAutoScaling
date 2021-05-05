@@ -369,12 +369,14 @@ def calculate_max_allocated(raw_trace_df, resource_col):
     return np.max(alloc_ts)
 
 
-def build_trace_data_from_trace_df(raw_trace_df, agg_window, alloced_mem):
+def build_trace_data_from_trace_df(raw_trace_df, agg_window, trace_usage):
     """Builds data for a `Trace` object from `raw_trace_df`.
 
     The DataFrame containing the data for a `Trace` is built. This is done
     by first replacing NaN values with 0 and then computing the aggregated
-    statistics for `raw_trace_df` based on `agg_window`.
+    statistics for `raw_trace_df` based on `agg_window`. The aggregated
+    quantities are reported as percentages based on the raw usage data from
+    `trace_usage`
 
     Parameters
     ----------
@@ -382,8 +384,8 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window, alloced_mem):
         A pandas DataFrame containing the raw data for the trace.
     agg_window: int
         An integer representing the aggregation period.
-    alloced_mem: float
-        A float representing the memory allocated for the trace.
+    trace_usage: TraceUsage
+        A `TraceUsage` object containing the usage data for the trace.
 
     Returns
     -------
@@ -392,37 +394,39 @@ def build_trace_data_from_trace_df(raw_trace_df, agg_window, alloced_mem):
         and aggregating data according to `agg_window`.
 
     """
-    trace_df = compute_memory_percentages_for_trace_df(
-        raw_trace_df, agg_window, alloced_mem)
+    trace_df = compute_usage_percents_for_trace(raw_trace_df, trace_usage)
     trace_df = trace_df[specs.RAW_TIME_SERIES_COLS].fillna(0)
     return build_trace_aggregate_df(trace_df, agg_window)
 
 
-def compute_memory_percentages_for_trace_df(raw_trace_df, agg_window,
-                                            alloced_mem):
-    """Computes the memory percentages for `raw_trace_df`.
+def compute_usage_percents_for_trace(raw_trace_df, trace_usage):
+    """Computes the usage percentages for `raw_trace_df`.
 
-    The memory percentages are calculated by dividing the memory columns
-    by the assigned memory, after aggregative the assigned memory according
-    to `agg_window`.
+    The usage percentages are calculated by dividing the resource usage
+    columns by the assigned resource amount. The resources of interest are
+    memory and CPU. The usage statistics consist of average and maximum usage
+    of each resource.
 
     Parameters
     ----------
     raw_trace_df: pd.DataFrame
         The pandas DataFrame for which the memory percentages are computed.
-    alloced_mem: float
-        A float representing the memory allocated for the trace.
+    trace_usage: TraceUsage
+        A `TraceUsage` object containing the usage data for the trace.
 
     Returns
     -------
     pd.DataFrame
         A pandas DataFrame obtained from `raw_trace_df` after modifying the
-        memory statistics to report percentages.
+        resource usage statistics to report percentages.
 
     """
     for mem_col in [specs.AVG_MEM_COL, specs.MAX_MEM_COL]:
         raw_trace_df[mem_col] = pd.Series(raw_trace_df[mem_col].divide(
-            alloced_mem).replace(np.inf, 0))
+            trace_usage.get_allocated_mem()).replace(np.inf, 0))
+    for cpu_col in [specs.AVG_CPU_COL, specs.MAX_CPU_COL]:
+        raw_trace_df[cpu_col] = pd.Series(raw_trace_df[cpu_col].divide(
+            trace_usage.get_allocated_cpu()).replace(np.inf, 0))
     return raw_trace_df
 
 

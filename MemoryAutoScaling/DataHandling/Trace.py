@@ -5,6 +5,7 @@ the Borg cluster.
 import numpy as np
 import pandas as pd
 from MemoryAutoScaling import specs, utils
+from MemoryAutoScaling.DataHandling.TraceUsage import TraceUsage
 
 
 class Trace:
@@ -158,10 +159,7 @@ class Trace:
             A float representing the total spare memory for the window.
 
         """
-        return utils.get_total_spare_during_window(
-            self._mem_alloc,
-            self._mem_alloc * self.get_maximum_memory_time_series(),
-            win_start, win_end)
+        return self._trace_usage.get_spare_mem_in_window(win_start, win_end)
 
     def get_maximum_cpu_time_series(self):
         """The maximum CPU usage time series for the trace.
@@ -196,10 +194,7 @@ class Trace:
             A float representing the total spare CPU units for the window.
 
         """
-        return utils.get_total_spare_during_window(
-            self._cpu_alloc,
-            self._cpu_alloc * self.get_maximum_cpu_time_series(),
-            win_start, win_end)
+        return self._trace_usage.get_spare_cpu_in_window(win_start, win_end)
 
     def get_target_time_series(self, target_col):
         """Retrieves the time series based on `target_col`.
@@ -237,8 +232,8 @@ class Trace:
 
         """
         if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
-            return self._mem_alloc
-        return self._cpu_alloc
+            return self._trace_usage.get_allocated_mem()
+        return self._trace_usage.get_allocated_cpu()
 
     def get_spare_resource_in_window(self, target_col, win_start, win_end):
         """The spare amount of `target_col` in [`win_start`, `win_end`].
@@ -265,10 +260,8 @@ class Trace:
             the window.
 
         """
-        if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
-            return self.get_spare_memory_in_window(win_start, win_end)
-        return self.get_spare_cpu_in_window(win_start, win_end)
-
+        return self._trace_usage.get_spare_resource_in_window(
+            target_col, win_start, win_end)
 
     def get_number_of_observations(self):
         """The number of observations of the trace.
