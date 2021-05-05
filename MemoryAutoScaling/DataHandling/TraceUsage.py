@@ -113,3 +113,90 @@ class TraceUsage:
 
         """
         return self._avg_cpu_ts
+
+    def get_spare_mem_in_window(self, win_start, win_end):
+        """The spare amount of memory in [`win_start`, `win_end`].
+
+        The spare amount of memory at a time point is the difference between
+        the amount of memory assigned to the machine and the amount taken by
+        the trace at that time point. The spare amount of memory in the window
+        is the sum of the spare amount at each time point in
+        [`win_start`, `win_end`].
+
+        Parameters
+        ----------
+        win_start: int
+            An integer representing the start index of the window.
+        win_end: int
+            An integer representing the end index of the window.
+
+
+        Returns
+        -------
+        float
+            A float representing the total amount of spare memory on the
+            machine in the window, after accounting for the memory consumed
+            by the trace.
+
+        """
+        return utils.get_total_spare_during_window(
+            self._mem_alloc, self._avg_mem_ts, win_start, win_end)
+
+    def get_spare_cpu_in_window(self, win_start, win_end):
+        """The spare amount of CPU in [`win_start`, `win_end`].
+
+        The spare amount of CPU at a time point is the difference between
+        the amount of CPU assigned to the machine and the amount taken by
+        the trace at that time point. The spare amount of CPU in the window is
+        the sum of the spare amount at each time point in
+        [`win_start`, `win_end`].
+
+        Parameters
+        ----------
+        win_start: int
+            An integer representing the start index of the window.
+        win_end: int
+            An integer representing the end index of the window.
+
+
+        Returns
+        -------
+        float
+            A float representing the total amount of spare CPU on the
+            machine in the window, after accounting for the memory consumed
+            by the trace.
+
+        """
+        return utils.get_total_spare_during_window(
+            self._cpu_alloc, self._avg_cpu_ts, win_start, win_end)
+
+    def get_spare_resource_in_window(self, target_col, win_start, win_end):
+        """The total spare amount of `target_col` in [`win_start`, `win_end`].
+
+        The spare amount of the resource at a time point is the difference
+        between the amount of CPU assigned to the machine and the amount
+        taken by the trace at that time point. The total amount of spare is
+        the sum of the spare amount at each time point in
+        [`win_start`, `win_end`].
+
+        Parameters
+        ----------
+        target_col: str
+            A string identifying the resource of interest, either memory or
+            CPU units.
+        win_start: int
+            An integer representing the start index of the window.
+        win_end: int
+            An integer representing the end index of the window.
+
+        Returns
+        -------
+        float
+            A float representing the total amount of spare CPU on the
+            machine in the window, after accounting for the memory consumed
+            by the trace.
+
+        """
+        if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self.get_spare_mem_in_window(win_start, win_end)
+        return self.get_spare_cpu_in_window(win_start, win_end)

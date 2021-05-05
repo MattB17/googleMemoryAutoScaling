@@ -494,7 +494,7 @@ def get_total_spare_during_window(allocated, used, win_start, win_end):
         during the window defined by [`win_start`, `win_end`).
 
     """
-    spare_ts = allocated - used[win_start:win_end]
+    spare_ts = np.maximum(allocated - used[win_start:win_end], 0.0)
     return sum(spare_ts)
 
 

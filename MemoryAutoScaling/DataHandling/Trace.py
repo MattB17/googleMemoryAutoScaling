@@ -20,8 +20,8 @@ class Trace:
         The time at which the trace data ends
     ts_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
-    mem_alloc: float
-        A float representing the amount of memory allocated to the machine.
+    trace_usage: TraceUsage
+        A `TraceUsage` object representing usage information for the trace.
     agg_window: int
         An integer representing the length of the aggregation window. That is,
         for every `agg_window` periods the trace data is aggregated.
@@ -36,22 +36,19 @@ class Trace:
         The time at which the trace data ends.
     _trace_df: pd.DataFrame
         A pandas DataFrame containing the time series data for the trace.
-    _mem_alloc: float
-        The amount of memory allocated to the machine.
-    _cpu_alloc: float
-        The amount of CPU units allocated to the machine.
+    _trace_usage: TraceUsage
+        The usage information for the trace.
     _agg_window: int
         The aggregation window for the trace.
 
     """
     def __init__(self, trace_id, start_time, end_time,
-                 ts_df, mem_alloc, agg_window):
+                 ts_df, trace_usage, agg_window):
         self._trace_id = trace_id
         self._start_time = start_time
         self._end_time = end_time
         self._trace_df = ts_df
-        self._mem_alloc = mem_alloc
-        self._cpu_alloc = 1.0
+        self._trace_usage = trace_usage
         self._agg_window = agg_window
         print("Trace {} created".format(trace_id))
 
@@ -75,11 +72,11 @@ class Trace:
         trace_id = int(trace_df[specs.TRACE_ID_COL].to_numpy()[0])
         start_time = int(trace_df[specs.START_INTERVAL_COL].to_numpy()[0])
         end_time = int(trace_df[specs.END_INTERVAL_COL].to_numpy()[-1])
-        alloc_mem = utils.calculate_max_alloc_mem(trace_df)
+        trace_usage = TraceUsage.from_trace_df(trace_df)
         ts_df = utils.build_trace_data_from_trace_df(
-            trace_df, agg_window, alloc_mem)
+            trace_df, agg_window, trace_usage)
         return cls(
-            trace_id, start_time, end_time, ts_df, alloc_mem, agg_window)
+            trace_id, start_time, end_time, ts_df, trace_usage, agg_window)
 
     def get_trace_id(self):
         """The ID of the trace.
