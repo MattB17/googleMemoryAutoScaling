@@ -66,30 +66,6 @@ class TraceVARMAX(MLBase):
         """
         return {'p': self._p, 'q': self._q}
 
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        dict
-            A dictionary representing the amount of the target resource
-            allocated to `trace` over its duration, for each target variable
-            of the model. The keys are strings representing the name of the
-            target variable and the value is the associated resource
-            allocation.
-
-        """
-        allocated_resources = {}
-        for model_var in self._model_vars:
-            alloc_amt = trace.get_amount_allocated_for_target(model_var)
-            allocated_resources[model_var] = alloc_amt
-        return allocated_resources
-
     def get_model_title(self):
         """A title describing the model.
 
@@ -167,46 +143,43 @@ class TraceVARMAX(MLBase):
         train_cutoff = len(train_features)
         return preds[:train_cutoff], preds[train_cutoff:]
 
-    def _run_model_pipeline(self, avail_data, X_train, train_target,
-                            X_test, test_target, total_spare):
+    def _run_model_pipeline(self, X_train, train_target,
+                            X_test, test_target, trace):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `X_train` and
         `train_target`. Predictions are made on `X_test` and these
-        predictions are compared to `test_target` using the mean absolute
-        scaled error.
+        predictions are compared to `test_target` using the mean squared
+        error.
 
         Parameters
         ----------
         X_train: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
-        train_target: pd.DataFrame
-            A pandas DataFrame representing the target variable for the
+        train_target: pd.Series
+            A pandas Series representing the target variable for the
             training set.
         X_test: pd.DataFrame
             A pandas Dataframe representing the features for the testing set.
         test_target: pd.Series
-            A pandas DataFrame representing the target variable for the
-            testing set.
-        total_spare: float
-            A float representing the total spare amount of the target variable
-            over the test period.
+            A pandas Series representing the target variable for the testing
+            set.
+        trace: Trace
+            The `Trace` on which the model pipeline is being run.
 
         Returns
         -------
-        dict
-            A dictionary of model results. The keys are strings representing
-            the modeled variables and the corresponding value is a
-            `ModelResults` object representing the results for that variable.
+        ModelResults
+            A `ModelResults` object containing the results of building the
+            model on `trace`.
 
         """
         self._fit(X_train, train_target)
         train_preds, test_preds = self._get_train_and_test_predictions(
             X_train, X_test)
         return parallel.get_multivariate_model_results(
-            self.get_params(), avail_data, train_target, train_preds,
-            test_target, test_preds, total_spare,
-            self._data_handler.get_target_variables())
+            self.get_params(), train_target, train_preds, test_target,
+            test_preds, trace, self._data_handler.get_target_variables())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.

@@ -95,24 +95,6 @@ class TraceARIMAX(MLBase):
         """
         return "{0}-{1}".format(self.get_params(), self._model_name)
 
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        float
-            A float representing the amount of the target resource allocated
-            to `trace` over its duration.
-
-        """
-        return trace.get_amount_allocated_for_target(
-            self.get_target_variable())
-
     def _fit(self, train_features, train_target):
         """Fits the model based on `train_features` and `train_target`.
 
@@ -181,20 +163,17 @@ class TraceARIMAX(MLBase):
         train_cutoff = len(train_features)
         return preds[:train_cutoff], preds[train_cutoff:]
 
-    def _run_model_pipeline(self, avail_data, X_train, train_target,
-                            X_test, test_target, total_spare):
+    def _run_model_pipeline(self, X_train, train_target,
+                            X_test, test_target, trace):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `X_train` and
         `train_target`. Predictions are made on `X_test` and these
-        predictions are compared to `test_target` using the mean absolute
-        scaled error.
+        predictions are compared to `test_target` using the mean squared
+        error.
 
         Parameters
         ----------
-        avail_data: np.array
-            A numpy array representing a time series of the availability of
-            the target resource.
         X_train: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
         train_target: pd.Series
@@ -205,9 +184,8 @@ class TraceARIMAX(MLBase):
         test_target: pd.Series
             A pandas Series representing the target variable for the testing
             set.
-        total_spare: float
-            A float representing the total spare amount of the target variable
-            over the test period.
+        trace: Trace
+            The `Trace` on which the model pipeline is being run.
 
         Returns
         -------
@@ -220,8 +198,8 @@ class TraceARIMAX(MLBase):
         train_preds, test_preds = self._get_train_and_test_predictions(
             X_train, X_test)
         return ModelResults.from_data(
-            self.get_params(), avail_data, train_target, train_preds,
-            test_target, test_preds, total_spare)
+            self.get_params(), train_target, train_preds, test_target,
+            test_preds, trace, self.get_target_variable())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.

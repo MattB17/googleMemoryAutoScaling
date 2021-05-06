@@ -170,10 +170,8 @@ class MLBase(TraceModel):
         """
         raw_data = self.get_model_data_for_trace(trace)
         X_train, y_train, X_eval, y_eval = self.split_data(raw_data, tuning)
-        total_spare = self.get_total_spare(trace, tuning)
-        avail_data = self.get_allocated_resource_amount(trace)
         return self._run_model_pipeline(
-            avail_data, X_train, y_train, X_eval, y_eval, total_spare)
+            X_train, y_train, X_eval, y_eval, trace)
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.

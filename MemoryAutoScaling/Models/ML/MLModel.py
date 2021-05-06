@@ -57,24 +57,6 @@ class MLModel(MLBase):
         """
         return self._data_handler.get_target_variables()[0]
 
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        float
-            A float representing the amount of the target resource allocated
-            to `trace` over its duration.
-
-        """
-        return trace.get_amount_allocated_for_target(
-            self.get_target_variable())
-
     def get_model_data_for_trace(self, trace):
         """Preprocesses `trace` to retrieve the data used for modelling.
 
@@ -172,8 +154,8 @@ class MLModel(MLBase):
         test_preds = self._get_predictions(test_features)
         return train_preds, test_preds
 
-    def _run_model_pipeline(self, avail_data, X_train, train_target,
-                            X_test, test_target, total_spare):
+    def _run_model_pipeline(self, X_train, train_target,
+                            X_test, test_target, trace):
         """Runs the model pipeline on the training and testing data.
 
         The model is instantiated and then fit on `X_train` and
@@ -183,9 +165,6 @@ class MLModel(MLBase):
 
         Parameters
         ----------
-        avail_data: np.array
-            A numpy array representing a time series of the availability of
-            the target resource.
         X_train: pd.DataFrame
             A pandas DataFrame representing the features for the training set.
         train_target: pd.Series
@@ -196,9 +175,8 @@ class MLModel(MLBase):
         test_target: pd.Series
             A pandas Series representing the target variable for the testing
             set.
-        total_spare: float
-            A float representing the total spare amount of the target variable
-            over the test period.
+        trace: Trace
+            The `Trace` on which the model pipeline is being run.
 
         Returns
         -------
@@ -212,8 +190,8 @@ class MLModel(MLBase):
         train_preds, test_preds = self._get_train_and_test_predictions(
             X_train, X_test)
         return ModelResults.from_data(
-            self.get_params(), avail_data, train_target,
-            train_preds, test_target, test_preds, total_spare)
+            self.get_params(), train_target, train_preds, test_target,
+            test_preds, trace, self.get_target_variable())
 
     def _plot_trace_data_vs_predictions(self, trace_df, title, tuning=True):
         """Plots the target time series of `trace_df` vs its model prediction.
