@@ -921,8 +921,10 @@ def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
         the number of violations.
 
     """
-    predicteds = np.minimum(predicted_ts * (1.0 + buffer_pct), avail_val)
-    under_pred_indices = predicteds < actual_ts
+    actuals = avail_val * actual_ts
+    predicteds = np.minimum(predicted_ts * avail_val * (1.0 + buffer_pct),
+                            avail_val)
+    under_pred_indices = predicteds < actuals
     predicted_spare_ts = avail_val - predicteds
     predicted_spare_ts[under_pred_indices] = 0.0
     return np.sum(predicted_spare_ts), np.sum(under_pred_indices)

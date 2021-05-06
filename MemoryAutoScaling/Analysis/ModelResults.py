@@ -41,8 +41,8 @@ class ModelResults:
         self._harvest_stats_dict = harvest_stats_dict
 
     @classmethod
-    def from_data(cls, model_params, avail_val, y_train,
-                  train_preds, y_test, test_preds, total_spare):
+    def from_data(cls, model_params, y_train, train_preds,
+                  y_test, test_preds, trace, target_col):
         """Builds a `ModelResults` object from training and testing data.
 
         Parameters
@@ -51,9 +51,6 @@ class ModelResults:
             A dictionary containing the model parameters. The keys are strings
             representing the name of the parameter and the corresponding value
             is the associated parameter.
-        avail_val: float
-            A float representing the amount of the resource allocated to the
-            trace throughout its duration.
         y_train: np.array
             A numpy array representing actual trace values of the target
             variable for the training set.
@@ -66,9 +63,10 @@ class ModelResults:
         test_preds: np.array
             A numpy array representing model predictions for the trace on the
             testing set.
-        total_spare: float
-            A float representing the total amount of spare resource available
-            for the testing period.
+        trace: Trace
+            The `Trace` to which the model results apply.
+        target_col: str
+            A string representing the target variable being predicted.
 
         Returns
         -------
@@ -78,11 +76,15 @@ class ModelResults:
         """
         train_preds, test_preds = utils.cap_train_and_test_predictions(
             train_preds, test_preds)
+        start = len(train_preds)
+        end = pred_start + len(test_preds)
+        total_spare = trace.get_spare_resource_in_window(
+            target_col, start, end)
         results_dict = utils.calculate_evaluation_metrics(
             y_train, train_preds, y_test, test_preds, total_spare)
         harvest_stats_dict = {
             buffer_pct: HarvestStats.from_predictions(
-                avail_val, y_test, test_preds, buffer_pct)
+                trace, test_preds, buffer_pct, target_col, start, end)
             for buffer_pct in specs.BUFFER_PCTS}
         return cls(model_params, results_dict, harvest_stats_dict)
 
