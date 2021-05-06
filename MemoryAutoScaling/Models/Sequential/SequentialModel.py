@@ -111,24 +111,6 @@ class SequentialModel(TraceModel):
         return trace.get_spare_resource_in_window(
             self.get_target_variable(), train_thresh, test_thresh)
 
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        float
-            A float representing the amount of the target resource allocated
-            to `trace` over its duration.
-
-        """
-        return trace.get_amount_allocated_for_target(
-            self.get_target_variable())
-
     def get_model_data_for_trace(self, trace):
         """Gets the data for modeling from `trace`.
 
@@ -198,10 +180,9 @@ class SequentialModel(TraceModel):
         y_train, y_test = self.split_data(trace_ts, tuning)
         total_spare = self.get_total_spare(trace, tuning)
         preds_train, preds_test = self._get_predictions(trace_ts, tuning)
-        avail_val = self.get_allocated_resource_amount(trace)
         return ModelResults.from_data(
-            self.get_params(), avail_val, y_train,
-            preds_train, y_test, preds_test, total_spare)
+            self.get_params(), y_train, preds_train, y_test,
+            preds_test, trace, self.get_target_variable())
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its predictions.

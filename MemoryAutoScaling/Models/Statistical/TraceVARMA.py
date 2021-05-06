@@ -183,10 +183,9 @@ class TraceVARMA(StatisticalModel):
         train_df, eval_df = self.split_data(trace_df, tuning)
         self._fit(train_df)
         preds_train, preds_eval = self._get_predictions(len(eval_df))
-        allocated_resources = self.get_allocated_resource_amount(trace)
         return parallel.get_multivariate_model_results(
-            self.get_params(), allocated_resources, train_df,
-            preds_train, eval_df, preds_eval)
+            self.get_params(), train_df, preds_train, eval_df,
+            preds_eval, trace, self._model_vars)
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its prediction.
