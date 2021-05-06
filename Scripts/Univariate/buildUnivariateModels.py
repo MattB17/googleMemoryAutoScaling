@@ -46,7 +46,7 @@ def build_es_models_for_traces(trace_lst, results_dict,
         results_dict, specs.MODELS_COUNT, fixed_model_params)
 
 
-AR_PARAMS = [1, 2, 3, 4, 5, 7, 10]
+AR_COMPS = [1, 2, 3, 4, 5, 7, 10]
 
 
 def build_ar_models_for_traces(trace_lst, results_dict, train_prop,
@@ -54,7 +54,7 @@ def build_ar_models_for_traces(trace_lst, results_dict, train_prop,
     fixed_model_params = {'train_prop': train_prop,
                           'val_prop': val_prop,
                           'max_mem': max_mem}
-    ar_params_lst = [{'p': p, **fixed_model_params} for p in AR_PARAMS]
+    ar_params_lst = [{'p': p, **fixed_model_params} for p in AR_COMPS]
     analysis.get_best_model_results_for_traces(
         TraceAR, ar_params_lst, trace_lst,
         results_dict, specs.MODELS_COUNT, fixed_model_params)

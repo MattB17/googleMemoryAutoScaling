@@ -71,7 +71,7 @@ class HarvestStats:
             predictions for `target_col` of `trace`.
 
         """
-        actuals = trace.get_target_time_series()[pred_start: pred_end]
+        actuals = trace.get_target_time_series(target_col)[pred_start:pred_end]
         allocated_amt = trace.get_amount_allocated_for_target(target_col)
         harvest_amt, num_violations = utils.calculate_harvest_stats(
             allocated_amt, actuals, predictions, buffer_pct)

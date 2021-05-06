@@ -565,10 +565,7 @@ def update_model_results_for_trace(trace, model, model_results, cutoff):
         modeling `trace` with `model`.
 
     """
-    try:
-        return handle_results_for_model(trace, model, model_results, cutoff)
-    except:
-        return model_results
+    return handle_results_for_model(trace, model, model_results, cutoff)
 
 def update_multivariate_model_results_for_trace(trace, model,
                                                 model_results, cutoff):

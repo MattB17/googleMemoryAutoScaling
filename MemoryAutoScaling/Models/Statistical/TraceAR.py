@@ -181,7 +181,6 @@ class TraceAR(StatisticalModel):
         """
         trace_ts = self.get_model_data_for_trace(trace)
         train_ts, eval_ts = self.split_data(trace_ts, tuning)
-        total_spare = self.get_total_spare(trace, tuning)
         self._fit(train_ts)
         preds_train, preds_eval = self._get_predictions(len(eval_ts))
         return ModelResults.from_data(
