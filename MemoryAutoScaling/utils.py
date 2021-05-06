@@ -930,20 +930,21 @@ def calculate_harvest_stats(avail_val, actual_ts, predicted_ts, buffer_pct):
     return np.sum(predicted_spare_ts), np.sum(under_pred_indices)
 
 
-def calculate_utilization_percent(alloced_amt, usage_pct_ts):
+def calculate_utilization_percent(alloced_amt, usage_ts):
     """Calculates the percent utilization for a trace.
 
     The percent utilization is the total amount used over the life of the
-    trace divided by the total amount allocated over the life of the trace.
+    trace, `usage_ts`, divided by the total amount allocated, `alloced_amt`,
+    over the life of the trace.
 
     Parameters
     ----------
     alloced_amt: float
         A float representing the amount of the resource allocated to the
         trace at any given time point.
-    usage_pct_ts: np.array
-        A numpy array representring the percent utilization at each time
-        point for the trace.
+    usage_ts: np.array
+        A numpy array representring the absolute value of utilization at each
+        time point for the trace.
 
     Returns
     -------
@@ -952,7 +953,5 @@ def calculate_utilization_percent(alloced_amt, usage_pct_ts):
         trace.
 
     """
-    usage_ts = alloced_amt * usage_pct_ts
-    used_amt = np.sum(usage_ts)
-    assigned_amt = alloced_amt * len(usage_ts)
-    return used_amt / assigned_amt
+    utilization_rates = usage_ts / alloced_amt
+    return min(np.mean(utilization_rates), 1.0)

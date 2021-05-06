@@ -201,3 +201,62 @@ class TraceUsage:
         if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
             return self.get_spare_mem_in_window(win_start, win_end)
         return self.get_spare_cpu_in_window(win_start, win_end)
+
+    def get_mem_utilization(self):
+        """The memory utilization for the trace.
+
+        The memory utilization for a time point is the average memory
+        usage for that time point divided by the memory allocated in
+        that period. The total memory utilization is the average memory
+        utilization over all time points.
+
+        Returns
+        -------
+        float
+            A float representing total memory utilization for the trace.
+
+        """
+        return utils.calculate_utilization_percent(
+            self._mem_alloc, self._avg_mem_ts)
+
+    def get_cpu_utilization(self):
+        """The CPU utilization for the trace.
+
+        The CPU utilization for a time point is the average CPU usage
+        for that time point divided by the CPU units allocated in that
+        period. The total CPU utilization is the average CPU utilization
+        over all time points.
+
+        Returns
+        -------
+        float
+            A float representing total memory utilization for the trace.
+
+        """
+        return utils.calculate_utilization_percent(
+            self._cpu_alloc, self._avg_cpu_ts)
+
+    def get_resource_utilization(self, resource_col):
+        """The utilization of `resource_col` for the trace.
+
+        The resource utilization for a time point is the average usage of
+        `resource_col` for that time point divided by the resource units
+        allocated in that period. The total resource utilization is the
+        average resource utilization over all time points.
+
+        Parameters
+        ----------
+        resource_col: str
+            A string identifying the resource for which the utilization is
+            calculated, either memory or CPU.
+
+        Returns
+        -------
+        float
+            A float representing the utilization rate of `resource_col` for
+            the trace.
+
+        """
+        if resource_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self.get_mem_utilization()
+        return self.get_cpu_utilization()

@@ -138,29 +138,6 @@ class Trace:
         max_mem_col = "{}_ts".format(specs.MAX_MEM_COL)
         return self._trace_df[max_mem_col].values
 
-    def get_spare_memory_in_window(self, win_start, win_end):
-        """The spare memory in the interval from [`win_start`, `win_end`).
-
-        The spare memory at a particular time point is the difference between
-        the assigned memory and the used memory for that time point. The spare
-        for the window is the sum of these values at each point in the window,
-        excluding `win_end`.
-
-        Parameters
-        ----------
-        win_start: int
-            An integer representing the start index for the window.
-        win_end: int
-            An integer representing the end index for the window.
-
-        Returns
-        -------
-        float
-            A float representing the total spare memory for the window.
-
-        """
-        return self._trace_usage.get_spare_mem_in_window(win_start, win_end)
-
     def get_maximum_cpu_time_series(self):
         """The maximum CPU usage time series for the trace.
 
@@ -172,29 +149,6 @@ class Trace:
         """
         max_cpu_col = "{}_ts".format(specs.MAX_CPU_COL)
         return self._trace_df[max_cpu_col].values
-
-    def get_spare_cpu_in_window(self, win_start, win_end):
-        """The spare CPU units in the interval from [`win_start`, `win_end`).
-
-        The spare CPU units at a particular time point is the difference
-        between the assigned CPU and the used CPU for that time point. The
-        spare for the window is the sum of these values at each point in the
-        window, excluding `win_end`.
-
-        Parameters
-        ----------
-        win_start: int
-            An integer representing the start index for the window.
-        win_end: int
-            An integer representing the end index for the window.
-
-        Returns
-        -------
-        float
-            A float representing the total spare CPU units for the window.
-
-        """
-        return self._trace_usage.get_spare_cpu_in_window(win_start, win_end)
 
     def get_target_time_series(self, target_col):
         """Retrieves the time series based on `target_col`.
@@ -262,6 +216,29 @@ class Trace:
         """
         return self._trace_usage.get_spare_resource_in_window(
             target_col, win_start, win_end)
+
+    def get_resource_utilization(self, target_col):
+        """The utilization of `target_col` for the trace.
+
+        The resource utilization for a time point is the average usage of
+        `target_col` for that time point divided by the resource units
+        allocated in that period. The total resource utilization is the
+        average resource utilization over all time points.
+
+        Parameters
+        ----------
+        target_col: str
+            A string identifying the resource for which the utilization is
+            calculated, either memory or CPU.
+
+        Returns
+        -------
+        float
+            A float representing the utilization rate of `resource_col` for
+            the trace.
+
+        """
+        return self._trace_usage.get_resource_utilization(target_col)
 
     def get_number_of_observations(self):
         """The number of observations of the trace.
