@@ -137,24 +137,6 @@ class TraceAR(StatisticalModel):
         return trace.get_spare_resource_in_window(
             self.get_target_variable(), train_thresh, test_thresh)
 
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        float
-            A float representing the amount of the target resource allocated
-            to `trace` over its duration.
-
-        """
-        return trace.get_amount_allocated_for_target(
-            self.get_target_variable())
-
     def get_model_data_for_trace(self, trace):
         """Retrieves the data for modeling from `trace`.
 
@@ -202,10 +184,9 @@ class TraceAR(StatisticalModel):
         total_spare = self.get_total_spare(trace, tuning)
         self._fit(train_ts)
         preds_train, preds_eval = self._get_predictions(len(eval_ts))
-        avail_val = self.get_allocated_resource_amount(trace)
         return ModelResults.from_data(
-            self.get_params(), avail_val, train_ts, preds_train,
-            eval_ts, preds_eval, total_spare)
+            self.get_params(), train_ts, preds_train, eval_ts,
+            preds_eval, trace, self.get_target_variable())
 
     def plot_trace_vs_prediction(self, trace, tuning=True):
         """Creates a plot of `trace` vs its prediction.

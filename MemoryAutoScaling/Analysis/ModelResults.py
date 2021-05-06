@@ -77,11 +77,10 @@ class ModelResults:
         train_preds, test_preds = utils.cap_train_and_test_predictions(
             train_preds, test_preds)
         start = len(train_preds)
-        end = pred_start + len(test_preds)
-        total_spare = trace.get_spare_resource_in_window(
-            target_col, start, end)
+        end = start + len(test_preds)
         results_dict = utils.calculate_evaluation_metrics(
-            y_train, train_preds, y_test, test_preds, total_spare)
+            y_train, train_preds, y_test, test_preds,
+            trace.get_spare_resource_in_window(target_col, start, end))
         harvest_stats_dict = {
             buffer_pct: HarvestStats.from_predictions(
                 trace, test_preds, buffer_pct, target_col, start, end)

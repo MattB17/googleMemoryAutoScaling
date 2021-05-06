@@ -60,24 +60,6 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        float
-            A float representing the amount of the target resource allocated
-            to `trace` over its duration.
-
-        """
-    pass
-
-    @abstractmethod
     def get_model_data_for_trace(self, trace):
         """Gets the data for modeling from `trace`.
 

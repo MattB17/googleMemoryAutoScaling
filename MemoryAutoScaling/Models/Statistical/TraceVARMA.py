@@ -114,30 +114,6 @@ class TraceVARMA(StatisticalModel):
         model_data = model_data.reset_index(drop=True)
         return model_data[:train_thresh], model_data[train_thresh:test_thresh]
 
-    def get_allocated_resource_amount(self, trace):
-        """The amount of the target resource allocated for `trace`.
-
-        Parameters
-        ----------
-        trace: Trace
-            The `Trace` object from which the resource number is retrieved.
-
-        Returns
-        -------
-        dict
-            A dictionary representing the amount of the target resource
-            allocated to `trace` over its duration, for each target variable
-            of the model. The keys are strings representing the name of the
-            target variable and the value is the associated resource
-            allocation.
-
-        """
-        allocated_resources = {}
-        for model_var in self._model_vars:
-            alloc_amt = trace.get_amount_allocated_for_target(model_var)
-            allocated_resources[model_var] = alloc_amt
-        return allocated_resources
-
     def get_model_data_for_trace(self, trace):
         """Retrieves the multivariate data for modeling from `trace`.
 
