@@ -215,7 +215,7 @@ class Trace:
 
         """
         return self._trace_usage.get_spare_resource_in_window(
-            target_col, win_start, win_end)
+            target_col, win_start, win_end, self._agg_window)
 
     def get_resource_utilization(self, target_col):
         """The utilization of `target_col` for the trace.

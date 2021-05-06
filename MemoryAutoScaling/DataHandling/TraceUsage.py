@@ -115,7 +115,7 @@ class TraceUsage:
         """
         return self._avg_cpu_ts
 
-    def get_spare_mem_in_window(self, win_start, win_end):
+    def get_spare_mem_in_window(self, win_start, win_end, agg_window):
         """The spare amount of memory in [`win_start`, `win_end`].
 
         The spare amount of memory at a time point is the difference between
@@ -130,6 +130,8 @@ class TraceUsage:
             An integer representing the start index of the window.
         win_end: int
             An integer representing the end index of the window.
+        agg_window: int
+            The aggregation period for the trace
 
 
         Returns
@@ -141,7 +143,7 @@ class TraceUsage:
 
         """
         return utils.get_total_spare_during_window(
-            self._mem_alloc, self._avg_mem_ts, win_start, win_end)
+            self._mem_alloc, self._avg_mem_ts, win_start, win_end, agg_window)
 
     def get_spare_cpu_in_window(self, win_start, win_end):
         """The spare amount of CPU in [`win_start`, `win_end`].
@@ -158,6 +160,8 @@ class TraceUsage:
             An integer representing the start index of the window.
         win_end: int
             An integer representing the end index of the window.
+        agg_window: int
+            The aggregation period for the trace
 
 
         Returns
@@ -169,9 +173,10 @@ class TraceUsage:
 
         """
         return utils.get_total_spare_during_window(
-            self._cpu_alloc, self._avg_cpu_ts, win_start, win_end)
+            self._cpu_alloc, self._avg_cpu_ts, win_start, win_end, agg_window)
 
-    def get_spare_resource_in_window(self, target_col, win_start, win_end):
+    def get_spare_resource_in_window(self, target_col, win_start,
+                                     win_end, agg_window):
         """The total spare amount of `target_col` in [`win_start`, `win_end`].
 
         The spare amount of the resource at a time point is the difference
@@ -189,6 +194,8 @@ class TraceUsage:
             An integer representing the start index of the window.
         win_end: int
             An integer representing the end index of the window.
+        agg_window: int
+            The aggregation period for the trace
 
         Returns
         -------
@@ -199,8 +206,8 @@ class TraceUsage:
 
         """
         if target_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
-            return self.get_spare_mem_in_window(win_start, win_end)
-        return self.get_spare_cpu_in_window(win_start, win_end)
+            return self.get_spare_mem_in_window(win_start, win_end, agg_window)
+        return self.get_spare_cpu_in_window(win_start, win_end, agg_window)
 
     def get_mem_utilization(self):
         """The memory utilization for the trace.

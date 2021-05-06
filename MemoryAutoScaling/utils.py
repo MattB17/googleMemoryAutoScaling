@@ -476,7 +476,8 @@ def extract_time_series_from_trace(trace_data, series_name):
     return impute_for_time_series(data_trace, 0)
 
 
-def get_total_spare_during_window(allocated, used, win_start, win_end):
+def get_total_spare_during_window(allocated, used, win_start,
+                                  win_end, agg_window):
     """The total amount of spare resource during [`win_start`, `win_end`).
 
     Parameters
@@ -490,6 +491,8 @@ def get_total_spare_during_window(allocated, used, win_start, win_end):
         An integer representing the start index for the window of interest.
     win_end: int
         An integer representing the end index for the window of interest.
+    agg_window: int
+        The aggregation period applied to the data.
 
     Returns
     -------
@@ -498,6 +501,8 @@ def get_total_spare_during_window(allocated, used, win_start, win_end):
         during the window defined by [`win_start`, `win_end`).
 
     """
+    win_start *= agg_window
+    win_end *= agg_window
     spare_ts = np.maximum(allocated - used[win_start:win_end], 0.0)
     return sum(spare_ts)
 
