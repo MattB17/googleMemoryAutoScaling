@@ -240,6 +240,22 @@ class Trace:
         """
         return self._trace_usage.get_resource_utilization(target_col)
 
+    def get_total_allocated_resource(self, target_col):
+        """The total allocated amount of `resource_col` for the trace.
+
+        The total amount of `resource_col` allocated to the trace is the sum
+        of the amount of `resource_col` allocated to the trace at each time
+        point.
+
+        Returns
+        -------
+        float
+            A float representing the total amount of `resource_col` allocated
+            to the trace.
+
+        """
+        return self._trace_usage.get_total_allocated_resource(target_col)
+
     def get_number_of_observations(self):
         """The number of observations of the trace.
 

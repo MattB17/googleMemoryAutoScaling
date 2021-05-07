@@ -267,3 +267,51 @@ class TraceUsage:
         if resource_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
             return self.get_mem_utilization()
         return self.get_cpu_utilization()
+
+    def get_total_allocated_mem(self):
+        """The total memory allocated to the trace.
+
+        The total memory allocated to the trace is the sum of the memory
+        allocated to the trace at each time point.
+
+        Returns
+        -------
+        float
+            A float representing the total amount of memory allocated to the
+            trace.
+
+        """
+        return self._mem_alloc * len(self._avg_mem_ts)
+
+    def get_total_allocated_cpu(self):
+        """The total CPU units allocated to the trace.
+
+        The total amount of CPU allocated to the trace is the sum of the CPU
+        units allocated to the trace at each time point.
+
+        Returns
+        -------
+        float
+            A float representing the total amount of CPU units allocated to
+            the trace.
+
+        """
+        return self._cpu_alloc * len(self._avg_cpu_ts)
+
+    def get_total_allocated_resource(self, resource_col):
+        """The total allocated amount of `resource_col` for the trace.
+
+        The total amount of `resource_col` allocated to the trace is the sum
+        of the amount of `resource_col` allocated to the trace at each time
+        point.
+
+        Returns
+        -------
+        float
+            A float representing the total amount of `resource_col` allocated
+            to the trace.
+
+        """
+        if resource_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self.get_total_allocated_mem()
+        return self.get_total_allocated_cpu()
