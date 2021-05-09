@@ -19,7 +19,7 @@ def get_cdf_values(dist_vals):
         distribution function, respectively.
 
     """
-    dist_vals[np.isnan(dist_vals)] = 0
+    dist_vals[np.isnan(dist_vals)] = 0.0
     x_vals = np.sort(dist_vals)
     pdf = x_vals / np.sum(x_vals)
     cdf = np.cumsum(pdf)
