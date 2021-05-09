@@ -20,10 +20,12 @@ def get_cdf_values(dist_vals):
 
     """
     dist_vals[np.isnan(dist_vals)] = 0.0
+    val_count = len(dist_vals)
     x_vals = np.sort(dist_vals)
-    pdf = x_vals / np.sum(x_vals)
-    cdf = np.cumsum(pdf)
-    return x_vals, cdf
+    cdf = []
+    for i in x_vals:
+        cdf.append(len(dist_vals[dist_vals <= i]) / val_count)
+    return x_vals, np.array(cdf)
 
 
 def plot_cumulative_distribution_function(dist_vals, ax, title, color, desc):

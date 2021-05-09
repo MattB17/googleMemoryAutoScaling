@@ -1415,9 +1415,9 @@ def get_percentiles_df_for_model_results(model_results_dict,
     results_lst = []
     for model_name in model_names_lst:
         col_name = "{0}_{1}".format(analysis_col, model_name)
-        results_lst.append(list(np.percentile(
-            model_results_dict[model_name][col_name].values,
-            [1, 25, 50, 75, 99])))
+        x, _ = plotting.get_cdf_values(
+            model_results_dict[model_name][col_name].values)
+        results_lst.append(list(np.percentile(x, [1, 25, 50, 75, 99])))
     return pd.DataFrame(results_lst, index=model_names_lst,
                         columns=["P1", "P25", "Median", "P75", "P99"])
 
