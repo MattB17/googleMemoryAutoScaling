@@ -1573,6 +1573,58 @@ def get_stationary_results_df(stats_dfs):
     return df
 
 
+def get_total_utilization_across_traces(stat_df):
+    """Gets total utilization across the traces in `stat_df`.
+
+    Parameters
+    ----------
+    stat_df: pd.DataFrame
+        A pandas DataFrame containing the utilization statistics for the
+        traces.
+
+    Returns
+    -------
+    str
+        A string representing the percent utilization across all traces in
+        `stat_df`, rounded to 2 decimal places.
+
+    """
+    utilization_vals = utils.impute_for_time_series(
+        stat_df['utilization'].values, 0.0)
+    allocated_vals = utils.impute_for_time_series(
+        stat_df['allocated'].values, 0.0)
+    numerator = np.sum(utilization_vals * allocated_vals)
+    denominator = np.sum(allocated_vals)
+    return "{}%".format(round(100 * (numerator / denominator), 2))
+
+
+def get_total_utilization_df(stats_dfs):
+    """A dataframe of total utilization rates from `stats_dfs`.
+
+    Parameters
+    ----------
+    stats_dfs: dict
+        A dictionary of pandas DataFrames from which the stationary results
+        are calculated.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the total utilization rate for each
+        DataFrame in `stats_dfs`.
+
+    """
+    results_lst = []
+    indices = []
+    for stats_name in stats_dfs.keys():
+        indices.append(" ".join(stats_name.split("_")).title())
+        results_lst.append(
+            get_total_utilization_across_traces(stats_dfs[stats_name]))
+    df = pd.DataFrame({"Total Utilization": results_lst})
+    df.index = indices
+    return df
+
+
 def build_model_from_model_results(model, model_results, other_params):
     """Builds a `model` object from `model_results` and `other_params`.
 
