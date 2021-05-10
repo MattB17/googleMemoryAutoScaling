@@ -145,7 +145,7 @@ class TraceUsage:
         return utils.get_total_spare_during_window(
             self._mem_alloc, self._avg_mem_ts, win_start, win_end, agg_window)
 
-    def get_spare_cpu_in_window(self, win_start, win_end):
+    def get_spare_cpu_in_window(self, win_start, win_end, agg_window):
         """The spare amount of CPU in [`win_start`, `win_end`].
 
         The spare amount of CPU at a time point is the difference between

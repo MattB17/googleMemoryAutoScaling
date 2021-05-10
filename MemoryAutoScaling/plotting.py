@@ -3,6 +3,7 @@
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import statsmodels.tsa.api as smt
 
 def get_cdf_values(dist_vals):
     """Computes the cumulative distribution function values for `dist_vals`.
