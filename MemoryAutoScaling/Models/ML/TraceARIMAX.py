@@ -121,6 +121,30 @@ class TraceARIMAX(MLBase):
         self._model = model.fit(disp=False)
         self._is_fit = True
 
+    def fit_and_get_test_predictions(self, trace, tuning=True):
+        """Fits the model and gets test predictions for `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
+
+        Returns
+        -------
+        np.array, np.array
+            A numpy array representing the actual values and predictions for
+            the testing set of `trace`.
+
+        """
+        trace_df = self.get_model_data_for_trace(trace)
+        X_train, y_train, X_test, y_test = self.split_data(trace_df, tuning)
+        self._fit(X_train, y_train)
+        _, test_preds = self._get_train_and_test_predictions(X_train, X_test)
+        return y_test, test_preds
+
     def _get_predictions(self, test_features):
         """Retrieves model predictions for `test_features`.
 

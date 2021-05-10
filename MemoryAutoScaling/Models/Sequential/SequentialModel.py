@@ -149,7 +149,30 @@ class SequentialModel(TraceModel):
 
         """
         trace_ts = self.get_model_data_for_trace(trace)
-        return self._get_predictions(trace_ts, tuning)
+        _, y_test = self.split_data(trace_ts, tuning)
+        return y_test, self._get_predictions(trace_ts, tuning)
+
+    def fit_and_get_test_predictions(self, trace, tuning=True):
+        """Fits the model and gets test predictions for `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
+
+        Returns
+        -------
+        np.array, np.array
+            A numpy array representing the actual values and predictions for
+            the testing set of `trace`.
+
+        """
+        trace_ts = self.get_model_data_for_trace(trace)
+        _, test_preds = self._get_predictions(trace_ts, tuning)
+        return test_preds
 
     def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
@@ -178,7 +201,6 @@ class SequentialModel(TraceModel):
         """
         trace_ts = self.get_model_data_for_trace(trace)
         y_train, y_test = self.split_data(trace_ts, tuning)
-        total_spare = self.get_total_spare(trace, tuning)
         preds_train, preds_test = self._get_predictions(trace_ts, tuning)
         return ModelResults.from_data(
             self.get_params(), y_train, preds_train, y_test,

@@ -99,6 +99,27 @@ class TraceModel(ABC):
         pass
 
     @abstractmethod
+    def fit_and_get_test_predictions(self, trace, tuning=True):
+        """Fits the model and gets test predictions for `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
+
+        Returns
+        -------
+        np.array, np.array
+            A numpy array representing the actual values and predictions for
+            the testing set of `trace`.
+
+        """
+        pass
+
+    @abstractmethod
     def run_model_pipeline_for_trace(self, trace, tuning=True):
         """Runs the full modeling pipeline on `trace`.
 

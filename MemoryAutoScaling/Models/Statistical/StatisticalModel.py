@@ -57,6 +57,30 @@ class StatisticalModel(TraceModel):
         _, eval_data = self.split_data(trace_data, tuning)
         return self._get_predictions(len(eval_data))
 
+    def fit_and_get_test_predictions(self, trace, tuning=True):
+        """Fits the model and gets test predictions for `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which predictions are retrieved.
+        tuning: bool
+            A boolean value indicating whether the model is being tuned on
+            the validation set or evaluated on the test set.
+
+        Returns
+        -------
+        np.array, np.array
+            A numpy array representing the actual values and predictions for
+            the testing set of `trace`.
+
+        """
+        trace_data = self.get_model_data_for_trace(trace)
+        train_data, eval_data = self.split_data(trace_data, tuning)
+        self._fit(train_data)
+        _, eval_preds = self._get_predictions(len(eval_data))
+        return eval_data, eval_preds
+
     def get_plot_title(self, trace):
         """Gets the plot title based on `trace`.
 
