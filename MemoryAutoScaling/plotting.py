@@ -265,6 +265,7 @@ def plot_proportions_across_models(model_props, prop_name):
     None
 
     """
+    print(model_props)
     plt.figure(figsize=(10, 8))
     model_names = model_props.keys()
     model_props = [model_props[model_name] for model_name in model_names]
