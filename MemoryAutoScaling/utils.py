@@ -28,8 +28,7 @@ def cap_predictions_at_1(predicted_vals):
         predictions have been capped at 1.
 
     """
-    return np.array([min(1.0, predicted_val) for predicted_val
-                     in list(predicted_vals)])
+    return np.minimum(predicted_vals, 1.0)
 
 
 def cap_train_and_test_predictions(train_preds, test_preds):
