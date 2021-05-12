@@ -21,9 +21,10 @@ Scripts
 The :code:`Scripts` folder contains python scripts to run models on traces or provide statistical summaries. There are 3 types of scripts:
 
 * :code:`Multivariate` for running multivariate models
+
   * The multivariate scripts can be run from the command line and take 6 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, and an integer representing the number of consecutive periods to aggregate for the modeling
   * For example, the following runs the VARMA models on all traces stored in csv files starting with :code:`task_usage_df` in :code:`<input_dir>`, the traces must have a minimum length of :code:`12`, are aggregated every :code:`3` time periods, with :code:`70%` of data in the training set, and the results are output to :code:`<output_dir>`
-
+  
     * :code:`python Scripts/Multivariate/buildVARMAModels.py <input_dir> <output_dir> task_usage_df 12 0.7 3`
 
 * :code:`Univariate` for running univariate models
