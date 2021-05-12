@@ -6,8 +6,8 @@
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = source
-BUILDDIR      = ../../memory_auto_scaling_docs/html
-PDFBUILDDIR   = /tmp
+BUILDDIR      = ../../memory_auto_scaling_docs
+PDFBUILDDIR   = source
 PDF           = ../manual.pdf
 
 # Put it first so that "make" without argument is like "make help".
@@ -22,8 +22,11 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 latexpdf:
-	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(PDFBUILDDIR)/latex
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(PDFBUILDDIR) $(PDF)
 	@echo "Running LaTeX files through pdflatex..."
-	make -C $(PDFBUILDDIR)/latex all-pdf
-	cp $(PDFBUILDDIR)/latex/*.pdf $(PDF)
+	make -C $(PDFBUILDDIR) all-pdf
+	cp $(PDFBUILDDIR)*.pdf $(PDF)
 	@eco "pdflatex finished; see $(PDF)"
+
+buildandcommit: html
+	cd $(BUILDDIR)/html; git add -A; git commit -m "Rebuilt docs"; git push origin gh-pages
