@@ -1,0 +1,437 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Abstract Sequential Model &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>Abstract Sequential Model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/Models/Sequential/sequential_model.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-MemoryAutoScaling.Models.Sequential.SequentialModel">
+<span id="abstract-sequential-model"></span><h1>Abstract Sequential Model<a class="headerlink" href="#module-MemoryAutoScaling.Models.Sequential.SequentialModel" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>SequentialModel</cite> class is an abstract base class used for all trace
+models that predict sequentially. That is, these models use previous values
+to predict the current value but do not store any state.</p>
+<dl class="py class">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.Models.Sequential.</span></code><code class="sig-name descname"><span class="pre">SequentialModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the functionality of a sequential trace model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>initial_pred: float</strong></dt><dd><p>A float representing the initial prediction for the model. This
+initial prediction is used until there is enough data available for
+the trace to make a prediction from trace data.</p>
+</dd>
+<dt><strong>train_prop: float</strong></dt><dd><p>A float in the range [0, 1] representing the proportion of
+observations in the training set. The default value is 0.6.</p>
+</dd>
+<dt><strong>val_prop: float</strong></dt><dd><p>A float in the range [0, 1] representing the proportion of data in
+the validation set. The default value is 0.2.</p>
+</dd>
+<dt><strong>max_mem: bool</strong></dt><dd><p>A boolean indicating if the target value is maximum memory. The
+default value is True, indicating that maximum memory usage is
+the target variable. Otherwise, maximum CPU usage is used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>_initial_pred: float</strong></dt><dd><p>The initial prediction for the model.</p>
+</dd>
+<dt><strong>_train_prop: float</strong></dt><dd><p>Represents the percent of data in the training set.</p>
+</dd>
+<dt><strong>_val_prop: float</strong></dt><dd><p>The proportion of data in the validation set.</p>
+</dd>
+<dt><strong>_max_mem: bool</strong></dt><dd><p>A boolean indicating the target variable. True indicates that maximum
+memory usage is the target variable. Otherwise, maximum CPU usage is
+used as the target.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.fit_and_get_test_predictions">
+<code class="sig-name descname"><span class="pre">fit_and_get_test_predictions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.fit_and_get_test_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.fit_and_get_test_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits the model and gets test predictions for <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> for which predictions are retrieved.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the model is being tuned on
+the validation set or evaluated on the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array, np.array</dt><dd><p>A numpy array representing the actual values and predictions for
+the testing set of <cite>trace</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.get_model_data_for_trace">
+<code class="sig-name descname"><span class="pre">get_model_data_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.get_model_data_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.get_model_data_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the data for modeling from <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> being modeled.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing the time series of maximum memory
+usage of the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.get_predictions_for_trace">
+<code class="sig-name descname"><span class="pre">get_predictions_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.get_predictions_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.get_predictions_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets predictions for the training and testing set for <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> for which predictions are retrieved.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the predictions are for the
+validation set or the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array, np.array</dt><dd><p>Two numpy arrays representing the predictions for the training and
+testing sets on <cite>trace</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.get_target_variable">
+<code class="sig-name descname"><span class="pre">get_target_variable</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.get_target_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.get_target_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>The target variable for the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>str</dt><dd><p>A string indicating the target variable for the model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.get_total_spare">
+<code class="sig-name descname"><span class="pre">get_total_spare</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.get_total_spare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.get_total_spare" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spare amount of the target for <cite>trace</cite> over the test window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> for which the spare is calculated.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the spare is being calculated
+to tune the model or evaluate the model on the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total spare amount of the target
+variable for <cite>trace</cite> over the test window.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.plot_trace_vs_prediction">
+<code class="sig-name descname"><span class="pre">plot_trace_vs_prediction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.plot_trace_vs_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.plot_trace_vs_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a plot of <cite>trace</cite> vs its predictions.</p>
+<p>The plot is arranged into two subplots. The first contains the maximum
+memory usage for the trace versus its prediction for the training set.
+The second plot is the same but for the testing set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> being plotted.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the predictions are for the
+validation set or the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.run_model_pipeline_for_trace">
+<code class="sig-name descname"><span class="pre">run_model_pipeline_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.run_model_pipeline_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.run_model_pipeline_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the full modeling pipeline on <cite>trace</cite>.</p>
+<p>The modeling pipeline first obtains the data needed for modeling
+from <cite>trace</cite>. Next it splits this data into the training and testing
+sets. It then fits the model and obtains predictions. Lastly, these
+predictions are evaluated using MASE on the training and testing sets.
+The number of under predictions and the magnitude of the maximum under
+prediction for the test set are also calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> being modeled.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the model is being tuned on
+the validation set or evaluated on the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>ModelResults</dt><dd><p>A <cite>ModelResults</cite> object containing the results of building the
+model on <cite>trace</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.SequentialModel.split_data">
+<code class="sig-name descname"><span class="pre">split_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/SequentialModel.html#SequentialModel.split_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.SequentialModel.split_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits <cite>model_data</cite> into the training and testing set.</p>
+<p>If <cite>tuning</cite> is True, <cite>model_data</cite> is split into training and
+validation sets. Otherwise, it is split into training + validation
+and testing sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_data: pandas.Object</strong></dt><dd><p>A pandas Object (Series or DataFrame) containing the data used to
+build the trace model.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the split is for tuning.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pandas.Object, pandas.Object</dt><dd><p>The two pandas objects obtained from <cite>model_data</cite> after applying
+the train-test split.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

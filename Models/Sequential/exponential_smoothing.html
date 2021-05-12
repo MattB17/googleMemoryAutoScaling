@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Exponential Smoothing &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>Exponential Smoothing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/Models/Sequential/exponential_smoothing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing">
+<span id="exponential-smoothing"></span><h1>Exponential Smoothing<a class="headerlink" href="#module-MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>TraceExponentialSmoothing</cite> class is used to construct a predictive
+model based on exponential smoothing. For exponential smoothing, the
+prediction at time <cite>t</cite> is <cite>p_t = alpha * x_t-1 + (1 - alpha) * p_t-1</cite> where
+<cite>alpha</cite> is a configurable weight constant between 0 and 1, <cite>x_t-1</cite> is the
+actual data observation at time <cite>t-1</cite> and <cite>p_t</cite> and <cite>p_t-1</cite> are the
+predictions at times <cite>t</cite> and <cite>t-1</cite> respectively.</p>
+<dl class="py class">
+<dt id="MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.Models.Sequential.</span></code><code class="sig-name descname"><span class="pre">TraceExponentialSmoothing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/TraceExponentialSmoothing.html#TraceExponentialSmoothing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds an Exponential Smoothing model for a data trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>alpha: float</strong></dt><dd><p>The alpha value for the model. It is a number between 0 and 1
+representing the weight of new observations versus past predictions.</p>
+</dd>
+<dt><strong>initial_pred: float</strong></dt><dd><p>A float representing the initial prediction. This is used as the
+prediction for a new trace before seeing any data for that trace.</p>
+</dd>
+<dt><strong>train_prop: float</strong></dt><dd><p>A float in the range [0, 1], representing the proportion of data
+in the training set. The default is 0.6.</p>
+</dd>
+<dt><strong>val_prop: float</strong></dt><dd><p>A float in the range [0, 1] representing the proportion of data in
+the validation set. The default value is 0.2.</p>
+</dd>
+<dt><strong>max_mem: bool</strong></dt><dd><p>A boolean indicating if the target value is maximum memory. The
+default value is True, indicating that maximum memory usage is
+the target variable. Otherwise, maximum CPU usage is used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>_alpha: float</strong></dt><dd><p>The alpha value for the model.</p>
+</dd>
+<dt><strong>_initial_pred: float</strong></dt><dd><p>The initial prediction for a new, unseen trace.</p>
+</dd>
+<dt><strong>_train_prop: float</strong></dt><dd><p>The proportion of data in the training set.</p>
+</dd>
+<dt><strong>_val_prop: float</strong></dt><dd><p>The proportion of data in the validation set.</p>
+</dd>
+<dt><strong>_max_mem: bool</strong></dt><dd><p>A boolean indicating the target variable. True indicates that maximum
+memory usage is the target variable. Otherwise, maximum CPU usage is
+used as the target.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing.get_model_title">
+<code class="sig-name descname"><span class="pre">get_model_title</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/TraceExponentialSmoothing.html#TraceExponentialSmoothing.get_model_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing.get_model_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>A title describing the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>str</dt><dd><p>A string representing the title for the model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing.get_next_prediction">
+<code class="sig-name descname"><span class="pre">get_next_prediction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">past_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">past_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/TraceExponentialSmoothing.html#TraceExponentialSmoothing.get_next_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing.get_next_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the current exponential smoothing model prediction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>past_obs: float</strong></dt><dd><p>A float representing the past observation.</p>
+</dd>
+<dt><strong>past_pred: float</strong></dt><dd><p>A float representing the past prediction.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the current exponential smoothing model
+prediction.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing.get_params">
+<code class="sig-name descname"><span class="pre">get_params</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/Sequential/TraceExponentialSmoothing.html#TraceExponentialSmoothing.get_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.Sequential.TraceExponentialSmoothing.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parameters of the model.</p>
+<p>The model parameters are the initial prediction and the alpha value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>tuple</dt><dd><p>A two element tuple containing the parameters of the model,
+corresponding to the initial prediction and the alpha value.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

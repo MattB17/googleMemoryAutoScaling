@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Abstract ML Base &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>Abstract ML Base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/Models/ML/ml_base.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-MemoryAutoScaling.Models.ML.MLBase">
+<span id="abstract-ml-base"></span><h1>Abstract ML Base<a class="headerlink" href="#module-MemoryAutoScaling.Models.ML.MLBase" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>MLBase</cite> class is an abstract base class used for all machine
+learning models that predict using a time series. It represents an interface
+providing the basic framework used by all machine learning models.</p>
+<dl class="py class">
+<dt id="MemoryAutoScaling.Models.ML.MLBase">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.Models.ML.</span></code><code class="sig-name descname"><span class="pre">MLBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_handler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to predict future values of a time series.</p>
+<p>The model has an <cite>MLDataHandler</cite>, <cite>data_handler</cite>, to ensure that all
+data handled by the model is handled consistently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_name: str</strong></dt><dd><p>A string representing the name of the machine learning model.</p>
+</dd>
+<dt><strong>data_handler: MLDataHandler</strong></dt><dd><p>An <cite>MLDataHandler</cite> used to pre-process data for the model.</p>
+</dd>
+<dt><strong>lags: list</strong></dt><dd><p>A list of integers representing the lags to use for time series
+features to the model. That is, for any time series used as a feature
+to the model, the model will use the value of the time series lagged
+by the time points in <cite>lags</cite> when predicting for the target variable.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>_model_name: str</strong></dt><dd><p>The name of the machine learning model.</p>
+</dd>
+<dt><strong>_data_handler: MLDataHandler</strong></dt><dd><p>The handler used to pre-process data for the model.</p>
+</dd>
+<dt><strong>_lags: list</strong></dt><dd><p>The lags used for time series features to the model.</p>
+</dd>
+<dt><strong>_model: Object</strong></dt><dd><p>The underlying machine learning model being fit.</p>
+</dd>
+<dt><strong>_is_fit: bool</strong></dt><dd><p>Indicates if the model has been fitted to training data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.get_model_data_for_trace">
+<code class="sig-name descname"><span class="pre">get_model_data_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.get_model_data_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.get_model_data_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preprocesses <cite>trace</cite> to retrieve the data used for modelling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>A <cite>Trace</cite> object containing the data to be modelled.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>A pandas DataFrame containing the data from <cite>trace</cite> that will be
+used in the modelling process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.get_model_title">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_model_title</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.get_model_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.get_model_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>A title describing the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>str</dt><dd><p>A string representing the title for the model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.get_predictions_for_trace">
+<code class="sig-name descname"><span class="pre">get_predictions_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.get_predictions_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.get_predictions_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets predictions for the training and testing set for <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> for which predictions are retrieved.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the predictions are for the
+validation set or the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array, np.array</dt><dd><p>Two numpy arrays representing the predictions for the training and
+testing sets on <cite>trace</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.get_total_spare">
+<code class="sig-name descname"><span class="pre">get_total_spare</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.get_total_spare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.get_total_spare" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spare amount of the target for <cite>trace</cite> over the test window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> for which the spare is calculated.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the spare is being calculated
+to tune the model or evaluate the model on the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total spare amount of the target
+variable for <cite>trace</cite> over the test window.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.plot_trace_vs_prediction">
+<code class="sig-name descname"><span class="pre">plot_trace_vs_prediction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.plot_trace_vs_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.plot_trace_vs_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a plot of <cite>trace</cite> vs its predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> being plotted.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the predictions are for the
+validation set or the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.run_model_pipeline_for_trace">
+<code class="sig-name descname"><span class="pre">run_model_pipeline_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.run_model_pipeline_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.run_model_pipeline_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the model pipeline on <cite>trace</cite>.</p>
+<p>The dataframe containing the data for modeling is obtained from
+<cite>trace</cite>. Then this data is split into features and target for both the
+training and test sets. Next, the model pipeline is run on the
+resulting data to calculate the mean absolute scaled error for the
+training and testing sets, respectively. The number of under
+predictions and the magnitude of the maximum under prediction for the
+test set are also calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>A <cite>Trace</cite> object containing the data being modelled.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the model is being tuned on
+the validation set or evaluated on the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>ModelResults</dt><dd><p>A <cite>ModelResults</cite> object containing the results of building the
+model on <cite>trace</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.Models.ML.MLBase.split_data">
+<code class="sig-name descname"><span class="pre">split_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/MemoryAutoScaling/Models/ML/MLBase.html#MLBase.split_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.Models.ML.MLBase.split_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits data into features and targets for the train and test sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the data on which the split is
+performed.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the split is for tuning.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame, pd.Series, pd.DataFrame, pd.Series</dt><dd><p>A pandas DataFrame and Series representing the training set values
+of the features and target variable, respectively. The second
+DataFrame and Series represent the same split for the testing set.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

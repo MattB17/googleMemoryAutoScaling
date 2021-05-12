@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.Models.Sequential.SequentialModel &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.Models.Sequential.SequentialModel</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.Models.Sequential.SequentialModel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `SequentialModel` class is an abstract base class used for all trace</span>
+<span class="sd">models that predict sequentially. That is, these models use previous values</span>
+<span class="sd">to predict the current value but do not store any state.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Models</span> <span class="kn">import</span> <span class="n">TraceModel</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Evaluation</span> <span class="kn">import</span> <span class="n">ModelResults</span>
+
+
+<div class="viewcode-block" id="SequentialModel"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel">[docs]</a><span class="k">class</span> <span class="nc">SequentialModel</span><span class="p">(</span><span class="n">TraceModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implements the functionality of a sequential trace model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial_pred: float</span>
+<span class="sd">        A float representing the initial prediction for the model. This</span>
+<span class="sd">        initial prediction is used until there is enough data available for</span>
+<span class="sd">        the trace to make a prediction from trace data.</span>
+<span class="sd">    train_prop: float</span>
+<span class="sd">        A float in the range [0, 1] representing the proportion of</span>
+<span class="sd">        observations in the training set. The default value is 0.6.</span>
+<span class="sd">    val_prop: float</span>
+<span class="sd">        A float in the range [0, 1] representing the proportion of data in</span>
+<span class="sd">        the validation set. The default value is 0.2.</span>
+<span class="sd">    max_mem: bool</span>
+<span class="sd">        A boolean indicating if the target value is maximum memory. The</span>
+<span class="sd">        default value is True, indicating that maximum memory usage is</span>
+<span class="sd">        the target variable. Otherwise, maximum CPU usage is used.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _initial_pred: float</span>
+<span class="sd">        The initial prediction for the model.</span>
+<span class="sd">    _train_prop: float</span>
+<span class="sd">        Represents the percent of data in the training set.</span>
+<span class="sd">    _val_prop: float</span>
+<span class="sd">        The proportion of data in the validation set.</span>
+<span class="sd">    _max_mem: bool</span>
+<span class="sd">        A boolean indicating the target variable. True indicates that maximum</span>
+<span class="sd">        memory usage is the target variable. Otherwise, maximum CPU usage is</span>
+<span class="sd">        used as the target.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_pred</span><span class="p">,</span> <span class="n">train_prop</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                 <span class="n">val_prop</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_pred</span> <span class="o">=</span> <span class="n">initial_pred</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_train_prop</span> <span class="o">=</span> <span class="n">train_prop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_val_prop</span> <span class="o">=</span> <span class="n">val_prop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_mem</span> <span class="o">=</span> <span class="n">max_mem</span>
+
+<div class="viewcode-block" id="SequentialModel.get_target_variable"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.get_target_variable">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The target variable for the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string indicating the target variable for the model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">specs</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_mem</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SequentialModel.split_data"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.split_data">[docs]</a>    <span class="k">def</span> <span class="nf">split_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Splits `model_data` into the training and testing set.</span>
+
+<span class="sd">        If `tuning` is True, `model_data` is split into training and</span>
+<span class="sd">        validation sets. Otherwise, it is split into training + validation</span>
+<span class="sd">        and testing sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_data: pandas.Object</span>
+<span class="sd">            A pandas Object (Series or DataFrame) containing the data used to</span>
+<span class="sd">            build the trace model.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the split is for tuning.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.Object, pandas.Object</span>
+<span class="sd">            The two pandas objects obtained from `model_data` after applying</span>
+<span class="sd">            the train-test split.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_thresh</span><span class="p">,</span> <span class="n">test_thresh</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">calculate_split_thresholds</span><span class="p">(</span>
+            <span class="n">model_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val_prop</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model_data</span><span class="p">[:</span><span class="n">train_thresh</span><span class="p">],</span> <span class="n">model_data</span><span class="p">[</span><span class="n">train_thresh</span><span class="p">:</span><span class="n">test_thresh</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SequentialModel.get_total_spare"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.get_total_spare">[docs]</a>    <span class="k">def</span> <span class="nf">get_total_spare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The spare amount of the target for `trace` over the test window.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` for which the spare is calculated.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the spare is being calculated</span>
+<span class="sd">            to tune the model or evaluate the model on the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the total spare amount of the target</span>
+<span class="sd">            variable for `trace` over the test window.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target_ts</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_target_time_series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">())</span>
+        <span class="n">train_thresh</span><span class="p">,</span> <span class="n">test_thresh</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">calculate_split_thresholds</span><span class="p">(</span>
+            <span class="n">target_ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val_prop</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_spare_resource_in_window</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">(),</span> <span class="n">train_thresh</span><span class="p">,</span> <span class="n">test_thresh</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SequentialModel.get_model_data_for_trace"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.get_model_data_for_trace">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_data_for_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the data for modeling from `trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` being modeled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            A numpy array representing the time series of maximum memory</span>
+<span class="sd">            usage of the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_mem</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_maximum_memory_time_series</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_maximum_cpu_time_series</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SequentialModel.get_predictions_for_trace"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.get_predictions_for_trace">[docs]</a>    <span class="k">def</span> <span class="nf">get_predictions_for_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets predictions for the training and testing set for `trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` for which predictions are retrieved.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the predictions are for the</span>
+<span class="sd">            validation set or the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array, np.array</span>
+<span class="sd">            Two numpy arrays representing the predictions for the training and</span>
+<span class="sd">            testing sets on `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SequentialModel.fit_and_get_test_predictions"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.fit_and_get_test_predictions">[docs]</a>    <span class="k">def</span> <span class="nf">fit_and_get_test_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits the model and gets test predictions for `trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` for which predictions are retrieved.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the model is being tuned on</span>
+<span class="sd">            the validation set or evaluated on the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array, np.array</span>
+<span class="sd">            A numpy array representing the actual values and predictions for</span>
+<span class="sd">            the testing set of `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">test_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">test_preds</span></div>
+
+<div class="viewcode-block" id="SequentialModel.run_model_pipeline_for_trace"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.run_model_pipeline_for_trace">[docs]</a>    <span class="k">def</span> <span class="nf">run_model_pipeline_for_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs the full modeling pipeline on `trace`.</span>
+
+<span class="sd">        The modeling pipeline first obtains the data needed for modeling</span>
+<span class="sd">        from `trace`. Next it splits this data into the training and testing</span>
+<span class="sd">        sets. It then fits the model and obtains predictions. Lastly, these</span>
+<span class="sd">        predictions are evaluated using MASE on the training and testing sets.</span>
+<span class="sd">        The number of under predictions and the magnitude of the maximum under</span>
+<span class="sd">        prediction for the test set are also calculated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` being modeled.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the model is being tuned on</span>
+<span class="sd">            the validation set or evaluated on the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ModelResults</span>
+<span class="sd">            A `ModelResults` object containing the results of building the</span>
+<span class="sd">            model on `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="n">preds_train</span><span class="p">,</span> <span class="n">preds_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ModelResults</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(),</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">preds_train</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
+            <span class="n">preds_test</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="SequentialModel.plot_trace_vs_prediction"><a class="viewcode-back" href="../../../../Models/Sequential/sequential_model.html#MemoryAutoScaling.Models.Sequential.SequentialModel.plot_trace_vs_prediction">[docs]</a>    <span class="k">def</span> <span class="nf">plot_trace_vs_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a plot of `trace` vs its predictions.</span>
+
+<span class="sd">        The plot is arranged into two subplots. The first contains the maximum</span>
+<span class="sd">        memory usage for the trace versus its prediction for the training set.</span>
+<span class="sd">        The second plot is the same but for the testing set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` being plotted.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the predictions are for the</span>
+<span class="sd">            validation set or the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Trace </span><span class="si">{0}</span><span class="s2"> vs </span><span class="si">{1}</span><span class="s2"> Predictions&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">trace</span><span class="o">.</span><span class="n">get_trace_id</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_title</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_time_series_vs_prediction</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span></div>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets predictions for the training and testing set for `trace_ts`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_ts: np.array</span>
+<span class="sd">            A numpy array representing the time series for which predictions</span>
+<span class="sd">            are calculated.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the predictions are for the</span>
+<span class="sd">            validation set or the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array, np.array</span>
+<span class="sd">            Two numpy arrays representing the predictions for the training and</span>
+<span class="sd">            testing sets on `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_plot_time_series_vs_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_series</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots `time_series` vs its prediction according to the model.</span>
+
+<span class="sd">        The plot of `time_series` vs its predictions is divided into two</span>
+<span class="sd">        subplots: one for the training set and another for the testing set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_series: np.array</span>
+<span class="sd">            A numpy array representing the time series being plotted.</span>
+<span class="sd">        title: str</span>
+<span class="sd">            A string representing the title of the plot.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the predictions are for the</span>
+<span class="sd">            validation set or the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">time_series</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="n">preds_train</span><span class="p">,</span> <span class="n">preds_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="n">time_series</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">plot_train_and_test_predictions_on_axes</span><span class="p">(</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">preds_train</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">preds_test</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">),</span> <span class="n">title</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.Models.ML.TraceVARMAX &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.Models.ML.TraceVARMAX</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.Models.ML.TraceVARMAX</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `TraceVARMAX` class is used to construct a predictive model based on</span>
+<span class="sd">the VARMAX model. VARMAX models are the combination of a VARMA model and</span>
+<span class="sd">a regression model on explanatory features.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">plotting</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Models.ML</span> <span class="kn">import</span> <span class="n">MLBase</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Evaluation</span> <span class="kn">import</span> <span class="n">ModelResults</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.statespace.varmax</span> <span class="kn">import</span> <span class="n">VARMAX</span>
+
+
+<div class="viewcode-block" id="TraceVARMAX"><a class="viewcode-back" href="../../../../Models/ML/trace_varmax.html#MemoryAutoScaling.Models.ML.TraceVARMAX">[docs]</a><span class="k">class</span> <span class="nc">TraceVARMAX</span><span class="p">(</span><span class="n">MLBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A `VARMAX` model for data traces.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_handler: MLDataHandler</span>
+<span class="sd">        An `MLDataHandler` used to pre-process data for the model.</span>
+<span class="sd">    lags: list</span>
+<span class="sd">        A list of integers representing the lags to use for time series</span>
+<span class="sd">        features to the model. That is, for any time series used as a feature</span>
+<span class="sd">        to the model, the model will use the value of the time series lagged</span>
+<span class="sd">        by the time points in `lags` when predicting for the target variable.</span>
+<span class="sd">    p: int</span>
+<span class="sd">        An integer representing the autoregressive component of the model.</span>
+<span class="sd">    q: int</span>
+<span class="sd">        An integer representing the moving average component of the model.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _model_name: str</span>
+<span class="sd">        The name of the machine learning model.</span>
+<span class="sd">    _data_handler: MLDataHandler</span>
+<span class="sd">        The handler used to pre-process data for the model.</span>
+<span class="sd">    _lags: list</span>
+<span class="sd">        The lags used for time series features to the model.</span>
+<span class="sd">    _p: int</span>
+<span class="sd">        The autoregressive component of the model.</span>
+<span class="sd">    _q: int</span>
+<span class="sd">        The moving average component of the model.</span>
+<span class="sd">    _model: VARMAX</span>
+<span class="sd">        The underlying VARMAX model being fit to the data. A value of None</span>
+<span class="sd">        indicates that no model is currently fit to the data.</span>
+<span class="sd">    _is_fit: bool</span>
+<span class="sd">        Indicates if the model has been fit to the training data.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_handler</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;TraceVARMAX&quot;</span><span class="p">,</span> <span class="n">data_handler</span><span class="p">,</span> <span class="n">lags</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_q</span> <span class="o">=</span> <span class="n">q</span>
+
+<div class="viewcode-block" id="TraceVARMAX.get_params"><a class="viewcode-back" href="../../../../Models/ML/trace_varmax.html#MemoryAutoScaling.Models.ML.TraceVARMAX.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the order for the VARMA component of the model.</span>
+
+<span class="sd">        The order is the two element tuple `(p, q)` representing the</span>
+<span class="sd">        autoregressive component and the moving average component,</span>
+<span class="sd">        respectively.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A two element tuple of integers representing the order of the</span>
+<span class="sd">            ARIMA component of the model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="TraceVARMAX.get_model_title"><a class="viewcode-back" href="../../../../Models/ML/trace_varmax.html#MemoryAutoScaling.Models.ML.TraceVARMAX.get_model_title">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A title describing the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representing the title for the model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">-</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_features</span><span class="p">,</span> <span class="n">train_target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits the model based on `train_features` and `train_target`.</span>
+
+<span class="sd">        A VARMAX model is built to predict the target variables with data</span>
+<span class="sd">        given by `train_target` based on the features with data given by</span>
+<span class="sd">        `train_features`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_features: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame representing the training features.</span>
+<span class="sd">        train_target: pd.Series</span>
+<span class="sd">            A pandas Series representing the target variable.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">varmax_order</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">VARMAX</span><span class="p">(</span><span class="n">train_target</span><span class="p">,</span> <span class="n">train_features</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">varmax_order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_fit</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_get_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_features</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves model predictions for `test_features`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        test_features: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame rerpresenting the testing features.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the predictions up to the end of the</span>
+<span class="sd">            testing period.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fit</span><span class="p">:</span>
+            <span class="n">forecast_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_features</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span>
+                <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">nobs</span> <span class="o">+</span> <span class="n">forecast_len</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">test_features</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">preds</span><span class="o">.</span><span class="n">predicted_mean</span>
+
+<div class="viewcode-block" id="TraceVARMAX.fit_and_get_test_predictions"><a class="viewcode-back" href="../../../../Models/ML/trace_varmax.html#MemoryAutoScaling.Models.ML.TraceVARMAX.fit_and_get_test_predictions">[docs]</a>    <span class="k">def</span> <span class="nf">fit_and_get_test_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits the model and gets test predictions for `trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` for which predictions are retrieved.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the model is being tuned on</span>
+<span class="sd">            the validation set or evaluated on the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array, np.array</span>
+<span class="sd">            A numpy array representing the actual values and predictions for</span>
+<span class="sd">            the testing set of `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">trace_df</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">test_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_and_test_predictions</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">test_preds</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_train_and_test_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_features</span><span class="p">,</span> <span class="n">test_features</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets predictions from `train_features` and `test_features`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_features: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the features for the training set.</span>
+<span class="sd">        test_features: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the features for the testing set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame, pd.DataFrame</span>
+<span class="sd">            Two pandas DataFrames arrays representing the predictions for the</span>
+<span class="sd">            training and testing sets on `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="n">test_features</span><span class="p">)</span>
+        <span class="n">train_cutoff</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_features</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">preds</span><span class="p">[:</span><span class="n">train_cutoff</span><span class="p">],</span> <span class="n">preds</span><span class="p">[</span><span class="n">train_cutoff</span><span class="p">:]</span>
+
+    <span class="k">def</span> <span class="nf">_run_model_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span>
+                            <span class="n">X_test</span><span class="p">,</span> <span class="n">test_target</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs the model pipeline on the training and testing data.</span>
+
+<span class="sd">        The model is instantiated and then fit on `X_train` and</span>
+<span class="sd">        `train_target`. Predictions are made on `X_test` and these</span>
+<span class="sd">        predictions are compared to `test_target` using the mean squared</span>
+<span class="sd">        error.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame representing the features for the training set.</span>
+<span class="sd">        train_target: pd.Series</span>
+<span class="sd">            A pandas Series representing the target variable for the</span>
+<span class="sd">            training set.</span>
+<span class="sd">        X_test: pd.DataFrame</span>
+<span class="sd">            A pandas Dataframe representing the features for the testing set.</span>
+<span class="sd">        test_target: pd.Series</span>
+<span class="sd">            A pandas Series representing the target variable for the testing</span>
+<span class="sd">            set.</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` on which the model pipeline is being run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ModelResults</span>
+<span class="sd">            A `ModelResults` object containing the results of building the</span>
+<span class="sd">            model on `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+        <span class="n">train_preds</span><span class="p">,</span> <span class="n">test_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_and_test_predictions</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parallel</span><span class="o">.</span><span class="n">get_multivariate_model_results</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(),</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">train_preds</span><span class="p">,</span> <span class="n">test_target</span><span class="p">,</span>
+            <span class="n">test_preds</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_handler</span><span class="o">.</span><span class="n">get_target_variables</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_plot_trace_data_vs_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_df</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots the target time series of `trace_df` vs its model prediction.</span>
+
+<span class="sd">        The plot of the time series vs its predictions for each model</span>
+<span class="sd">        variable. Each variable is plotted in a row and the row is divided</span>
+<span class="sd">        into two subplots: one for the training set and another for the</span>
+<span class="sd">        testing set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_df: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the trace data used for modeling.</span>
+<span class="sd">        title: str</span>
+<span class="sd">            A string representing the title of the plot.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the predictions are for the</span>
+<span class="sd">            validation set or the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">var_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_handler</span><span class="o">.</span><span class="n">get_target_variables</span><span class="p">())</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">var_count</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">var_count</span><span class="p">))</span>
+        <span class="n">trace_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_eval</span><span class="p">,</span> <span class="n">y_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">trace_df</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="n">train_preds</span><span class="p">,</span> <span class="n">eval_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_and_test_predictions</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_eval</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">plot_multivariate_train_and_test_predictions</span><span class="p">(</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">train_preds</span><span class="p">,</span> <span class="n">y_eval</span><span class="p">,</span> <span class="n">eval_preds</span><span class="p">,</span>
+            <span class="n">axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_handler</span><span class="o">.</span><span class="n">get_target_variables</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_plot_title</span><span class="p">())</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

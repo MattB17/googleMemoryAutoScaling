@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.Models.Statistical.TraceARIMA &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.Models.Statistical.TraceARIMA</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.Models.Statistical.TraceARIMA</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `TraceARIMA` class is used to construct a predictive model based on</span>
+<span class="sd">ARIMA. ARIMA models have 3 terms: `p`, `d`, and `q`. `p` indicates the auto</span>
+<span class="sd">regressive component, that is the number of previous values used to predict</span>
+<span class="sd">the current value. `d` refers to the number of differencing rounds that must</span>
+<span class="sd">be applied to make the time series stationary. `q` is the moving average</span>
+<span class="sd">component, refering to the number of lagged forecast errors used in the model.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Evaluation</span> <span class="kn">import</span> <span class="n">ModelResults</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Models.Statistical</span> <span class="kn">import</span> <span class="n">StatisticalModel</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.statespace.sarimax</span> <span class="kn">import</span> <span class="n">SARIMAX</span>
+
+
+<div class="viewcode-block" id="TraceARIMA"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA">[docs]</a><span class="k">class</span> <span class="nc">TraceARIMA</span><span class="p">(</span><span class="n">StatisticalModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An ARIMA model for time series data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p: int</span>
+<span class="sd">        An integer representing the autoregressive component of the model.</span>
+<span class="sd">    d: int</span>
+<span class="sd">        An integer representing the integrated component of the model.</span>
+<span class="sd">        That is, the level of differencing needed to make the time</span>
+<span class="sd">        series stationary.</span>
+<span class="sd">    q: int</span>
+<span class="sd">        An integer representing the moving average component of the model.</span>
+<span class="sd">    train_prop: float</span>
+<span class="sd">        A float in the range [0, 1] representing the proportion of data</span>
+<span class="sd">        in the training set. The default value is 0.6.</span>
+<span class="sd">    val_prop: float</span>
+<span class="sd">        A float in the range [0, 1] representing the proportion of data in</span>
+<span class="sd">        the validation set. The default value is 0.2.</span>
+<span class="sd">    max_mem: bool</span>
+<span class="sd">        A boolean indicating if the target value is maximum memory. The</span>
+<span class="sd">        default value is True, indicating that maximum memory usage is</span>
+<span class="sd">        the target variable. Otherwise, maximum CPU usage is used.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _train_prop: float</span>
+<span class="sd">        The proportion of data in the training set.</span>
+<span class="sd">    _val_prop: float</span>
+<span class="sd">        The proportion of data in the validation set.</span>
+<span class="sd">    _model: Object</span>
+<span class="sd">        The underlying machine learning model being fit.</span>
+<span class="sd">    _p: int</span>
+<span class="sd">        The autoregressive component of the model.</span>
+<span class="sd">    _d: int</span>
+<span class="sd">        The integrated component of the model.</span>
+<span class="sd">    _q: int</span>
+<span class="sd">        The moving average component of the model.</span>
+<span class="sd">    _max_mem: bool</span>
+<span class="sd">        A boolean indicating the target variable. True indicates that maximum</span>
+<span class="sd">        memory usage is the target variable. Otherwise, maximum CPU usage is</span>
+<span class="sd">        used as the target.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">train_prop</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">val_prop</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">train_prop</span><span class="p">,</span> <span class="n">val_prop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_q</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_mem</span> <span class="o">=</span> <span class="n">max_mem</span>
+
+<div class="viewcode-block" id="TraceARIMA.get_target_variable"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.get_target_variable">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The target variable for the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string indicating the target variable for the model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">specs</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_mem</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.get_params"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the order for the ARIMA model.</span>
+
+<span class="sd">        The order is the three element tuple `(p, d, q)` representing</span>
+<span class="sd">        the autoregressive component, the degree of differencing, and the</span>
+<span class="sd">        moving average component, respectively.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A three element tuple of integers representing the order of the</span>
+<span class="sd">            ARIMA model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.get_model_title"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.get_model_title">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The title for the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representing the title for the model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;Trace ARIMA </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.split_data"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.split_data">[docs]</a>    <span class="k">def</span> <span class="nf">split_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Splits `model_data` into training and testing time series.</span>
+
+<span class="sd">        If `tuning` is True, `model_data` is split into training and</span>
+<span class="sd">        validation sets. Otherwise, it is split into training + validation</span>
+<span class="sd">        and testing sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_data: np.array</span>
+<span class="sd">            A numpy array containing the data of the time series being</span>
+<span class="sd">            forecast.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the split is for tuning.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array, np.array</span>
+<span class="sd">            Two numpy arrays representing the records in the train and</span>
+<span class="sd">            test sets respectively.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_thresh</span><span class="p">,</span> <span class="n">test_thresh</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">calculate_split_thresholds</span><span class="p">(</span>
+            <span class="n">model_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val_prop</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model_data</span><span class="p">[:</span><span class="n">train_thresh</span><span class="p">],</span> <span class="n">model_data</span><span class="p">[</span><span class="n">train_thresh</span><span class="p">:</span><span class="n">test_thresh</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.get_total_spare"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.get_total_spare">[docs]</a>    <span class="k">def</span> <span class="nf">get_total_spare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The spare amount of the target for `trace` over the test window.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` for which the spare is calculated.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the spare is being calculated</span>
+<span class="sd">            to tune the model or evaluate the model on the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the total spare amount of the target</span>
+<span class="sd">            variable for `trace` over the test window.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target_ts</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_target_time_series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">())</span>
+        <span class="n">train_thresh</span><span class="p">,</span> <span class="n">test_thresh</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">calculate_split_thresholds</span><span class="p">(</span>
+            <span class="n">target_ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val_prop</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_spare_resource_in_window</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">(),</span> <span class="n">train_thresh</span><span class="p">,</span> <span class="n">test_thresh</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.get_model_data_for_trace"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.get_model_data_for_trace">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_data_for_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the data for modeling from `trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` object being modeled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            A numpy array representing the maximum memory usage for `trace`</span>
+<span class="sd">            for each time interval.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_mem</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_maximum_memory_time_series</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_maximum_cpu_time_series</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.run_model_pipeline_for_trace"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.run_model_pipeline_for_trace">[docs]</a>    <span class="k">def</span> <span class="nf">run_model_pipeline_for_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs the full modeling pipeline on `trace`.</span>
+
+<span class="sd">        The modeling pipeline first obtains the data needed for modeling</span>
+<span class="sd">        from `trace`. Next it splits this data into the training and testing</span>
+<span class="sd">        sets. It then fits the model and obtains predictions. Lastly, these</span>
+<span class="sd">        predictions are evaluated using MASE on the training and testing sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` being modeled.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the model is being tuned on</span>
+<span class="sd">            the validation set or evaluated on the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ModelResults</span>
+<span class="sd">            A `ModelResults` object containing the results of building the</span>
+<span class="sd">            model on `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">train_ts</span><span class="p">,</span> <span class="n">eval_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="n">total_spare</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_spare</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">train_ts</span><span class="p">)</span>
+        <span class="n">preds_train</span><span class="p">,</span> <span class="n">preds_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eval_ts</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ModelResults</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(),</span> <span class="n">train_ts</span><span class="p">,</span> <span class="n">preds_train</span><span class="p">,</span> <span class="n">eval_ts</span><span class="p">,</span>
+            <span class="n">preds_eval</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_variable</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="TraceARIMA.plot_trace_vs_prediction"><a class="viewcode-back" href="../../../../Models/Statistical/trace_arima.html#MemoryAutoScaling.Models.Statistical.TraceARIMA.plot_trace_vs_prediction">[docs]</a>    <span class="k">def</span> <span class="nf">plot_trace_vs_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a plot of `trace` vs its prediction.</span>
+
+<span class="sd">        The plot is divided into two subplots showing the actual values versus</span>
+<span class="sd">        the predicted values for the training and testing sets, respectively.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` object for which actual and predicted values are</span>
+<span class="sd">            plotted.</span>
+<span class="sd">        tuning: bool</span>
+<span class="sd">            A boolean value indicating whether the predictions are for the</span>
+<span class="sd">            validation set or the test set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">trace_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_data_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">train_ts</span><span class="p">,</span> <span class="n">eval_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">trace_ts</span><span class="p">,</span> <span class="n">tuning</span><span class="p">)</span>
+        <span class="n">preds_train</span><span class="p">,</span> <span class="n">preds_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_predictions</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eval_ts</span><span class="p">))</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">plot_train_and_test_predictions_on_axes</span><span class="p">(</span>
+            <span class="n">train_ts</span><span class="p">,</span> <span class="n">preds_train</span><span class="p">,</span> <span class="n">eval_ts</span><span class="p">,</span> <span class="n">preds_eval</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plot_title</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits the ARIMA model based on `train_data`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_data: np.array</span>
+<span class="sd">            A numpy array representing the time series used for training.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arima_order</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">SARIMAX</span><span class="p">(</span>
+            <span class="n">train_data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">arima_order</span><span class="p">,</span> <span class="n">simple_differencing</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
