@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to MemoryAutoScaling’s documentation! &#8212; MemoryAutoScaling  documentation</title>
+    <title>Google Memory Auto Scaling &#8212; MemoryAutoScaling  documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,54 +30,64 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-memoryautoscaling-s-documentation">
-<h1>Welcome to MemoryAutoScaling’s documentation!<a class="headerlink" href="#welcome-to-memoryautoscaling-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p># Google Memory Auto Scaling</p>
-<p>This package analyzes the Borg traces from Google in May 2019. The original data can be found [here](<a class="reference external" href="https://github.com/google/cluster-data">https://github.com/google/cluster-data</a>). Each trace contains information about maximum memory and CPU usage as well as average memory and CPU usage of a task in periods of 5 minutes.</p>
+  <div class="section" id="google-memory-auto-scaling">
+<h1>Google Memory Auto Scaling<a class="headerlink" href="#google-memory-auto-scaling" title="Permalink to this headline">¶</a></h1>
+<p>This package analyzes the Borg traces from Google in May 2019. The original data can be found <a class="reference external" href="https://github.com/google/cluster-data">here</a>. Each trace contains information about maximum memory and CPU usage as well as average memory and CPU usage of a task in periods of 5 minutes.</p>
 <p>The purpose of this project is to harvest spare memory and CPU resources from primary jobs running in the Borg cluster. The purpose of this harvesting is to use the spare resources to run secondary batch jobs. In this scenario, priority is given to primary jobs. Thus, the goal is to schedule these batch jobs on the spare resources in such a way that the jobs are rarely throttled or killed because they are stealing resources from the primary jobs.</p>
 <p>The code contains functions and scripts for loading raw trace files, performing pre-processing, and modeling the maximum memory usage or maximum CPU usage for each trace.</p>
-<p>### Installation
-To install the package:
-* <cite>git clone https://github.com/MattB17/googleMemoryAutoScaling.git</cite>
-* <cite>cd MemoryAutoScaling</cite>
-* <cite>python -m pip install -r requirements.txt</cite>
-* <cite>python -m pip install .</cite></p>
-<p>### Scripts
-The <cite>Scripts</cite> folder contains python scripts to run models on traces or provide statistical summaries. There are 3 types of scripts:
-* <cite>Multivariate</cite> for running multivariate models</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To install the package:</p>
+<ul class="simple">
+<li><p><cite>git clone https://github.com/MattB17/googleMemoryAutoScaling.git</cite></p></li>
+<li><p><cite>cd MemoryAutoScaling</cite></p></li>
+<li><p><cite>python -m pip install -r requirements.txt</cite></p></li>
+<li><p><cite>python -m pip install .</cite></p></li>
+</ul>
+</div>
+<div class="section" id="scripts">
+<h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>Scripts</cite> folder contains python scripts to run models on traces or provide statistical summaries. There are 3 types of scripts:</p>
+<ul>
+<li><p><cite>Multivariate</cite> for running multivariate models
+* The multivariate scripts can be run from the command line and take 6 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, and an integer representing the number of consecutive periods to aggregate for the modeling
+* For example, the following runs the VARMA models on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, with <cite>70%</cite> of data in the training set, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The multivariate scripts can be run from the command line and take 6 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, and an integer representing the number of consecutive periods to aggregate for the modeling</p></li>
-<li><p>For example, the following runs the VARMA models on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, with <cite>70%</cite> of data in the training set, and the results are output to <cite>&lt;output_dir&gt;</cite>
-* <cite>python Scripts/Multivariate/buildVARMAModels.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 0.7 3</cite></p></li>
+<li><p><cite>python Scripts/Multivariate/buildVARMAModels.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 0.7 3</cite></p></li>
 </ul>
 </div></blockquote>
+</li>
+<li><p><cite>Univariate</cite> for running univariate models</p>
+<ul class="simple">
+<li><p>The univariate scripts can be run from the command line and take 7 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, an integer representing the number of consecutive periods to aggregate for the modeling, and a boolean flag indicating if maximum memory usage is the target variable or maximum CPU usage</p></li>
+<li><p>For example, the following runs the Regression models on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, with <cite>70%</cite> of data in the training set, the target variable is maximum memory usage, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
 <ul>
-<li><p><cite>Univariate</cite> for running univariate models
-* The univariate scripts can be run from the command line and take 7 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, an integer representing the number of consecutive periods to aggregate for the modeling, and a boolean flag indicating if maximum memory usage is the target variable or maximum CPU usage
-* For example, the following runs the Regression models on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, with <cite>70%</cite> of data in the training set, the target variable is maximum memory usage, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
-<blockquote>
-<div><ul class="simple">
 <li><p><cite>python Scripts/Univariate/buildRegModels.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 0.7 3 True</cite></p></li>
 </ul>
-</div></blockquote>
 </li>
-<li><p><cite>Statistical</cite> to run statistical summaries
-* The statistical scripts can be run from the command line and take 6 argument specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, an integer representing the number of consecutive periods to aggregate for the summary, and a boolean flag indicating if maximum memory usage is the target variable or maximum CPU usage
-* For example, the following runs the statistical analysis on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, the target variable is maximum CPU usage, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
-<blockquote>
-<div><ul class="simple">
+</ul>
+</li>
+<li><p><cite>Statistical</cite> to run statistical summaries</p>
+<ul class="simple">
+<li><p>The statistical scripts can be run from the command line and take 6 argument specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, an integer representing the number of consecutive periods to aggregate for the summary, and a boolean flag indicating if maximum memory usage is the target variable or maximum CPU usage</p></li>
+<li><p>For example, the following runs the statistical analysis on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, the target variable is maximum CPU usage, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
+<ul>
 <li><p><cite>python Scripts/Statistical/getTraceStats.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 3 False</cite></p></li>
 </ul>
-</div></blockquote>
 </li>
 </ul>
-<p>### Analysis
-The <cite>Notebooks</cite> folder contains jupyter notebooks used to conduct the analysis.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="analysis">
+<h2>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>Notebooks</cite> folder contains jupyter notebooks used to conduct the analysis.</p>
 <p>These notebooks assume the scripts in the <cite>Scripts</cite> folder have been run with the appropriate parameters and have been saved in a folder labeled <cite>output_data</cite>.</p>
-<p>The results of the statistical analysis on the traces can be found [here](<a class="reference external" href="https://docs.google.com/document/d/1K7BBxZMQ5QlbUrKDK4NnTBq--luysnHjai97oCy94HA/edit">https://docs.google.com/document/d/1K7BBxZMQ5QlbUrKDK4NnTBq–luysnHjai97oCy94HA/edit</a>)</p>
-<p>The results of the modeling procedures on the traces can be found [here](<a class="reference external" href="https://docs.google.com/document/d/16n9JSmnUdko3LTuFWJ0YN_qZpUGBaHSoHmaMigGJYLI/edit#heading=h.fjx4h8ju152c">https://docs.google.com/document/d/16n9JSmnUdko3LTuFWJ0YN_qZpUGBaHSoHmaMigGJYLI/edit#heading=h.fjx4h8ju152c</a>)</p>
+<p>The results of the statistical analysis on the traces can be found <a class="reference external" href="https://docs.google.com/document/d/1K7BBxZMQ5QlbUrKDK4NnTBq--luysnHjai97oCy94HA/edit">here</a></p>
+<p>The results of the modeling procedures on the traces can be found <a class="reference external" href="https://docs.google.com/document/d/16n9JSmnUdko3LTuFWJ0YN_qZpUGBaHSoHmaMigGJYLI/edit#heading=h.fjx4h8ju152c">here</a></p>
 <div class="toctree-wrapper compound">
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
