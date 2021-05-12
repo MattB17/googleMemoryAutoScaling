@@ -39,41 +39,41 @@
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>To install the package:</p>
 <ul class="simple">
-<li><p><cite>git clone https://github.com/MattB17/googleMemoryAutoScaling.git</cite></p></li>
-<li><p><cite>cd MemoryAutoScaling</cite></p></li>
-<li><p><cite>python -m pip install -r requirements.txt</cite></p></li>
-<li><p><cite>python -m pip install .</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/MattB17/googleMemoryAutoScaling.git</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">MemoryAutoScaling</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="scripts">
 <h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
-<p>The <cite>Scripts</cite> folder contains python scripts to run models on traces or provide statistical summaries. There are 3 types of scripts:</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">Scripts</span></code> folder contains python scripts to run models on traces or provide statistical summaries. There are 3 types of scripts:</p>
 <ul>
-<li><p><cite>Multivariate</cite> for running multivariate models
+<li><p><code class="code docutils literal notranslate"><span class="pre">Multivariate</span></code> for running multivariate models
 * The multivariate scripts can be run from the command line and take 6 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, and an integer representing the number of consecutive periods to aggregate for the modeling
-* For example, the following runs the VARMA models on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, with <cite>70%</cite> of data in the training set, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
+* For example, the following runs the VARMA models on all traces stored in csv files starting with <code class="code docutils literal notranslate"><span class="pre">task_usage_df</span></code> in <code class="code docutils literal notranslate"><span class="pre">&lt;input_dir&gt;</span></code>, the traces must have a minimum length of <code class="code docutils literal notranslate"><span class="pre">12</span></code>, are aggregated every <code class="code docutils literal notranslate"><span class="pre">3</span></code> time periods, with <code class="code docutils literal notranslate"><span class="pre">70%</span></code> of data in the training set, and the results are output to <code class="code docutils literal notranslate"><span class="pre">&lt;output_dir&gt;</span></code></p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>python Scripts/Multivariate/buildVARMAModels.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 0.7 3</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">Scripts/Multivariate/buildVARMAModels.py</span> <span class="pre">&lt;input_dir&gt;</span> <span class="pre">&lt;output_dir&gt;</span> <span class="pre">task_usage_df</span> <span class="pre">12</span> <span class="pre">0.7</span> <span class="pre">3</span></code></p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p><cite>Univariate</cite> for running univariate models</p>
+<li><p><code class="code docutils literal notranslate"><span class="pre">Univariate</span></code> for running univariate models</p>
 <ul class="simple">
 <li><p>The univariate scripts can be run from the command line and take 7 arguments specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, the proportion of data in the training set, an integer representing the number of consecutive periods to aggregate for the modeling, and a boolean flag indicating if maximum memory usage is the target variable or maximum CPU usage</p></li>
-<li><p>For example, the following runs the Regression models on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, with <cite>70%</cite> of data in the training set, the target variable is maximum memory usage, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
+<li><p>For example, the following runs the Regression models on all traces stored in csv files starting with <code class="code docutils literal notranslate"><span class="pre">task_usage_df</span></code> in <code class="code docutils literal notranslate"><span class="pre">&lt;input_dir&gt;</span></code>, the traces must have a minimum length of <code class="code docutils literal notranslate"><span class="pre">12</span></code>, are aggregated every <code class="code docutils literal notranslate"><span class="pre">3</span></code> time periods, with <code class="code docutils literal notranslate"><span class="pre">70%</span></code> of data in the training set, the target variable is maximum memory usage, and the results are output to <code class="code docutils literal notranslate"><span class="pre">&lt;output_dir&gt;</span></code></p>
 <ul>
-<li><p><cite>python Scripts/Univariate/buildRegModels.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 0.7 3 True</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">Scripts/Univariate/buildRegModels.py</span> <span class="pre">&lt;input_dir&gt;</span> <span class="pre">&lt;output_dir&gt;</span> <span class="pre">task_usage_df</span> <span class="pre">12</span> <span class="pre">0.7</span> <span class="pre">3</span> <span class="pre">True</span></code></p></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p><cite>Statistical</cite> to run statistical summaries</p>
+<li><p><code class="code docutils literal notranslate"><span class="pre">Statistical</span></code> to run statistical summaries</p>
 <ul class="simple">
 <li><p>The statistical scripts can be run from the command line and take 6 argument specifying the input directory for trace files, the output directory for the results, the prefix name for traces in the input directory, the minimum length for a trace, an integer representing the number of consecutive periods to aggregate for the summary, and a boolean flag indicating if maximum memory usage is the target variable or maximum CPU usage</p></li>
-<li><p>For example, the following runs the statistical analysis on all traces stored in csv files starting with <cite>task_usage_df</cite> in <cite>&lt;input_dir&gt;</cite>, the traces must have a minimum length of <cite>12</cite>, are aggregated every <cite>3</cite> time periods, the target variable is maximum CPU usage, and the results are output to <cite>&lt;output_dir&gt;</cite></p>
+<li><p>For example, the following runs the statistical analysis on all traces stored in csv files starting with <code class="code docutils literal notranslate"><span class="pre">task_usage_df</span></code> in <code class="code docutils literal notranslate"><span class="pre">&lt;input_dir&gt;</span></code>, the traces must have a minimum length of <code class="code docutils literal notranslate"><span class="pre">12</span></code>, are aggregated every <code class="code docutils literal notranslate"><span class="pre">3</span></code> time periods, the target variable is maximum CPU usage, and the results are output to <code class="code docutils literal notranslate"><span class="pre">&lt;output_dir&gt;</span></code></p>
 <ul>
-<li><p><cite>python Scripts/Statistical/getTraceStats.py &lt;input_dir&gt; &lt;output_dir&gt; task_usage_df 12 3 False</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">Scripts/Statistical/getTraceStats.py</span> <span class="pre">&lt;input_dir&gt;</span> <span class="pre">&lt;output_dir&gt;</span> <span class="pre">task_usage_df</span> <span class="pre">12</span> <span class="pre">3</span> <span class="pre">False</span></code></p></li>
 </ul>
 </li>
 </ul>
@@ -82,8 +82,8 @@
 </div>
 <div class="section" id="analysis">
 <h2>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h2>
-<p>The <cite>Notebooks</cite> folder contains jupyter notebooks used to conduct the analysis.</p>
-<p>These notebooks assume the scripts in the <cite>Scripts</cite> folder have been run with the appropriate parameters and have been saved in a folder labeled <cite>output_data</cite>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">Notebooks</span></code> folder contains jupyter notebooks used to conduct the analysis.</p>
+<p>These notebooks assume the scripts in the <code class="code docutils literal notranslate"><span class="pre">Scripts</span></code> folder have been run with the appropriate parameters and have been saved in a folder labeled <code class="code docutils literal notranslate"><span class="pre">output_data</span></code>.</p>
 <p>The results of the statistical analysis on the traces can be found <a class="reference external" href="https://docs.google.com/document/d/1K7BBxZMQ5QlbUrKDK4NnTBq--luysnHjai97oCy94HA/edit">here</a></p>
 <p>The results of the modeling procedures on the traces can be found <a class="reference external" href="https://docs.google.com/document/d/16n9JSmnUdko3LTuFWJ0YN_qZpUGBaHSoHmaMigGJYLI/edit#heading=h.fjx4h8ju152c">here</a></p>
 <div class="toctree-wrapper compound">
