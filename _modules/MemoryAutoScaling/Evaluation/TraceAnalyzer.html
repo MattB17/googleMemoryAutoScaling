@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.Evaluation.TraceAnalyzer &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Evaluation/evaluation.html">Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.Evaluation.TraceAnalyzer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.Evaluation.TraceAnalyzer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `TraceAnalyzer` class is used to calculate statistics and perform</span>
+<span class="sd">analysis on a trace.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">plotting</span>
+<span class="kn">import</span> <span class="nn">statsmodels.tsa.api</span> <span class="k">as</span> <span class="nn">smt</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">adfuller</span><span class="p">,</span> <span class="n">grangercausalitytests</span>
+
+
+<div class="viewcode-block" id="TraceAnalyzer"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">TraceAnalyzer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Performs analysis on a data trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    seaborn_style: str</span>
+<span class="sd">        A string representing the style used for seaborn plots.</span>
+<span class="sd">    matplotlib_style: str</span>
+<span class="sd">        A string representing the style used for matplotlib plots.</span>
+<span class="sd">    tick_interval: int</span>
+<span class="sd">        An integer representing the interval at which ticks are displayed</span>
+<span class="sd">        on plots.</span>
+<span class="sd">    plot_color: str</span>
+<span class="sd">        A string representing the color for plots</span>
+<span class="sd">    analysis_title: str</span>
+<span class="sd">        A string representing the title for the analysis being run.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _tick_interval: int</span>
+<span class="sd">        The interval at which ticks are displayed on plots.</span>
+<span class="sd">    _plot_color: str</span>
+<span class="sd">        The color used for analysis plots.</span>
+<span class="sd">    _analysis_title: str</span>
+<span class="sd">        The title of the analysis being run.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seaborn_style</span><span class="p">,</span> <span class="n">matplotlib_style</span><span class="p">,</span>
+                 <span class="n">tick_interval</span><span class="p">,</span> <span class="n">plot_color</span><span class="p">,</span> <span class="n">analysis_title</span><span class="p">):</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="n">seaborn_style</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">matplotlib_style</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tick_interval</span> <span class="o">=</span> <span class="n">tick_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span> <span class="o">=</span> <span class="n">plot_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span> <span class="o">=</span> <span class="n">analysis_title</span>
+
+<div class="viewcode-block" id="TraceAnalyzer.get_tick_interval"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.get_tick_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_tick_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the tick interval used for plotting.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            An integer representing the interval at which ticks are displayed</span>
+<span class="sd">            on plots generated by the analyzer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tick_interval</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.get_plot_color"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.get_plot_color">[docs]</a>    <span class="k">def</span> <span class="nf">get_plot_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the color used for plotting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representing the color of plots produced by the analyzer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.get_analysis_title"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.get_analysis_title">[docs]</a>    <span class="k">def</span> <span class="nf">get_analysis_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the title for the analysis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representing the analysis title.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.set_tick_interval"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.set_tick_interval">[docs]</a>    <span class="k">def</span> <span class="nf">set_tick_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_interval</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the tick interval to `new_interval`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_interval: int</span>
+<span class="sd">            An integer representing the new interval at which ticks will be</span>
+<span class="sd">            displayed on plots generated by the analyzer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tick_interval</span> <span class="o">=</span> <span class="n">new_interval</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.set_plot_color"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.set_plot_color">[docs]</a>    <span class="k">def</span> <span class="nf">set_plot_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_color</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the plot color to `new_color`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_color: str</span>
+<span class="sd">            A string representing the new color used for plots generated by</span>
+<span class="sd">            the analyzer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span> <span class="o">=</span> <span class="n">new_color</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.set_analysis_title"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.set_analysis_title">[docs]</a>    <span class="k">def</span> <span class="nf">set_analysis_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_title</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the analysis title to `new_title`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_title: str</span>
+<span class="sd">            A string representing the new title for the analysis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span> <span class="o">=</span> <span class="n">new_title</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.plot_trace"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.plot_trace">[docs]</a>    <span class="k">def</span> <span class="nf">plot_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots `data_trace` across time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing the trace to be plotted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trace</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">setup_trace_plot</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tick_interval</span><span class="p">,</span>
+                                  <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Trace&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.plot_deviations_from_average"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.plot_deviations_from_average">[docs]</a>    <span class="k">def</span> <span class="nf">plot_deviations_from_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots the deviations of `data_trace` from its average across time.</span>
+
+<span class="sd">        The average value of `data_trace` is computed and subtracted from each</span>
+<span class="sd">        time point to get a trace recording the deviations of `data_trace`</span>
+<span class="sd">        from its average. The resulting trace is then plotted.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing the raw data trace for which the</span>
+<span class="sd">            deviations from its average will be plotted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trace</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
+                 <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">setup_trace_plot</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tick_interval</span><span class="p">,</span>
+                                  <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Trace - Deviations From Average&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.plot_auto_correlations"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.plot_auto_correlations">[docs]</a>    <span class="k">def</span> <span class="nf">plot_auto_correlations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">,</span> <span class="n">lags</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots auto correlations for `data_trace`.</span>
+
+<span class="sd">        The auto correlations and partial auto correlations are plotted</span>
+<span class="sd">        for `data_trace` with a lag of `lags`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing the data trace for which auto</span>
+<span class="sd">            correlations are plotted.</span>
+<span class="sd">        lags: int</span>
+<span class="sd">            The number of lags to include in the auto correlation plots.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ts_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">acf_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">pacf_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">plot_autocorrelations_for_data</span><span class="p">(</span>
+            <span class="n">data_trace</span><span class="p">,</span> <span class="n">ts_axis</span><span class="p">,</span> <span class="n">acf_axis</span><span class="p">,</span> <span class="n">pacf_axis</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Trace&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.plot_differenced_auto_correlations"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.plot_differenced_auto_correlations">[docs]</a>    <span class="k">def</span> <span class="nf">plot_differenced_auto_correlations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">,</span> <span class="n">lags</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot autocorrelations for `data_trace` and its differencing.</span>
+
+<span class="sd">        The autocorrelations and partial autocorrelations are plotted for both</span>
+<span class="sd">        `data_trace` and the time series generated by taking successive</span>
+<span class="sd">        differences for `data_trace`. The plots are plotted with lags of</span>
+<span class="sd">        `lags`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing the data trace for which auto</span>
+<span class="sd">            correlations are plotted.</span>
+<span class="sd">        lags: int</span>
+<span class="sd">            The number of lags to include in the auto correlation plots.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ts_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">diff_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">acf_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">diff_acf_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">pacf_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">diff_pacf_axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">plotting</span><span class="o">.</span><span class="n">plot_autocorrelations_for_data</span><span class="p">(</span>
+            <span class="n">data_trace</span><span class="p">,</span> <span class="n">ts_axis</span><span class="p">,</span> <span class="n">acf_axis</span><span class="p">,</span> <span class="n">pacf_axis</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span><span class="p">)</span>
+
+        <span class="n">diffs</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_differenced_trace</span><span class="p">(</span><span class="n">data_trace</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">plot_autocorrelations_for_data</span><span class="p">(</span>
+            <span class="n">diffs</span><span class="p">,</span> <span class="n">diff_axis</span><span class="p">,</span> <span class="n">diff_acf_axis</span><span class="p">,</span> <span class="n">diff_pacf_axis</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Trace vs Differenced Trace&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.plot_differenced_time_series"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.plot_differenced_time_series">[docs]</a>    <span class="k">def</span> <span class="nf">plot_differenced_time_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots `data_trace` and the differences time series.</span>
+
+<span class="sd">        The differences time series is a time series obtained from</span>
+<span class="sd">        `data_trace` by taking successive differences from the observations</span>
+<span class="sd">        of data traces.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing the data trace from which the</span>
+<span class="sd">            successive differences are calculated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_trace</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_plot_color</span><span class="p">,</span>
+                 <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Raw&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">get_differenced_trace</span><span class="p">(</span><span class="n">data_trace</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Differenced&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">setup_trace_plot</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tick_interval</span><span class="p">,</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Trace And 1 Level Differencing&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_analysis_title</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TraceAnalyzer.calculate_statistics"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.calculate_statistics">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates statistics for `data_trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing a data trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.Series</span>
+<span class="sd">            A pandas Series containing the statistics for `data_trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_trace_stats</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)</span>
+        <span class="n">trace_stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">],</span>
+                       <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">],</span>
+                       <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;median&quot;</span><span class="p">],</span>
+                       <span class="s2">&quot;avg&quot;</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;avg&quot;</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">trace_stats</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.test_for_stationarity"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.test_for_stationarity">[docs]</a>    <span class="k">def</span> <span class="nf">test_for_stationarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tests for stationarity in the `data_trace` time series.</span>
+
+<span class="sd">        The augmented Dickey-Fuller statistic is used to test for</span>
+<span class="sd">        stationarity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_trace: np.array</span>
+<span class="sd">            A numpy array representing the time series being tested for</span>
+<span class="sd">            stationarity.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the p-value of the augmented Dickey-Fuller</span>
+<span class="sd">            test for stationarity applied to `data_trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+<div class="viewcode-block" id="TraceAnalyzer.test_for_causality"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.test_for_causality">[docs]</a>    <span class="k">def</span> <span class="nf">test_for_causality</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_data</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span> <span class="n">lags</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tests for causality in `trace_data` between `col_names`.</span>
+
+<span class="sd">        The Granger causality test is applied to test whether the time series</span>
+<span class="sd">        indicated by the second element of `col_names` is useful in</span>
+<span class="sd">        forecasting the time series indicated by the first element of</span>
+<span class="sd">        `col_names` based on the data in `trace_data`. The tests are applied</span>
+<span class="sd">        at the lags indicated by `lags`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_data: pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing time series associated with a data</span>
+<span class="sd">            trace. There is one time series per column.</span>
+<span class="sd">        col_names: list</span>
+<span class="sd">            A list of the columns used in the test. It is a two element list</span>
+<span class="sd">            where the first element represents the name of the target time</span>
+<span class="sd">            series and the second element represents the name of the time</span>
+<span class="sd">            series being tested for whether it is useful in forecasting the</span>
+<span class="sd">            target time series.</span>
+<span class="sd">        lags: list</span>
+<span class="sd">            A list of integers representing the lags used in the causality</span>
+<span class="sd">            test. For each lag of `lags`, the time series indicated by the</span>
+<span class="sd">            second element of `col_names` will be tested at that lag to see</span>
+<span class="sd">            if it causes a change in the target time series.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary indicating the results of the Granger test for</span>
+<span class="sd">            causality for the data in `trace_data` indicated by `col_names`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">grangercausalitytests</span><span class="p">(</span><span class="n">trace_data</span><span class="p">[</span><span class="n">col_names</span><span class="p">],</span> <span class="n">lags</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

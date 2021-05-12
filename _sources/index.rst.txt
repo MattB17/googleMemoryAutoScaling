@@ -11,7 +11,7 @@ Code Contents
 .. toctree::
    :maxdepth: 2
 
-   Analysis/analysis
+   Evaluation/evaluation
    analysis
    parallel
    plotting
