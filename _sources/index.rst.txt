@@ -7,7 +7,13 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Code Contents:
+
+   analysis
+   parallel
+   plotting
+   specs
+   utils
 
 
 
