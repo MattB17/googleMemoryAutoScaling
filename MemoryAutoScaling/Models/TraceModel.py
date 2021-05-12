@@ -4,7 +4,7 @@ by all time series models.
 
 """
 from abc import ABC, abstractmethod
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Evaluation import ModelResults
 
 class TraceModel(ABC):
     """Implements the functionality of a generic trace model.

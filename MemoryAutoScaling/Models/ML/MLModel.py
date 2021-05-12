@@ -6,7 +6,7 @@ providing the basic framework used by all machine learning models.
 from abc import abstractmethod
 from MemoryAutoScaling import plotting, utils
 from MemoryAutoScaling.Models.ML import MLBase
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Evaluation import ModelResults
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 

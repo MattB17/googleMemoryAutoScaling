@@ -1,7 +1,7 @@
 Trace Analysis
 ==============
 
-.. automodule:: MemoryAutoScaling.Analysis
+.. automodule:: MemoryAutoScaling.Evaluation
 
 Contents
 --------

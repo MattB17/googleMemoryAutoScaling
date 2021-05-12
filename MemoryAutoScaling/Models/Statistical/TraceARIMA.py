@@ -7,7 +7,7 @@ component, refering to the number of lagged forecast errors used in the model.
 
 """
 from MemoryAutoScaling import plotting, specs, utils
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Evaluation import ModelResults
 from MemoryAutoScaling.Models.Statistical import StatisticalModel
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 

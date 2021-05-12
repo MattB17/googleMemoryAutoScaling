@@ -7,7 +7,7 @@ import numpy as np
 from abc import abstractmethod
 from MemoryAutoScaling import utils
 from MemoryAutoScaling.Models import TraceModel
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Evaluation import ModelResults
 from MemoryAutoScaling.DataHandling import MLDataHandler
 
 

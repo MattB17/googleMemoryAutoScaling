@@ -4,7 +4,7 @@ of training a model on a `Trace`.
 """
 import numpy as np
 from MemoryAutoScaling import specs, utils
-from MemoryAutoScaling.Analysis.HarvestStats import HarvestStats
+from MemoryAutoScaling.Evaluation.HarvestStats import HarvestStats
 
 
 class ModelResults:

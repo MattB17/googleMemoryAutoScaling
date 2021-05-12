@@ -5,7 +5,7 @@ a regression model on explanatory features.
 """
 from MemoryAutoScaling import parallel, plotting
 from MemoryAutoScaling.Models.ML import MLBase
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Evaluation import ModelResults
 from statsmodels.tsa.statespace.varmax import VARMAX
 
 

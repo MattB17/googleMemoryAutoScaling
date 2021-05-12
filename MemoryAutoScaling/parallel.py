@@ -6,7 +6,7 @@ import pandas as pd
 import multiprocessing as mp
 from MemoryAutoScaling import specs
 from MemoryAutoScaling.DataHandling.Trace import Trace
-from MemoryAutoScaling.Analysis.ModelResults import ModelResults
+from MemoryAutoScaling.Evaluation.ModelResults import ModelResults
 
 
 def get_cores_and_traces_per_core(trace_count):

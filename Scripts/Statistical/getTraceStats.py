@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from MemoryAutoScaling import analysis, parallel, specs, utils
-from MemoryAutoScaling.Analysis import TraceAnalyzer
+from MemoryAutoScaling.Evaluation import TraceAnalyzer
 from MemoryAutoScaling.DataHandling import Trace, TraceHandler
 
 

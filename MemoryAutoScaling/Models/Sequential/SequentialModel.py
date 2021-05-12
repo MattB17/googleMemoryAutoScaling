@@ -6,7 +6,7 @@ to predict the current value but do not store any state.
 from abc import abstractmethod
 from MemoryAutoScaling import plotting, specs, utils
 from MemoryAutoScaling.Models import TraceModel
-from MemoryAutoScaling.Analysis import ModelResults
+from MemoryAutoScaling.Evaluation import ModelResults
 
 
 class SequentialModel(TraceModel):
