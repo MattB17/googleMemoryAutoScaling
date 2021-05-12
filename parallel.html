@@ -1,36 +1,153 @@
 
-<!DOCTYPE html>
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Parallelization Functions &#8212; MemoryAutoScaling  documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Parallelization Functions &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Plotting Functions" href="plotting.html" />
-    <link rel="prev" title="Analysis Functions" href="analysis.html" />
+    <link rel="prev" title="Analysis Functions" href="analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Parallelization Functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/parallel.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-MemoryAutoScaling.parallel">
 <span id="parallelization-functions"></span><h1>Parallelization Functions<a class="headerlink" href="#module-MemoryAutoScaling.parallel" title="Permalink to this headline">¶</a></h1>
@@ -40,18 +157,24 @@
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">build_all_traces_from_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#build_all_traces_from_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.build_all_traces_from_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds a list of traces from <cite>trace_files</cite>.</p>
 <p>The traces are built using parallel processing.</p>
-<dl class="simple">
-<dt>trace_files: list</dt><dd><p>A list of strings representing the files from which the traces
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_files: list</strong></dt><dd><p>A list of strings representing the files from which the traces
 are built.</p>
 </dd>
-<dt>min_length: int</dt><dd><p>An integer representing the minimum number of time points needed
+<dt><strong>min_length: int</strong></dt><dd><p>An integer representing the minimum number of time points needed
 for a trace to be considered.</p>
 </dd>
-<dt>agg_window: int</dt><dd><p>An integer representing the aggregation window for the trace.</p>
+<dt><strong>agg_window: int</strong></dt><dd><p>An integer representing the aggregation window for the trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of <cite>Traces</cite> obtained from the trace files.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -60,19 +183,27 @@ for a trace to be considered.</p>
 <dt id="MemoryAutoScaling.parallel.build_traces_from_files">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">build_traces_from_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traces_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#build_traces_from_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.build_traces_from_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds a list of traces from <cite>trace_files</cite>.</p>
-<dl class="simple">
-<dt>trace_files: list</dt><dd><p>A list of strings representing the files from which the traces
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_files: list</strong></dt><dd><p>A list of strings representing the files from which the traces
 are built.</p>
 </dd>
-<dt>traces_lst: mp.Manager().list</dt><dd><p>A multiprocessing list to which traces are appended.</p>
+<dt><strong>traces_lst: mp.Manager().list</strong></dt><dd><p>A multiprocessing list to which traces are appended.</p>
 </dd>
-<dt>min_length: int</dt><dd><p>An integer representing the minimum number of time points needed
+<dt><strong>min_length: int</strong></dt><dd><p>An integer representing the minimum number of time points needed
 for a trace to be considered.</p>
 </dd>
-<dt>agg_window: int</dt><dd><p>An integer representing the aggregation window for the trace.</p>
+<dt><strong>agg_window: int</strong></dt><dd><p>An integer representing the aggregation window for the trace.</p>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -82,13 +213,19 @@ for a trace to be considered.</p>
 <p>The number of cores to use is determined based on the system and
 <cite>trace_count</cite>. Then, given the number of cores, the number of
 traces to be processed on each core is calculated based on <cite>trace_count</cite>.</p>
-<dl class="simple">
-<dt>trace_count: int</dt><dd><p>An integer representing the number of total traces to be processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_count: int</strong></dt><dd><p>An integer representing the number of total traces to be processed.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>int, int</dt><dd><p>Two integers representing the number of cores to use and the number
 of traces to be handled by each core, respectively.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -100,27 +237,33 @@ of traces to be handled by each core, respectively.</p>
 <p>A separate <cite>ModelResults</cite> object is built for each variable in
 <cite>model_vars</cite> based on the actual and predicted values in the training
 and test sets.</p>
-<dl class="simple">
-<dt>model_params: tuple</dt><dd><p>A tuple specifying the parameters of the trained model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_params: tuple</strong></dt><dd><p>A tuple specifying the parameters of the trained model.</p>
 </dd>
-<dt>train_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the target data for the training set.</p>
+<dt><strong>train_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the target data for the training set.</p>
 </dd>
-<dt>train_preds: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the predictions for the training set.</p>
+<dt><strong>train_preds: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the predictions for the training set.</p>
 </dd>
-<dt>test_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the target data for the testing set.</p>
+<dt><strong>test_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the target data for the testing set.</p>
 </dd>
-<dt>test_preds: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the predictions for the testing set.</p>
+<dt><strong>test_preds: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the predictions for the testing set.</p>
 </dd>
-<dt>spare: float</dt><dd><p>A float representing the total spare amount of the target variable
+<dt><strong>spare: float</strong></dt><dd><p>A float representing the total spare amount of the target variable
 over the test period.</p>
 </dd>
-<dt>model_vars: list</dt><dd><p>A list of strings with the names of the variables being modeled.</p>
+<dt><strong>model_vars: list</strong></dt><dd><p>A list of strings with the names of the variables being modeled.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary of model results. The keys are the variable names
 specified in <cite>model_vars</cite> and the corresponding value is a
 <cite>ModelResults</cite> object corresponding to the results for that variable.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -131,19 +274,25 @@ specified in <cite>model_vars</cite> and the corresponding value is a
 <dd><p>Gets the traces from <cite>traces</cite> for the core specified by <cite>core_num</cite>.</p>
 <p>Subsets <cite>traces</cite> to a list of length <cite>traces_per_core</cite> to get a list of
 traces to be processed on the core specified by <cite>core_num</cite>.</p>
-<dl class="simple">
-<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>traces: list</strong></dt><dd><p>A list of <cite>Trace</cite> objects.</p>
 </dd>
-<dt>traces_per_core: int</dt><dd><p>An integer specifying the number of traces to be processed by
+<dt><strong>traces_per_core: int</strong></dt><dd><p>An integer specifying the number of traces to be processed by
 each core.</p>
 </dd>
-<dt>core_num: int</dt><dd><p>An integer representing the specific core processing the subsetted
+<dt><strong>core_num: int</strong></dt><dd><p>An integer representing the specific core processing the subsetted
 traces.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list representing the subset of <cite>Trace</cite> objects in <cite>traces</cite> that
 will be processed on the core specified by <cite>core_num</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -152,33 +301,47 @@ will be processed on the core specified by <cite>core_num</cite>.</p>
 <dt id="MemoryAutoScaling.parallel.initialize_and_join_processes">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">initialize_and_join_processes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#initialize_and_join_processes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.initialize_and_join_processes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes and joins all the processes in <cite>procs</cite>.</p>
-<dl class="simple">
-<dt>procs: list</dt><dd><p>A list of <cite>mp.Process</cite> objects representing the processes
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>procs: list</strong></dt><dd><p>A list of <cite>mp.Process</cite> objects representing the processes
 to be initialized and joined.</p>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.parallel.perform_trace_modelling">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">perform_trace_modelling</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#perform_trace_modelling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.perform_trace_modelling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs the modelling procedure on <cite>traces</cite> according to <cite>model_func</cite>.</p>
-<dl class="simple">
-<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects to be modelled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>traces: list</strong></dt><dd><p>A list of <cite>Trace</cite> objects to be modelled.</p>
 </dd>
-<dt>model_func: function</dt><dd><p>A function specifying how modelling should be carried out for a
+<dt><strong>model_func: function</strong></dt><dd><p>A function specifying how modelling should be carried out for a
 collection of traces. The function takes a list of traces to be
 processed, a dictionary to store modeling results, and the set of
 arguments specified in <cite>model_args</cite>.</p>
 </dd>
-<dt>model_args: tuple</dt><dd><p>A tuple containing the arguments used for <cite>model_func</cite>.</p>
+<dt><strong>model_args: tuple</strong></dt><dd><p>A tuple containing the arguments used for <cite>model_func</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary of lists in which the keys are strings representing the
 id of a trace and the values correspond to model results for the
 trace.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -186,76 +349,52 @@ trace.</p>
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">MemoryAutoScaling</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Code Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis Functions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Parallelization Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="specs.html">Specifications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="analysis.html" title="previous chapter">Analysis Functions</a></li>
-      <li>Next: <a href="plotting.html" title="next chapter">Plotting Functions</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plotting.html" class="btn btn-neutral float-right" title="Plotting Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="analysis.html" class="btn btn-neutral float-left" title="Analysis Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2021, Matt Buckley.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/parallel.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>

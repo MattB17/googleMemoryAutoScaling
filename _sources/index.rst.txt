@@ -5,9 +5,11 @@
 
 .. include:: ../../README.rst
 
+Code Contents
+=============
+
 .. toctree::
    :maxdepth: 2
-   :caption: Code Contents:
 
    analysis
    parallel

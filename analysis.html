@@ -1,36 +1,153 @@
 
-<!DOCTYPE html>
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Analysis Functions &#8212; MemoryAutoScaling  documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Analysis Functions &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Parallelization Functions" href="parallel.html" />
-    <link rel="prev" title="Google Memory Auto Scaling" href="index.html" />
+    <link rel="prev" title="Google Memory Auto Scaling" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Analysis Functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/analysis.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-MemoryAutoScaling.analysis">
 <span id="analysis-functions"></span><h1>Analysis Functions<a class="headerlink" href="#module-MemoryAutoScaling.analysis" title="Permalink to this headline">¶</a></h1>
@@ -39,19 +156,25 @@
 <dt id="MemoryAutoScaling.analysis.append_multivariate_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">append_multivariate_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_results_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#append_multivariate_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.append_multivariate_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends <cite>new_results_dict</cite> into <cite>model_results_dict</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>A dictionary containing lists of <cite>ModelResults</cite>. Each key is a string
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>A dictionary containing lists of <cite>ModelResults</cite>. Each key is a string
 representing a modeled variable and the corresponding value is a list
 of <cite>ModelResults</cite> objects for that variable.</p>
 </dd>
-<dt>new_results_dict: dict</dt><dd><p>A dictionary of <cite>ModelResults</cite>. Each key is a string representing a
+<dt><strong>new_results_dict: dict</strong></dt><dd><p>A dictionary of <cite>ModelResults</cite>. Each key is a string representing a
 modeled variable and the corresponding value is an associated
 <cite>ModelResults</cite> object.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>model_results_dict</cite> after inserting
 <cite>new_results_dict</cite> at <cite>idx</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -60,13 +183,19 @@ modeled variable and the corresponding value is an associated
 <dt id="MemoryAutoScaling.analysis.build_harvest_stats_dict_from_model_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">build_harvest_stats_dict_from_model_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#build_harvest_stats_dict_from_model_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.build_harvest_stats_dict_from_model_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary of harvest statistics from <cite>model_results_dict</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the model results for a trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the model results for a trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing <cite>HarvestStats</cite> objects for the harvest
 statistics in <cite>model_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -75,19 +204,25 @@ statistics in <cite>model_results_dict</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.build_model_from_model_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">build_model_from_model_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#build_model_from_model_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.build_model_from_model_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds a <cite>model</cite> object from <cite>model_results</cite> and <cite>other_params</cite>.</p>
-<dl class="simple">
-<dt>model: TraceModel.class</dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the model being
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model: TraceModel.class</strong></dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the model being
 created.</p>
 </dd>
-<dt>model_results: ModelResults</dt><dd><p>A <cite>ModelResults</cite> object containing the model results used to build
+<dt><strong>model_results: ModelResults</strong></dt><dd><p>A <cite>ModelResults</cite> object containing the model results used to build
 <cite>model</cite>.</p>
 </dd>
-<dt>other_params: dict</dt><dd><p>A dictionary of other parameters used to build <cite>model</cite>.</p>
+<dt><strong>other_params: dict</strong></dt><dd><p>A dictionary of other parameters used to build <cite>model</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>TraceModel</dt><dd><p>A <cite>TraceModel</cite> object of type <cite>model</cite> built from <cite>model_results</cite> and
 <cite>other_params</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -96,12 +231,18 @@ created.</p>
 <dt id="MemoryAutoScaling.analysis.build_model_results_from_results_dict">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">build_model_results_from_results_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#build_model_results_from_results_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.build_model_results_from_results_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds a <cite>ModelResults</cite> object from <cite>model_results_dict</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the model results for a trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the model results for a trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>ModelResults</dt><dd><p>The <cite>ModelResults</cite> object obtained from <cite>model_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -112,17 +253,23 @@ created.</p>
 <dd><p>Builds <cite>trace_model</cite> objects from the params in <cite>params_lst</cite>.</p>
 <p>A separate <cite>trace_model</cite> object is built for each set of params
 in <cite>params_lst</cite>.</p>
-<dl class="simple">
-<dt>trace_model: TraceModel.class</dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the models being
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_model: TraceModel.class</strong></dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the models being
 created.</p>
 </dd>
-<dt>params_lst: list</dt><dd><p>A list of dictionaries in which each dictionary represents the set of
+<dt><strong>params_lst: list</strong></dt><dd><p>A list of dictionaries in which each dictionary represents the set of
 named parameters used to initialize a <cite>trace_model</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of <cite>trace_model</cite> objects instantiated from the parameters
 in <cite>params_lst</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -131,17 +278,23 @@ in <cite>params_lst</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.calculate_prop_harvested_for_model">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">calculate_prop_harvested_for_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_pct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#calculate_prop_harvested_for_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.calculate_prop_harvested_for_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>The proportion harvested across all traces with <cite>model_name</cite>.</p>
-<dl class="simple">
-<dt>model_results_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the model results for each trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the model results for each trace.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string representing the name of the model to which the results
+<dt><strong>model_name: str</strong></dt><dd><p>A string representing the name of the model to which the results
 apply.</p>
 </dd>
-<dt>buffer_pct: float</dt><dd><p>A float representing the buffer percentage applied to predictions.</p>
+<dt><strong>buffer_pct: float</strong></dt><dd><p>A float representing the buffer percentage applied to predictions.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float</dt><dd><p>A float in the range [0, 1] representing the proportion harvested.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -152,20 +305,26 @@ apply.</p>
 <dd><p>Gets <cite>ModelResults</cite> for the best models of <cite>models</cite> for <cite>trace</cite>.</p>
 <p>The best multivariate models in <cite>models</cite> are the <cite>models_count</cite> models
 with the lowest test MASE when built on <cite>trace</cite>.</p>
-<dl class="simple">
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
 </dd>
-<dt>models: list</dt><dd><p>A list of <cite>TraceModel</cite> objects representing the models being fit
+<dt><strong>models: list</strong></dt><dd><p>A list of <cite>TraceModel</cite> objects representing the models being fit
 to <cite>trace</cite> and from which the best models are chosen.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of models to include in the results.</p>
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of models to include in the results.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary of model results. The keys are strings representing the
 names of the variables being modeled. The corresponding value is a
 list of <cite>ModelResults</cite> objects representing model results for <cite>trace</cite>
 on the associated variable.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -176,24 +335,30 @@ on the associated variable.</p>
 <dd><p>Gets <cite>ModelResults</cite> for the best models of <cite>models</cite> for <cite>trace</cite>.</p>
 <p>The best models of <cite>models</cite> are the <cite>models_count</cite> models with the lowest
 test MASE when built on <cite>trace</cite>.</p>
-<dl class="simple">
-<dt>model_type: TraceModel.class</dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the types of the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_type: TraceModel.class</strong></dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the types of the
 models being fit to <cite>trace</cite>.</p>
 </dd>
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
 </dd>
-<dt>models: list</dt><dd><p>A list of <cite>TraceModel</cite> objects representing the models being fit
+<dt><strong>models: list</strong></dt><dd><p>A list of <cite>TraceModel</cite> objects representing the models being fit
 to <cite>trace</cite> and from which the best models are chosen.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of models to include in the results.</p>
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of models to include in the results.</p>
 </dd>
-<dt>fixed_params: dict</dt><dd><p>A dictionary of model parameters representing the parameters that are
+<dt><strong>fixed_params: dict</strong></dt><dd><p>A dictionary of model parameters representing the parameters that are
 common to each model being fit to <cite>trace</cite>, given by <cite>models</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list consisting of the ID of <cite>trace</cite> followed by the results for the
 <cite>models_count</cite> best models from <cite>models</cite> fit to <cite>trace</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -204,17 +369,23 @@ common to each model being fit to <cite>trace</cite>, given by <cite>models</cit
 <dd><p>Gets all granger column names for <cite>causal_cols</cite> and <cite>causal_lags</cite>.</p>
 <p>That is there is a column for each combination of <cite>causal_cols</cite>,
 <cite>causal_lags</cite>, and each statistical test.</p>
-<dl class="simple">
-<dt>causal_cols: list</dt><dd><p>A list of strings representing the columns for which a test was
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>causal_cols: list</strong></dt><dd><p>A list of strings representing the columns for which a test was
 carried out to determine if the given column is causally related
 to the target variable.</p>
 </dd>
-<dt>causal_lags: list</dt><dd><p>A list of integers representing the lags tested for causality.</p>
+<dt><strong>causal_lags: list</strong></dt><dd><p>A list of integers representing the lags tested for causality.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of strings representing all granger column names for
 <cite>causal_cols</cite> and <cite>causal_lags</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -229,23 +400,29 @@ trace. Otherwise, the best <cite>ModelResults</cite> for the trace is the better
 <cite>ModelResults</cite> object between <cite>best_results_dict</cite> and <cite>row_dict</cite>. The
 dictionary has the model name of the best model and the corresponding
 <cite>ModelResults</cite> object.</p>
-<dl class="simple">
-<dt>best_results_dict: dict</dt><dd><p>A dictionary containing the best model results for each trace. The
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>best_results_dict: dict</strong></dt><dd><p>A dictionary containing the best model results for each trace. The
 keys are strings representing trace IDs. The corresponding value is
 a dictionary with 2 key-value pairs: one specifying the name of the
 best model and the other specifying the <cite>ModelResults</cite> object
 associated with the model.</p>
 </dd>
-<dt>row_dict: dict</dt><dd><p>A dictionary specifying the model results for a model of type
+<dt><strong>row_dict: dict</strong></dt><dd><p>A dictionary specifying the model results for a model of type
 <cite>model_name</cite> built on a trace.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string specifying the type of model to which the results in row_dict
+<dt><strong>model_name: str</strong></dt><dd><p>A string specifying the type of model to which the results in row_dict
 refer.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary of best results for the trace based on <cite>row_dict</cite> and
 <cite>best_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -259,16 +436,22 @@ is built from the model results dataframes in <cite>model_results_dfs</cite>. Th
 keys are strings representing trace IDs and the corresponding value is
 a dictionary of 2 key-value pairs: specifying the name of the best model
 and the associated <cite>ModelResults</cite> for that trace.</p>
-<dl class="simple">
-<dt>model_results_dfs: dict</dt><dd><p>A dictionary of model results DataFrames where the keys are strings
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dfs: dict</strong></dt><dd><p>A dictionary of model results DataFrames where the keys are strings
 representing the names of the model to which the DataFrame refers to.
 Each dataframe contains the results of the corresponding model fit on
 each trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary of the best <cite>ModelResults</cite> for each trace obtained from
 <cite>model_results_dfs</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -280,29 +463,37 @@ each trace.</p>
 <p>For each trace in <cite>traces</cite> a <cite>trace_model</cite> object is built for each set of
 model parameters in <cite>model_params</cite> and the results of the best
 <cite>models_count</cite> models are saved in <cite>result_dict</cite>.</p>
-<dl class="simple">
-<dt>trace_model: TraceModel.class</dt><dd><p>A <cite>TraceModel</cite> class specifying the model to be built.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_model: TraceModel.class</strong></dt><dd><p>A <cite>TraceModel</cite> class specifying the model to be built.</p>
 </dd>
-<dt>model_params: list</dt><dd><p>A list of dictionaries specifying the model parameters for each model
+<dt><strong>model_params: list</strong></dt><dd><p>A list of dictionaries specifying the model parameters for each model
 to be built.</p>
 </dd>
-<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects specifying the traces to which models are
+<dt><strong>traces: list</strong></dt><dd><p>A list of <cite>Trace</cite> objects specifying the traces to which models are
 fit.</p>
 </dd>
-<dt>result_dict: dict</dt><dd><p>The dictionary to which the model results for each trace are saved.</p>
+<dt><strong>result_dict: dict</strong></dt><dd><p>The dictionary to which the model results for each trace are saved.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of model results to save. The
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of model results to save. The
 results for the <cite>models_count</cite> best models for each trace will be
 saved.</p>
 </dd>
-<dt>fixed_model_params: dict</dt><dd><p>A dictionary of model parameters representing the parameters that are
+<dt><strong>fixed_model_params: dict</strong></dt><dd><p>A dictionary of model parameters representing the parameters that are
 common to each model being fit to <cite>trace</cite>.</p>
 </dd>
-<dt>verbose: bool</dt><dd><p>A boolean indicating whether to run in verbose mode. The default
+<dt><strong>verbose: bool</strong></dt><dd><p>A boolean indicating whether to run in verbose mode. The default
 value is True, in which case progress is printed to the screen.</p>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -312,43 +503,57 @@ value is True, in which case progress is printed to the screen.</p>
 <p>For each trace in <cite>traces</cite> a <cite>model</cite> object is built for each set of model
 parameters in <cite>model_params</cite> and the results of the best <cite>models_count</cite>
 models are saved in <cite>result_dict</cite>.</p>
-<dl class="simple">
-<dt>model: TraceModel.class</dt><dd><p>A <cite>TraceModel</cite> class specifying the model to be built.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model: TraceModel.class</strong></dt><dd><p>A <cite>TraceModel</cite> class specifying the model to be built.</p>
 </dd>
-<dt>model_params: list</dt><dd><p>A list of dictionaries specifying the model parameters for each model
+<dt><strong>model_params: list</strong></dt><dd><p>A list of dictionaries specifying the model parameters for each model
 to be built.</p>
 </dd>
-<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects specifying the traces to which models are
+<dt><strong>traces: list</strong></dt><dd><p>A list of <cite>Trace</cite> objects specifying the traces to which models are
 fit.</p>
 </dd>
-<dt>result_dict: dict</dt><dd><p>The dictionary to which the model results for each trace are saved.</p>
+<dt><strong>result_dict: dict</strong></dt><dd><p>The dictionary to which the model results for each trace are saved.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of model results to save. The
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of model results to save. The
 results for the <cite>models_count</cite> best models for each trace will be
 saved.</p>
 </dd>
-<dt>verbose: bool</dt><dd><p>A boolean indicating whether to run in verbose mode. The default
+<dt><strong>verbose: bool</strong></dt><dd><p>A boolean indicating whether to run in verbose mode. The default
 value is True, in which case progress is printed to the screen.</p>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.analysis.get_col_list_for_params">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_col_list_for_params</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_col_list_for_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_col_list_for_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a list of columns based on <cite>params</cite> and <cite>model_cols</cite>.</p>
-<dl class="simple">
-<dt>params: list</dt><dd><p>A list of model parameters used to generate the column names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>params: list</strong></dt><dd><p>A list of model parameters used to generate the column names.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string representing the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string representing the name of the model.</p>
 </dd>
-<dt>model_cols: list</dt><dd><p>A list of column names for the models.</p>
+<dt><strong>model_cols: list</strong></dt><dd><p>A list of column names for the models.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list consisting of column names generated from <cite>params</cite> and
 <cite>model_cols</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -357,13 +562,19 @@ value is True, in which case progress is printed to the screen.</p>
 <dt id="MemoryAutoScaling.analysis.get_granger_col_names_for_lag">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_granger_col_names_for_lag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_granger_col_names_for_lag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_granger_col_names_for_lag" title="Permalink to this definition">¶</a></dt>
 <dd><p>The set of granger column names for <cite>lag</cite>.</p>
-<dl class="simple">
-<dt>lag: int</dt><dd><p>An integer representing the time lag of interest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lag: int</strong></dt><dd><p>An integer representing the time lag of interest.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of strings representing the column names for the granger
 causality test at a lag of <cite>lag</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -372,15 +583,21 @@ causality test at a lag of <cite>lag</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.get_granger_pvalues_at_lag">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_granger_pvalues_at_lag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">granger_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_granger_pvalues_at_lag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_granger_pvalues_at_lag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the pvalues from <cite>granger_dict</cite> at <cite>lag</cite>.</p>
-<dl class="simple">
-<dt>granger_dict: dict</dt><dd><p>A dictionarity containing the results of a Granger test for causality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>granger_dict: dict</strong></dt><dd><p>A dictionarity containing the results of a Granger test for causality.</p>
 </dd>
-<dt>lag: int</dt><dd><p>An integer representing the lag used for the causality test.</p>
+<dt><strong>lag: int</strong></dt><dd><p>An integer representing the lag used for the causality test.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of pvalues from the granger causality test recorded in
 <cite>granger_dict</cite> at the lag <cite>lag</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -393,10 +610,14 @@ causality test at a lag of <cite>lag</cite>.</p>
 the input parameters for model building. These input parameters are
 the collection of traces to be modeled, an output directory for model
 results, and the proportion of records in the training set.</p>
-<dl class="simple">
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing the list of traces to be modeled, the output
 directory for modeling results, and a float representing the
 proportion of records to use in the training set.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -407,13 +628,19 @@ proportion of records to use in the training set.</p>
 <dd><p>The number of non-stationary traces in <cite>stats_df</cite>.</p>
 <p>A trace is deemed non-stationary if it is still not stationary after
 2 levels of differencing.</p>
-<dl class="simple">
-<dt>stats_df: pd.DataFrame</dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>int</dt><dd><p>An integer representing the number of traces that were not stationary
 after two levels of differencing based on data in <cite>stats_df</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -425,22 +652,28 @@ after two levels of differencing based on data in <cite>stats_df</cite>.</p>
 <p>The percentile dataframe is a pandas DataFrame containing the 1, 25, 50,
 75, and 99 percentile values for <cite>analysis_col</cite> for each model in
 <cite>model_names_lst</cite> based on the data in <cite>model_results_dict</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>A dictionary of model results DataFrames where the keys are strings
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>A dictionary of model results DataFrames where the keys are strings
 representing the names of the model to which the DataFrame refers to.
 Each dataframe contains the results of the corresponding model fit on
 each trace.</p>
 </dd>
-<dt>model_names_lst: list</dt><dd><p>A list of strings representing the names of models for which the
+<dt><strong>model_names_lst: list</strong></dt><dd><p>A list of strings representing the names of models for which the
 corresponding model results dataframe appears in <cite>model_results_dict</cite>.</p>
 </dd>
-<dt>analysis_col: str</dt><dd><p>A string representing the name of the column in the model results
+<dt><strong>analysis_col: str</strong></dt><dd><p>A string representing the name of the column in the model results
 dataframes for which the percentiles are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>A pandas DataFrame representing the percentile dataframe for
 <cite>analysis_col</cite> based on the data in <cite>model_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -454,16 +687,22 @@ of total resource harvested across all traces is calculated. The
 dictionary has a key as a string representing the model name and the
 corresponding value is a float representing the proportion harvested by
 that model across all traces.</p>
-<dl class="simple">
-<dt>model_results_dfs: dict</dt><dd><p>A dictionary of model results DataFrames where the keys are strings
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dfs: dict</strong></dt><dd><p>A dictionary of model results DataFrames where the keys are strings
 representing the model name and the corresponding value is a
 DataFrame containing the associated model results.</p>
 </dd>
-<dt>buffer_pct: float</dt><dd><p>A float representing the buffer percentage applied to predictions.</p>
+<dt><strong>buffer_pct: float</strong></dt><dd><p>A float representing the buffer percentage applied to predictions.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary of proportion of resources harvested for each model.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -475,16 +714,22 @@ DataFrame containing the associated model results.</p>
 <p>The results list is a list of lists in which each list represents the
 modelling result for a trace. The list consists of the trace’s ID followed
 by a list representation of all of the model results for that trace.</p>
-<dl class="simple">
-<dt>trace_model_dicts: dict</dt><dd><p>A dictionary containing model results for each trace. The keys are
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_model_dicts: dict</strong></dt><dd><p>A dictionary containing model results for each trace. The keys are
 strings representing trace IDs and the corresponding value is a
 dictionary of <cite>ModelResults</cite> for the trace. This nested dictionary has
 a key for each variable being modeled and the corresponding value is
 a list of <cite>ModelResults</cite> objects for that variable.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of lists representing the results list.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -496,14 +741,20 @@ a list of <cite>ModelResults</cite> objects for that variable.</p>
 <p>A results list is a list of lists containing a list for each trace.
 These lists consist of the trace id followed by list representations of
 the <cite>ModelResults</cite> in <cite>trace_model_results</cite> associated with the trace.</p>
-<dl class="simple">
-<dt>trace_model_results: dict</dt><dd><p>A dictionary in which each key is a string representing the id of a
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_model_results: dict</strong></dt><dd><p>A dictionary in which each key is a string representing the id of a
 trace. The corresponding value is a list of <cite>ModelResults</cite>
 corresponding to the model results for that trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of lists representing the results list.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -512,13 +763,19 @@ corresponding to the model results for that trace.</p>
 <dt id="MemoryAutoScaling.analysis.get_stationary_1_diff_count">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_stationary_1_diff_count</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_stationary_1_diff_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_stationary_1_diff_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of stationary traces in <cite>stats_df</cite> after 1 differences.</p>
-<dl class="simple">
-<dt>stats_df: pd.DataFrame</dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>int</dt><dd><p>An integer representing the number of traces that were stationary
 after one level of differencing based on data in <cite>stats_df</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -527,13 +784,19 @@ after one level of differencing based on data in <cite>stats_df</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.get_stationary_2_diff_count">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_stationary_2_diff_count</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_stationary_2_diff_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_stationary_2_diff_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of stationary traces in <cite>stats_df</cite> after 2 differences.</p>
-<dl class="simple">
-<dt>stats_df: pd.DataFrame</dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>int</dt><dd><p>An integer representing the number of traces that were stationary
 after two levels of differencing based on data in <cite>stats_df</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -542,14 +805,20 @@ after two levels of differencing based on data in <cite>stats_df</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.get_stationary_results_df">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_stationary_results_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats_dfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_stationary_results_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_stationary_results_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dataframe of stationary results from <cite>stats_dfs</cite>.</p>
-<dl class="simple">
-<dt>stats_dfs: dict</dt><dd><p>A dictionary of pandas DataFrames from which the stationary results
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats_dfs: dict</strong></dt><dd><p>A dictionary of pandas DataFrames from which the stationary results
 are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>A pandas DataFrame containing a summary of the stationary results from
 <cite>stats_dfs</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -562,22 +831,28 @@ are calculated.</p>
 constructed based on <cite>val_results</cite> and <cite>other_params</cite>. Once constructed,
 the model is run on trace for the test set and the model results are
 calculated.</p>
-<dl class="simple">
-<dt>trace_model: TraceModel.class</dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the model built
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_model: TraceModel.class</strong></dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the model built
 from the validation results and evaluated on the test set.</p>
 </dd>
-<dt>val_results: ModelResults</dt><dd><p>A <cite>ModelResults</cite> object representing the results of running a model of
+<dt><strong>val_results: ModelResults</strong></dt><dd><p>A <cite>ModelResults</cite> object representing the results of running a model of
 type <cite>trace_model</cite> on the validation set of <cite>trace</cite>.</p>
 </dd>
-<dt>other_params: dict</dt><dd><p>A dictionary of other parameters used to build <cite>model</cite>.</p>
+<dt><strong>other_params: dict</strong></dt><dd><p>A dictionary of other parameters used to build <cite>model</cite>.</p>
 </dd>
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object that is being modeled.</p>
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object that is being modeled.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>ModelResults</dt><dd><p>A <cite>ModelResults</cite> object representing the results of training a model
 of type <cite>trace_model</cite> on <cite>trace</cite> where the model is constructed based
 on the validation results.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -591,25 +866,31 @@ validation model for each <cite>ModelResults</cite> object in <cite>val_results_
 which is constructed based on the <cite>ModelResults</cite> and <cite>other_params</cite>.
 Each such model is evaluated on the test set of <cite>trace</cite> to get a new
 <cite>ModelResults</cite> object for the test set.</p>
-<dl class="simple">
-<dt>trace_model: TraceModel.class</dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the types of models
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_model: TraceModel.class</strong></dt><dd><p>A reference to a <cite>TraceModel</cite> class representing the types of models
 that will be built from the validation results and evaluated on the
 test set.</p>
 </dd>
-<dt>val_results_lst: list</dt><dd><p>A list of <cite>ModelResults</cite> objects representing the results of running
+<dt><strong>val_results_lst: list</strong></dt><dd><p>A list of <cite>ModelResults</cite> objects representing the results of running
 models of type <cite>trace_model</cite> on the validation set of <cite>trace</cite>.</p>
 </dd>
-<dt>other_params: dict</dt><dd><p>A dictionary of other parameters used to build the models. These
+<dt><strong>other_params: dict</strong></dt><dd><p>A dictionary of other parameters used to build the models. These
 parameters are the same across every model constructed and do not
 depend on the validation results.</p>
 </dd>
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object that is being modeled.</p>
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object that is being modeled.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of <cite>ModelResults</cite> objects representing the results of
 evaluating the validation models of type <cite>trace_model</cite> on the test
 set of <cite>trace</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -618,14 +899,20 @@ set of <cite>trace</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.get_total_utilization_across_traces">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_total_utilization_across_traces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stat_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_total_utilization_across_traces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_total_utilization_across_traces" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets total utilization across the traces in <cite>stat_df</cite>.</p>
-<dl class="simple">
-<dt>stat_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the utilization statistics for the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stat_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the utilization statistics for the
 traces.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>str</dt><dd><p>A string representing the percent utilization across all traces in
 <cite>stat_df</cite>, rounded to 2 decimal places.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -634,14 +921,20 @@ traces.</p>
 <dt id="MemoryAutoScaling.analysis.get_total_utilization_df">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_total_utilization_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats_dfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_total_utilization_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_total_utilization_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dataframe of total utilization rates from <cite>stats_dfs</cite>.</p>
-<dl class="simple">
-<dt>stats_dfs: dict</dt><dd><p>A dictionary of pandas DataFrames from which the stationary results
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats_dfs: dict</strong></dt><dd><p>A dictionary of pandas DataFrames from which the stationary results
 are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>A pandas DataFrame containing the total utilization rate for each
 DataFrame in <cite>stats_dfs</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -650,14 +943,20 @@ DataFrame in <cite>stats_dfs</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.get_traces_from_input_params">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">get_traces_from_input_params</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#get_traces_from_input_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.get_traces_from_input_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the collection of traces based on <cite>input_params</cite>.</p>
-<dl class="simple">
-<dt>input_params: dict</dt><dd><p>A dictionary containing the input parameters used to construct the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>input_params: dict</strong></dt><dd><p>A dictionary containing the input parameters used to construct the
 traces. The dictionary has keys ‘input_dir’, ‘file_id’,
 ‘min_trace_length’, and ‘aggregation_window’.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list of <cite>Trace</cite> objects constructed based on <cite>input_params</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -670,11 +969,15 @@ traces. The dictionary has keys ‘input_dir’, ‘file_id’,
 the input parameters for model building. These input parameters are
 the collection of traces to be modeled, an output directory for model
 results, and the proportion of records in the training set.</p>
-<dl class="simple">
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing a list of traces, the output directory for
 model results, a float representing the proportion of records in the
 training set, and a boolean indicating which target variable to use
 for modeling.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -687,28 +990,33 @@ for modeling.</p>
 these models for each trace are recorded. <cite>modeling_func</cite> is used to run
 the models on a batch of traces and this function is parallelized to cover
 all traces. The best models are then retrieved.</p>
-<dl class="simple">
-<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects to be modeled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>traces: list</strong></dt><dd><p>A list of <cite>Trace</cite> objects to be modeled.</p>
 </dd>
-<dt>modeling_func: function</dt><dd><p>The function used to perform the modelling on a batch of traces. The
+<dt><strong>modeling_func: function</strong></dt><dd><p>The function used to perform the modelling on a batch of traces. The
 function takes three arguments: a list of <cite>Trace</cite> objects on which the
 models are run, a list to which results are saved, and a float
 specifying the proportion of data in the training set.</p>
 </dd>
-<dt>model_args: tuple</dt><dd><p>A tuple containing the arguments used for <cite>model_func</cite>.</p>
+<dt><strong>model_args: tuple</strong></dt><dd><p>A tuple containing the arguments used for <cite>model_func</cite>.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of models to record. The results
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of models to record. The results
 for the <cite>models_count</cite> best models for each trace are recorded.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string specifying the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string specifying the name of the model.</p>
 </dd>
-<dt>output_dir: str</dt><dd><p>A string specifying the directory to which the results will be output.</p>
+<dt><strong>output_dir: str</strong></dt><dd><p>A string specifying the directory to which the results will be output.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>The results of the modelling procedure is saved to a csv file containing
-one row per trace. The file is output to a file named <cite>&lt;name&gt;_results.csv</cite>
-where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -719,20 +1027,26 @@ where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
 <cite>model_results</cite> if it has fewer than <cite>cutoff</cite> entries or if the results
 for the model are better than the results of at least one model contained
 in <cite>model_results</cite>.</p>
-<dl class="simple">
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
 </dd>
-<dt>model: TraceModel</dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
+<dt><strong>model: TraceModel</strong></dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
 </dd>
-<dt>model_results: list</dt><dd><p>A list of <cite>ModelResults</cite> objects for the results of models built on
+<dt><strong>model_results: list</strong></dt><dd><p>A list of <cite>ModelResults</cite> objects for the results of models built on
 the trace.</p>
 </dd>
-<dt>cutoff: int</dt><dd><p>An integer representing the maximum length of <cite>model_results</cite>.</p>
+<dt><strong>cutoff: int</strong></dt><dd><p>An integer representing the maximum length of <cite>model_results</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list obtained from <cite>model_results</cite> after handling the results of
 modeling <cite>trace</cite> with <cite>model</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -745,19 +1059,25 @@ modeling <cite>trace</cite> with <cite>model</cite>.</p>
 <cite>model_results</cite> if it has fewer than <cite>cutoff</cite> entries or if the results
 for the model are better than the results of at least one model contained
 in <cite>model_results</cite>.</p>
-<dl class="simple">
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
 </dd>
-<dt>model: TraceModel</dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
+<dt><strong>model: TraceModel</strong></dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
 </dd>
-<dt>model_results: dict</dt><dd><p>A dictionary containing results for modelling done on the trace.</p>
+<dt><strong>model_results: dict</strong></dt><dd><p>A dictionary containing results for modelling done on the trace.</p>
 </dd>
-<dt>cutoff: int</dt><dd><p>An integer representing the maximum length of <cite>results</cite>.</p>
+<dt><strong>cutoff: int</strong></dt><dd><p>An integer representing the maximum length of <cite>results</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary obtained from <cite>model_results</cite> after handling the results
 of modeling <cite>trace</cite> with <cite>model</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -766,17 +1086,23 @@ of modeling <cite>trace</cite> with <cite>model</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.initialize_multivariate_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">initialize_multivariate_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#initialize_multivariate_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.initialize_multivariate_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the multivariate results from <cite>model_results_dict</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>A dictionary of <cite>ModelResults</cite>. The keys are strings representing
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>A dictionary of <cite>ModelResults</cite>. The keys are strings representing
 one of the variables being modelled. The corresponding value is a
 <cite>ModelResults</cite> object associated with that variable.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary of model results in which the keys are strings
 representing the model variables specified in <cite>model_results_dict</cite>
 and the corresponding value is a 1-element list containing the
 associate <cite>ModelResults</cite> object from <cite>model_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -785,23 +1111,29 @@ associate <cite>ModelResults</cite> object from <cite>model_results_dict</cite>.
 <dt id="MemoryAutoScaling.analysis.insert_multivariate_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">insert_multivariate_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#insert_multivariate_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.insert_multivariate_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inserts <cite>new_results_dict</cite> into <cite>model_results_dict</cite> at <cite>idx</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>A dictionary containing lists of <cite>ModelResults</cite>. Each key is a string
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>A dictionary containing lists of <cite>ModelResults</cite>. Each key is a string
 representing a modeled variable and the corresponding value is a list
 of <cite>ModelResults</cite> objects for that variable.</p>
 </dd>
-<dt>new_results_dict: dict</dt><dd><p>A dictionary of <cite>ModelResults</cite>. Each key is a string representing a
+<dt><strong>new_results_dict: dict</strong></dt><dd><p>A dictionary of <cite>ModelResults</cite>. Each key is a string representing a
 modeled variable and the corresponding value is an associated
 <cite>ModelResults</cite> object.</p>
 </dd>
-<dt>idx: int</dt><dd><p>An integer representing the index to which the <cite>ModelResults</cite> of
+<dt><strong>idx: int</strong></dt><dd><p>An integer representing the index to which the <cite>ModelResults</cite> of
 <cite>new_results_dict</cite> will be inserted into the lists of
 <cite>model_results_dict</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>model_results_dict</cite> after inserting
 <cite>new_results_dict</cite> at <cite>idx</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -813,11 +1145,13 @@ modeled variable and the corresponding value is an associated
 <p>The model progress prints a message to the screen indicating how many
 traces have been modeled by the current process based on <cite>trace_idx</cite>
 and <cite>trace_count</cite>.</p>
-<dl>
-<dt>trace_idx: int</dt><dd><p>An integer representing the index of the trace that has finished
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>trace_idx: int</strong></dt><dd><p>An integer representing the index of the trace that has finished
 processing.</p>
 </dd>
-<dt>trace_count: int</dt><dd><blockquote>
+<dt><strong>trace_count: int</strong></dt><dd><blockquote>
 <div><p>An integer representing the total number of traces to be processed.</p>
 </div></blockquote>
 <dl class="simple">
@@ -826,7 +1160,13 @@ processing.</p>
 </dl>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -838,15 +1178,21 @@ processing.</p>
 key-value pairs: one identifying the model as <cite>model_name</cite> and the other
 containing a <cite>ModelResults</cite> object summarizing the model results for that
 trace based on the data in <cite>model_results_df</cite>.</p>
-<dl class="simple">
-<dt>model_results_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the model results for all traces for the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the model results for all traces for the
 model specified by <cite>model_name</cite>.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string representing the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string representing the name of the model.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary representation of <cite>model_results_df</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -855,20 +1201,26 @@ model specified by <cite>model_name</cite>.</p>
 <dt id="MemoryAutoScaling.analysis.output_best_model_results_dict">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">output_best_model_results_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">best_results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#output_best_model_results_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.output_best_model_results_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Outputs <cite>best_results_dict</cite> to a <cite>csv</cite> file.</p>
-<dl class="simple">
-<dt>best_results_dict: dict</dt><dd><p>A dictionary containing the best model results for each trace. The
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>best_results_dict: dict</strong></dt><dd><p>A dictionary containing the best model results for each trace. The
 keys are strings representing trace IDs. The corresponding value is
 a dictionary with 2 key-value pairs: one specifying the name of the
 best model and the other specifying the <cite>ModelResults</cite> object
 associated with the model.</p>
 </dd>
-<dt>output_dir: str</dt><dd><p>A string representing the name of the output directory to which the
+<dt><strong>output_dir: str</strong></dt><dd><p>A string representing the name of the output directory to which the
 results are output.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>A file named <cite>best_model_results.csv</cite> is saved to <cite>output_dir</cite> containing
-the results from <cite>best_results_dict</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -877,19 +1229,25 @@ the results from <cite>best_results_dict</cite>.</p>
 <dd><p>Outputs the best model results based on <cite>model_results_dfs</cite>.</p>
 <p>For each trace, the best <cite>ModelResults</cite> is used across all the model
 results DataFrame in <cite>model_results_dfs</cite>.</p>
-<dl class="simple">
-<dt>model_results_dfs: dict</dt><dd><p>A dictionary of model results DataFrames where the keys are strings
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dfs: dict</strong></dt><dd><p>A dictionary of model results DataFrames where the keys are strings
 representing the names of the model to which the DataFrame refers to.
 Each dataframe contains the results of the corresponding model fit on
 each trace.</p>
 </dd>
-<dt>output_dir: str</dt><dd><p>A string representing the name of the output directory to which the
+<dt><strong>output_dir: str</strong></dt><dd><p>A string representing the name of the output directory to which the
 results are output.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>A file named <cite>best_model_results.csv</cite> is saved to <cite>output_dir</cite> containing
-the best model results for each trace from <cite>model_results_dfs</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -898,35 +1256,49 @@ the best model results for each trace from <cite>model_results_dfs</cite>.</p>
 <dd><p>Outputs <cite>results</cite> to <cite>file_name</cite> in <cite>output_dir</cite>.</p>
 <p>The model results are converted to a pandas DataFrame and written to
 a csv file in <cite>output_dir</cite> named <cite>file_name</cite>.</p>
-<dl class="simple">
-<dt>results: list</dt><dd><p>A list of lists containing the model results. Each list corresponds
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>results: list</strong></dt><dd><p>A list of lists containing the model results. Each list corresponds
 to the results for a particular trace.</p>
 </dd>
-<dt>col_list: list</dt><dd><p>A list of strings representing the column names for the data.</p>
+<dt><strong>col_list: list</strong></dt><dd><p>A list of strings representing the column names for the data.</p>
 </dd>
-<dt>output_dir: str</dt><dd><p>A string representing the directory to which the results are written.</p>
+<dt><strong>output_dir: str</strong></dt><dd><p>A string representing the directory to which the results are written.</p>
 </dd>
-<dt>file_name: str</dt><dd><p>A string representing the name of the file to which the results are
+<dt><strong>file_name: str</strong></dt><dd><p>A string representing the name of the file to which the results are
 written.</p>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.analysis.pad_model_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">pad_model_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#pad_model_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.pad_model_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pads <cite>model_results_lst</cite> with null <cite>ModelResults</cite> to length <cite>pad_len</cite>.</p>
-<dl class="simple">
-<dt>model_results_lst: list</dt><dd><p>The list of <cite>ModelResults</cite> objects being padded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_lst: list</strong></dt><dd><p>The list of <cite>ModelResults</cite> objects being padded.</p>
 </dd>
-<dt>pad_len: int</dt><dd><p>An integer representing the length to which <cite>model_results_lst</cite>
+<dt><strong>pad_len: int</strong></dt><dd><p>An integer representing the length to which <cite>model_results_lst</cite>
 should be padded.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>The list obtained from <cite>model_results_lst</cite> after padding with null
 <cite>ModelResults</cite> objects up to length <cite>pad_len</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -937,18 +1309,24 @@ should be padded.</p>
 <dd><p>Pads <cite>models_results_dict</cite> with null <cite>ModelResults</cite> to <cite>pad_len</cite>.</p>
 <p>Each list of <cite>model_results_dict</cite> is padded with null <cite>ModelResults</cite>
 objects up to <cite>pad_len</cite>.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>A dictionary of <cite>ModelResults</cite>. They keys are strings representing the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>A dictionary of <cite>ModelResults</cite>. They keys are strings representing the
 names of the target variables and the corresponding value is a list of
 <cite>ModelResults</cite> for that variable which will be padded to <cite>pad_len</cite>.</p>
 </dd>
-<dt>pad_len: int</dt><dd><p>An integer representing the length to which each list of
+<dt><strong>pad_len: int</strong></dt><dd><p>An integer representing the length to which each list of
 <cite>model_results_dict</cite> will be padded.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>model_results_dict</cite> after padding each
 list with null <cite>ModelResults</cite> up to <cite>pad_len</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -961,80 +1339,104 @@ list with null <cite>ModelResults</cite> up to <cite>pad_len</cite>.</p>
 model results for each trace for that model, after tuning the parameters
 for each trace. The proportion of the resource harvested across all
 traces is calculated for each model and plotted.</p>
-<dl class="simple">
-<dt>model_results_dfs: dict</dt><dd><p>A dictionary of model results DataFrames</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dfs: dict</strong></dt><dd><p>A dictionary of model results DataFrames</p>
 </dd>
-<dt>buffer_pct: float</dt><dd><p>A float representing the buffer percentage applied to predictions.</p>
+<dt><strong>buffer_pct: float</strong></dt><dd><p>A float representing the buffer percentage applied to predictions.</p>
 </dd>
 </dl>
-<p>None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.analysis.process_and_output_model_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">process_and_output_model_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#process_and_output_model_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.process_and_output_model_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes <cite>model_results</cite> and outputs them to <cite>output_dir</cite>.</p>
-<dl class="simple">
-<dt>model_results: dict</dt><dd><p>A dictionary in which each key is a string representing the id of a
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results: dict</strong></dt><dd><p>A dictionary in which each key is a string representing the id of a
 trace. The corresponding value is a list of <cite>ModelResults</cite>
 corresponding to the model results for that trace.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of best models kept for each trace.</p>
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of best models kept for each trace.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string specifying the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string specifying the name of the model.</p>
 </dd>
-<dt>output_dir: str</dt><dd><p>A string specifying the directory to which the model results will be
+<dt><strong>output_dir: str</strong></dt><dd><p>A string specifying the directory to which the model results will be
 output.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>The results in <cite>model_results</cite> are saved to a csv file containing one row
-per trace. The file is output to a file named <cite>&lt;name&gt;_results.csv</cite> in
-<cite>output_dir</cite>, where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.analysis.process_and_output_multivariate_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">process_and_output_multivariate_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#process_and_output_multivariate_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.process_and_output_multivariate_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes <cite>model_results</cite> and outputs them to <cite>output_dir</cite>.</p>
-<dl class="simple">
-<dt>model_results: dict</dt><dd><p>A dictionary containing model results for each trace. The keys are
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results: dict</strong></dt><dd><p>A dictionary containing model results for each trace. The keys are
 strings representing trace IDs and the corresponding value is a
 dictionary of <cite>ModelResults</cite> for the trace. This nested dictionary
 has a key for each variable being modeled and the corresponding
 value is a list of <cite>ModelResults</cite> objects for that variable.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of best models kept for each trace.</p>
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of best models kept for each trace.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string specifying the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string specifying the name of the model.</p>
 </dd>
-<dt>model_vars: list</dt><dd><p>A list of strings representing the names of the target variables
+<dt><strong>model_vars: list</strong></dt><dd><p>A list of strings representing the names of the target variables
 in the multivariate modeling process.</p>
 </dd>
-<dt>output_dir: str</dt><dd><p>A string specifying the directory to which the model results will be
+<dt><strong>output_dir: str</strong></dt><dd><p>A string specifying the directory to which the model results will be
 output.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>The results in <cite>model_results</cite> are saved to a csv file containing one row
-per trace. The file is output to a file named <cite>&lt;name&gt;_results.csv</cite> in
-<cite>output_dir</cite>, where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.analysis.process_model_results_dict">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">process_model_results_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#process_model_results_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.process_model_results_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes <cite>model_results_dict</cite> to a list.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>A dictionary containing model results. The keys are strings
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>A dictionary containing model results. The keys are strings
 representing names of the target variables being modeled and the
 corresponding value is a list of <cite>ModelResults</cite> objects associated
 with that variable.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list containing the list representation of each <cite>ModelResults</cite>
 object in <cite>model_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1049,8 +1451,12 @@ identifying files to read from the input directory, an integer
 representing the minimum length for a trace to be modelled, a float
 representing the proportion of data in the training set, and an integer
 representing for how many successive periods to aggregate data.</p>
-<dl class="simple">
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing the input parameters.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1066,8 +1472,12 @@ representing the minimum length for a trace to be modelled, a float
 representing the proportion of data in the training set, an integer
 representing for how many successive periods to aggregate data, and
 a boolean value indicating the target variable.</p>
-<dl class="simple">
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing the input parameters.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1080,22 +1490,27 @@ a boolean value indicating the target variable.</p>
 these models for each trace are recorded. <cite>modeling_func</cite> is used to run
 the models on a batch of traces and this function is parallelized to cover
 all traces. The best models are then retrieved.</p>
-<dl class="simple">
-<dt>modeling_func: function</dt><dd><p>The function used to perform the modelling on a batch of traces. The
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>modeling_func: function</strong></dt><dd><p>The function used to perform the modelling on a batch of traces. The
 function takes three arguments: a list of <cite>Trace</cite> objects on which the
 models are run, a list to which results are saved, and a float
 specifying the proportion of data in the training set.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of models to record. The results
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of models to record. The results
 for the <cite>models_count</cite> best models for each trace are recorded.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string specifying the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string specifying the name of the model.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>The results of the modelling procedure is saved to a csv file containing
-one row per trace. The file is output to a file named <cite>&lt;name&gt;_results.csv</cite>
-where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1106,37 +1521,48 @@ where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
 <cite>models_count</cite> of these models for each trace are recorded. <cite>modeling_func</cite>
 is used to run the models on a batch of traces and this function is
 parallelized to cover all traces. The best models are then retrieved.</p>
-<dl class="simple">
-<dt>modeling_func: function</dt><dd><p>The function used to perform the modelling on a batch of traces. The
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>modeling_func: function</strong></dt><dd><p>The function used to perform the modelling on a batch of traces. The
 function takes three arguments: a list of <cite>Trace</cite> objects on which the
 models are run, a list to which results are saved, and a float
 specifying the proportion of data in the training set.</p>
 </dd>
-<dt>models_count: int</dt><dd><p>An integer representing the number of models to record. The results
+<dt><strong>models_count: int</strong></dt><dd><p>An integer representing the number of models to record. The results
 for the <cite>models_count</cite> best models for each trace are recorded.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string specifying the name of the model.</p>
+<dt><strong>model_name: str</strong></dt><dd><p>A string specifying the name of the model.</p>
 </dd>
-<dt>model_vars: list</dt><dd><p>A list of the variables being modelled.</p>
+<dt><strong>model_vars: list</strong></dt><dd><p>A list of the variables being modelled.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>The results of the modelling procedure is saved to a csv file containing
-one row per trace. The file is output to a file named <cite>&lt;name&gt;_results.csv</cite>
-where <cite>&lt;name&gt;</cite> is <cite>model_name</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.analysis.standardize_counts_dict">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">standardize_counts_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#standardize_counts_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.standardize_counts_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the numbers in <cite>counts_dict</cite> to percentages.</p>
-<dl class="simple">
-<dt>counts_dict: dict</dt><dd><p>A dictionary of counts being standardized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>counts_dict: dict</strong></dt><dd><p>A dictionary of counts being standardized.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>counts_dict</cite> after converting each
 count to a percentage.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1149,12 +1575,18 @@ count to a percentage.</p>
 and “adf_p_val_diff2”. The stationary results report the percent of traces
 that are stationary after 0, 1, or 2 levels of differencing, and the traces
 that are not stationary after 2 levels of differencing.</p>
-<dl class="simple">
-<dt>stats_df: pd.DataFrame</dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame from which the stationary results are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing the stationary results.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1165,15 +1597,21 @@ that are not stationary after 2 levels of differencing.</p>
 <dd><p>Truncates each list of <cite>raw_dict</cite> if it is longer than <cite>cutoff</cite>.</p>
 <p>The size of each list in <cite>raw_dict</cite> is reduced to <cite>cutoff</cite> if it is longer
 than <cite>cutoff</cite>. Otherwise, it is unchanged.</p>
-<dl class="simple">
-<dt>raw_dict: dict</dt><dd><p>The dictionary being truncated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>raw_dict: dict</strong></dt><dd><p>The dictionary being truncated.</p>
 </dd>
-<dt>cutoff: int</dt><dd><p>An integer representing the maximum length for the lists of <cite>raw_dict</cite>.</p>
+<dt><strong>cutoff: int</strong></dt><dd><p>An integer representing the maximum length for the lists of <cite>raw_dict</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary resulting from truncating each list of <cite>raw_dict</cite> to a
 length of <cite>cutoff</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1184,14 +1622,20 @@ length of <cite>cutoff</cite>.</p>
 <dd><p>Truncates <cite>lst</cite> if it is longer than <cite>cutoff</cite>.</p>
 <p>The size of <cite>lst</cite> is reduced to <cite>cutoff</cite> if it is longer than <cite>cutoff</cite>.
 Otherwise, it is unchanged.</p>
-<dl class="simple">
-<dt>lst: list</dt><dd><p>The list being truncated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lst: list</strong></dt><dd><p>The list being truncated.</p>
 </dd>
-<dt>cutoff: int</dt><dd><p>An integer representing the maximum length for <cite>lst</cite>.</p>
+<dt><strong>cutoff: int</strong></dt><dd><p>An integer representing the maximum length for <cite>lst</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>The list resulting from truncating <cite>lst</cite> with <cite>cutoff</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1203,23 +1647,29 @@ Otherwise, it is unchanged.</p>
 <p>For each record in <cite>new_results_df</cite>, the corresponding trace is updated
 in <cite>best_results_dict</cite> if the model results in <cite>new_results_df</cite> are better
 than the model results in <cite>best_results_dict</cite> for that trace.</p>
-<dl class="simple">
-<dt>best_results_dict: dict</dt><dd><p>A dictionary containing the best model results for each trace. The
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>best_results_dict: dict</strong></dt><dd><p>A dictionary containing the best model results for each trace. The
 keys are strings representing trace IDs. The corresponding value is
 a dictionary with 2 key-value pairs: one specifying the name of the
 best model and the other specifying the <cite>ModelResults</cite> object
 associated with the model.</p>
 </dd>
-<dt>new_results_df: pd.DataFrame</dt><dd><p>A pandas DataFrame with new model results which is being used to
+<dt><strong>new_results_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame with new model results which is being used to
 update <cite>best_results_dict</cite>.</p>
 </dd>
-<dt>model_name: str</dt><dd><p>A string representing the name of the model which generated the results
+<dt><strong>model_name: str</strong></dt><dd><p>A string representing the name of the model which generated the results
 in <cite>new_results_df</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>best_results_dict</cite> after updating based
 on the data in <cite>new_results_df</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1232,19 +1682,25 @@ on the data in <cite>new_results_df</cite>.</p>
 <cite>model_results</cite> if it has fewer than <cite>cutoff</cite> entries or if the results
 for the model are better than the results of at least one model contained
 in <cite>model_results</cite>.</p>
-<dl class="simple">
-<dt>model: TraceModel</dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model: TraceModel</strong></dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
 </dd>
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
 </dd>
-<dt>trace_results: list</dt><dd><p>A list containing results for modelling done on the trace.</p>
+<dt><strong>trace_results: list</strong></dt><dd><p>A list containing results for modelling done on the trace.</p>
 </dd>
-<dt>cutoff: int</dt><dd><p>An integer representing the maximum length of <cite>trace_results</cite>.</p>
+<dt><strong>cutoff: int</strong></dt><dd><p>An integer representing the maximum length of <cite>trace_results</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list obtained from <cite>model_results</cite> after handling the results of
 modeling <cite>trace</cite> with <cite>model</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1257,19 +1713,25 @@ modeling <cite>trace</cite> with <cite>model</cite>.</p>
 <cite>model_results</cite> if it has fewer than <cite>cutoff</cite> entries or if the results
 for the model are better than the results of at least one model contained
 in <cite>model_results</cite>.</p>
-<dl class="simple">
-<dt>model: TraceModel</dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model: TraceModel</strong></dt><dd><p>A <cite>TraceModel</cite> to be fit to <cite>trace</cite>.</p>
 </dd>
-<dt>trace: Trace</dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object being modeled.</p>
 </dd>
-<dt>model_results: dict</dt><dd><p>A dictionary containing results for modelling done on the trace.</p>
+<dt><strong>model_results: dict</strong></dt><dd><p>A dictionary containing results for modelling done on the trace.</p>
 </dd>
-<dt>cutoff: int</dt><dd><p>An integer representing the maximum length of <cite>results</cite>.</p>
+<dt><strong>cutoff: int</strong></dt><dd><p>An integer representing the maximum length of <cite>results</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>model_results</cite> after handling the
 results of modeling <cite>trace</cite> with <cite>model</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1281,14 +1743,20 @@ results of modeling <cite>trace</cite> with <cite>model</cite>.</p>
 <p><cite>new_model_results</cite> is inserted into its appropriate place in the sorted
 list <cite>model_results</cite>, based on the ranking metric defined on
 <cite>ModelResults</cite> objects.</p>
-<dl class="simple">
-<dt>model_results: list</dt><dd><p>The list of <cite>ModelResults</cite> that is being updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results: list</strong></dt><dd><p>The list of <cite>ModelResults</cite> that is being updated.</p>
 </dd>
-<dt>new_model_results: ModelResults</dt><dd><p>A <cite>ModelResults</cite> object representing the most recent model results</p>
+<dt><strong>new_model_results: ModelResults</strong></dt><dd><p>A <cite>ModelResults</cite> object representing the most recent model results</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>The list obtained <cite>model_results</cite> inserting <cite>new_model_results</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1300,17 +1768,23 @@ list <cite>model_results</cite>, based on the ranking metric defined on
 <p>The <cite>ModelResults</cite> in <cite>new_results_dict</cite> are inserted into the appropriate
 place in <cite>model_results_dict</cite>, based on the ranking metric defined on
 <cite>ModelResults</cite> objects.</p>
-<dl class="simple">
-<dt>model_results_dict: dict</dt><dd><p>The dictionary containing model results that is being updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_dict: dict</strong></dt><dd><p>The dictionary containing model results that is being updated.</p>
 </dd>
-<dt>new_results_dict: dict</dt><dd><p>A dictionary of new model results. The keys are strings representing
+<dt><strong>new_results_dict: dict</strong></dt><dd><p>A dictionary of new model results. The keys are strings representing
 the target variables being modeled. The corresponding value is a
 <cite>ModelResults</cite> object for that variable.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>model_results_dict</cite> after possibly
 extending or inserting the <cite>ModelResults</cite> from <cite>new_results_dict</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1318,76 +1792,52 @@ extending or inserting the <cite>ModelResults</cite> from <cite>new_results_dict
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">MemoryAutoScaling</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Code Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parallel.html">Parallelization Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="specs.html">Specifications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Google Memory Auto Scaling</a></li>
-      <li>Next: <a href="parallel.html" title="next chapter">Parallelization Functions</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parallel.html" class="btn btn-neutral float-right" title="Parallelization Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Google Memory Auto Scaling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2021, Matt Buckley.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/analysis.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>

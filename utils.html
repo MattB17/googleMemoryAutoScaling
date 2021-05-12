@@ -1,35 +1,152 @@
 
-<!DOCTYPE html>
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Utility Functions &#8212; MemoryAutoScaling  documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Utility Functions &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Specifications" href="specs.html" />
+    <link rel="prev" title="Specifications" href="specs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs.html">Specifications</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Utility Functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-MemoryAutoScaling.utils">
 <span id="utility-functions"></span><h1>Utility Functions<a class="headerlink" href="#module-MemoryAutoScaling.utils" title="Permalink to this headline">¶</a></h1>
@@ -40,17 +157,23 @@
 <dd><p>Max aggregates <cite>time_series</cite> at the period <cite>window_length</cite>.</p>
 <p>The aggregation computes the maximum, standard deviation, average, median,
 and range of <cite>time_series</cite> for each interval of length <cite>window_length</cite>.</p>
-<dl class="simple">
-<dt>time_series: np.array</dt><dd><p>A numpy array representing the time series to be aggregated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>time_series: np.array</strong></dt><dd><p>A numpy array representing the time series to be aggregated.</p>
 </dd>
-<dt>window_length: int</dt><dd><p>An integer denoting the aggregation interval. That is, every
+<dt><strong>window_length: int</strong></dt><dd><p>An integer denoting the aggregation interval. That is, every
 <cite>window_length</cite> time periods of <cite>time_series</cite> are aggregated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary with the aggregate statistics for <cite>time_series</cite>. Each
 key is a string representing the statistic name and the corresponding
 value is a list representing the aggregated values of the statistic.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -61,22 +184,28 @@ value is a list representing the aggregated values of the statistic.</p>
 <dd><p>Appends aggregate stats for <cite>ts_name</cite> in <cite>trace_df</cite> to <cite>append_dict</cite>.</p>
 <p>The aggregate statistics for <cite>ts_name</cite> are calculated based on
 <cite>window_length</cite> and combined with the data in <cite>append_dict</cite>.</p>
-<dl class="simple">
-<dt>trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the trace data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the trace data.</p>
 </dd>
-<dt>ts_name: str</dt><dd><p>A string representing the name of the time series.</p>
+<dt><strong>ts_name: str</strong></dt><dd><p>A string representing the name of the time series.</p>
 </dd>
-<dt>append_dict: dict</dt><dd><p>The dictionary to which the aggregate stats are appended.</p>
+<dt><strong>append_dict: dict</strong></dt><dd><p>The dictionary to which the aggregate stats are appended.</p>
 </dd>
-<dt>window_length: int</dt><dd><p>An integer representing the aggregation window.</p>
+<dt><strong>window_length: int</strong></dt><dd><p>An integer representing the aggregation window.</p>
 </dd>
-<dt>is_max: bool</dt><dd><p>A boolean value indicating whether the time series records the
+<dt><strong>is_max: bool</strong></dt><dd><p>A boolean value indicating whether the time series records the
 maximum or not. The default value is True.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>append_dict</cite> after adding the
 aggregate statistics for <cite>ts_name</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -85,17 +214,23 @@ aggregate statistics for <cite>ts_name</cite>.</p>
 <dt id="MemoryAutoScaling.utils.build_trace_aggregate_df">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">build_trace_aggregate_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#build_trace_aggregate_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.build_trace_aggregate_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds an aggregated dataframe from <cite>raw_trace_df</cite> using <cite>window_len</cite>.</p>
-<dl class="simple">
-<dt>raw_trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the raw data for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>raw_trace_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the raw data for the trace.</p>
 </dd>
-<dt>window_len: int</dt><dd><p>The aggregation window for the trace. Data will be aggregated every
+<dt><strong>window_len: int</strong></dt><dd><p>The aggregation window for the trace. Data will be aggregated every
 <cite>window_len</cite> time periods.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>A pandas DataFrame containing the aggregated measures for the trace
 data specified in <cite>raw_trace_df</cite> using <cite>window_len</cite> as the aggregation
 period.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -109,17 +244,23 @@ by first replacing NaN values with 0 and then computing the aggregated
 statistics for <cite>raw_trace_df</cite> based on <cite>agg_window</cite>. The aggregated
 quantities are reported as percentages based on the raw usage data from
 <cite>trace_usage</cite></p>
-<dl class="simple">
-<dt>trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the raw data for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the raw data for the trace.</p>
 </dd>
-<dt>agg_window: int</dt><dd><p>An integer representing the aggregation period.</p>
+<dt><strong>agg_window: int</strong></dt><dd><p>An integer representing the aggregation period.</p>
 </dd>
-<dt>trace_usage: TraceUsage</dt><dd><p>A <cite>TraceUsage</cite> object containing the usage data for the trace.</p>
+<dt><strong>trace_usage: TraceUsage</strong></dt><dd><p>A <cite>TraceUsage</cite> object containing the usage data for the trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>The DataFrame obtained from <cite>raw_trace_df</cite> after removing NaN values
 and aggregating data according to <cite>agg_window</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -135,27 +276,33 @@ maximum under prediction, the one-sided mean absolute scaled error for
 over predictions, the proportion of over predictions, the magnitude of
 the average over prediction, and the total spare amount of the resource
 over the testing preiod.</p>
-<dl class="simple">
-<dt>y_train: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>y_train: np.array</strong></dt><dd><p>A numpy array representing actual values of the target for the
 training set.</p>
 </dd>
-<dt>preds_train: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+<dt><strong>preds_train: np.array</strong></dt><dd><p>A numpy array representing predicted values of the target for the
 training set.</p>
 </dd>
-<dt>y_test: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+<dt><strong>y_test: np.array</strong></dt><dd><p>A numpy array representing actual values of the target for the
 testing set.</p>
 </dd>
-<dt>preds_test: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+<dt><strong>preds_test: np.array</strong></dt><dd><p>A numpy array representing predicted values of the target for the
 testing set.</p>
 </dd>
-<dt>total_spare: float</dt><dd><p>A float representing the total spare amount of the resource over the
+<dt><strong>total_spare: float</strong></dt><dd><p>A float representing the total spare amount of the resource over the
 test period.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing the evaluation metrics. Keys are strings
 representing the names of the evaluation metric and the corresponding
 value is a float.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -172,25 +319,31 @@ based on this predicted value. The amount harvested is the difference
 between <cite>avail_val</cite> and the predictions (after adding the buffer) summed
 over all time points in which the predicted value is greater than or
 equal to the actual value.</p>
-<dl class="simple">
-<dt>avail_val: float</dt><dd><p>A float representing the amount of the resource allocated to the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>avail_val: float</strong></dt><dd><p>A float representing the amount of the resource allocated to the
 trace for its duration.</p>
 </dd>
-<dt>actual_ts: np.array</dt><dd><p>A numpy array of actual values for the trace, representing the
+<dt><strong>actual_ts: np.array</strong></dt><dd><p>A numpy array of actual values for the trace, representing the
 percent of the available resource used at each time point.</p>
 </dd>
-<dt>predicted_ts: np.array</dt><dd><p>A numpy array of predicted values for the trace, representing the
+<dt><strong>predicted_ts: np.array</strong></dt><dd><p>A numpy array of predicted values for the trace, representing the
 percent of the available resource predicted to be used at each
 time point.</p>
 </dd>
-<dt>buffer_pct: float</dt><dd><p>A float representing the percentage of each prediction to be used as
+<dt><strong>buffer_pct: float</strong></dt><dd><p>A float representing the percentage of each prediction to be used as
 a buffer. Thus, the effective prediction for each time period is the
 original prediction multiplied by <cite>1 + buffer_pct</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float, int</dt><dd><p>A float representing the amount harvested and an integer representing
 the number of violations.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -199,16 +352,22 @@ the number of violations.</p>
 <dt id="MemoryAutoScaling.utils.calculate_max_allocated">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_max_allocated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_max_allocated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_max_allocated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculatate the maximum allocated amount over the life of the trace.</p>
-<dl class="simple">
-<dt>raw_trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the data for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>raw_trace_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the data for the trace.</p>
 </dd>
-<dt>resource_col: str</dt><dd><p>A string representing the name of the resource for which the maximum
+<dt><strong>resource_col: str</strong></dt><dd><p>A string representing the name of the resource for which the maximum
 allocated amount is being calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float</dt><dd><p>A float representing the maximum allocated amount of <cite>resource_col</cite>
 over the life of the trace.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -221,22 +380,28 @@ over the life of the trace.</p>
 the training and validation sets, respectively. Otherwise, the split
 thresholds mark the end of the training + validation and testing sets,
 respectively.</p>
-<dl class="simple">
-<dt>data: pd.DataFrame</dt><dd><p>A pandas DataFrame representing the data to be split.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame representing the data to be split.</p>
 </dd>
-<dt>train_prop: float</dt><dd><p>A float representing the proportion of the training set.</p>
+<dt><strong>train_prop: float</strong></dt><dd><p>A float representing the proportion of the training set.</p>
 </dd>
-<dt>val_prop: float</dt><dd><p>A float representing the proportion of the testing set.</p>
+<dt><strong>val_prop: float</strong></dt><dd><p>A float representing the proportion of the testing set.</p>
 </dd>
-<dt>tuning: bool</dt><dd><p>A boolean value indicating whether the split is for tuning or
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the split is for tuning or
 testing.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>int, int</dt><dd><p>Two thresholds representing the endpoint of the two subsets. If
 <cite>tuning</cite> is true these thresholds represent the end of the training
 and validation sets, respectively. Otherwise, they represent the end
 of the training + validation and testing sets, respectively.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -245,23 +410,29 @@ of the training + validation and testing sets, respectively.</p>
 <dt id="MemoryAutoScaling.utils.calculate_train_and_test_mase">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_train_and_test_mase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_train_and_test_mase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_train_and_test_mase" title="Permalink to this definition">¶</a></dt>
 <dd><p>The mean absolute scaled error for the training and testing sets.</p>
-<dl class="simple">
-<dt>y_train: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>y_train: np.array</strong></dt><dd><p>A numpy array representing actual values of the target for the
 training set.</p>
 </dd>
-<dt>preds_train: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+<dt><strong>preds_train: np.array</strong></dt><dd><p>A numpy array representing predicted values of the target for the
 training set.</p>
 </dd>
-<dt>y_test: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+<dt><strong>y_test: np.array</strong></dt><dd><p>A numpy array representing actual values of the target for the
 testing set.</p>
 </dd>
-<dt>preds_test: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+<dt><strong>preds_test: np.array</strong></dt><dd><p>A numpy array representing predicted values of the target for the
 testing set.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float, float</dt><dd><p>Two floats representing the mean absolute scaled errors for the
 training and testing sets, respectively.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -273,17 +444,23 @@ training and testing sets, respectively.</p>
 <p>The percent utilization is the total amount used over the life of the
 trace, <cite>usage_ts</cite>, divided by the total amount allocated, <cite>alloced_amt</cite>,
 over the life of the trace.</p>
-<dl class="simple">
-<dt>alloced_amt: float</dt><dd><p>A float representing the amount of the resource allocated to the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>alloced_amt: float</strong></dt><dd><p>A float representing the amount of the resource allocated to the
 trace at any given time point.</p>
 </dd>
-<dt>usage_ts: np.array</dt><dd><p>A numpy array representring the absolute value of utilization at each
+<dt><strong>usage_ts: np.array</strong></dt><dd><p>A numpy array representring the absolute value of utilization at each
 time point for the trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float</dt><dd><p>A float representing the percent utilization over the life of the
 trace.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -294,13 +471,19 @@ trace.</p>
 <dd><p>Caps each value of <cite>predicted_vals</cite> at 1.</p>
 <p>That is, if any value of <cite>predicted_vals</cite> is greater than 1 then
 it is reset to 1. Otherwise, it is left unchanged.</p>
-<dl class="simple">
-<dt>predicted_vals: np.array</dt><dd><p>A numpy array containing the predicted values to be capped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>predicted_vals: np.array</strong></dt><dd><p>A numpy array containing the predicted values to be capped.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>np.array</dt><dd><p>The numpy array obtained from <cite>predicted_vals</cite> after all of the
 predictions have been capped at 1.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -310,15 +493,21 @@ predictions have been capped at 1.</p>
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">cap_train_and_test_predictions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_preds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#cap_train_and_test_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.cap_train_and_test_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Caps the training and testing predictions.</p>
 <p>Caps both the values of <cite>train_preds</cite> and <cite>test_preds</cite> at 1.</p>
-<dl class="simple">
-<dt>train_preds: np.array</dt><dd><p>A numpy array representing the predictions for the train set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>train_preds: np.array</strong></dt><dd><p>A numpy array representing the predictions for the train set.</p>
 </dd>
-<dt>test_preds: np.array</dt><dd><p>A numpy array representing the predictions for the test set.</p>
+<dt><strong>test_preds: np.array</strong></dt><dd><p>A numpy array representing the predictions for the test set.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>np.array, np.array</dt><dd><p>Two numpy arrays representing the predictions for the training and
 testing sets, repectively, both capped at 1.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -331,15 +520,21 @@ testing sets, repectively, both capped at 1.</p>
 columns by the assigned resource amount. The resources of interest are
 memory and CPU. The usage statistics consist of average and maximum usage
 of each resource.</p>
-<dl class="simple">
-<dt>raw_trace_df: pd.DataFrame</dt><dd><p>The pandas DataFrame for which the memory percentages are computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>raw_trace_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame for which the memory percentages are computed.</p>
 </dd>
-<dt>trace_usage: TraceUsage</dt><dd><p>A <cite>TraceUsage</cite> object containing the usage data for the trace.</p>
+<dt><strong>trace_usage: TraceUsage</strong></dt><dd><p>A <cite>TraceUsage</cite> object containing the usage data for the trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>A pandas DataFrame obtained from <cite>raw_trace_df</cite> after modifying the
 resource usage statistics to report percentages.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -349,16 +544,22 @@ resource usage statistics to report percentages.</p>
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">extract_time_series_from_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#extract_time_series_from_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.extract_time_series_from_trace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the time series for <cite>series_name</cite> from <cite>trace_data</cite>.</p>
 <p>Any NaN values in the time series are converted to 0.</p>
-<dl class="simple">
-<dt>trace_data: pd.DataFrame</dt><dd><p>A DataFrame representing the data for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_data: pd.DataFrame</strong></dt><dd><p>A DataFrame representing the data for the trace.</p>
 </dd>
-<dt>series_name: str</dt><dd><p>A string representing the name of the data representing the time
+<dt><strong>series_name: str</strong></dt><dd><p>A string representing the name of the data representing the time
 series.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>np.array</dt><dd><p>A numpy array representing the time series for <cite>series_name</cite> extracted
 from <cite>trace_data</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -371,15 +572,21 @@ from <cite>trace_data</cite>.</p>
 <cite>data_trace</cite> and for which at each time point the observation of the
 trace is equal to the cumulative sum of <cite>data_trace</cite> up to that time
 point.</p>
-<dl class="simple">
-<dt>data_trace: np.array</dt><dd><p>A numpy array representing the data trace from which the cumulative
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_trace: np.array</strong></dt><dd><p>A numpy array representing the data trace from which the cumulative
 sum is computed.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>np.array</dt><dd><p>A numpy array having the same length as <cite>data_trace</cite> and for which
 the observation at each time point is the cumulative sum of the
 observations of <cite>data_trace</cite> up to that time point.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -388,16 +595,22 @@ observations of <cite>data_trace</cite> up to that time point.</p>
 <dt id="MemoryAutoScaling.utils.get_differenced_trace">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_differenced_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_differenced_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_differenced_trace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the result of differencing <cite>data_trace</cite> <cite>diff_level</cite> times.</p>
-<dl class="simple">
-<dt>data_trace: np.array</dt><dd><p>A numpy array representing the trace to be differenced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_trace: np.array</strong></dt><dd><p>A numpy array representing the trace to be differenced.</p>
 </dd>
-<dt>diff_level: int</dt><dd><p>An integer representing the degree of differencing applied to
+<dt><strong>diff_level: int</strong></dt><dd><p>An integer representing the degree of differencing applied to
 <cite>data_trace</cite>.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>np.array</dt><dd><p>The numpy array obtained from <cite>data_trace</cite> after applying differencing
 at a degree of <cite>diff_level</cite></p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -412,15 +625,21 @@ baseline error. The prediction errors are <cite>|a[i] - p[i]|</cite> where <cite
 the actual value and <cite>p[i]</cite> is the predicted value for period <cite>i</cite>. The
 baseline errors are the errors from a model that predicts the current value
 based on the past value.</p>
-<dl class="simple">
-<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
-<dt>predicteds: np.array</dt><dd><p>A numpy array representing the predicted values.</p>
+<dt><strong>predicteds: np.array</strong></dt><dd><p>A numpy array representing the predicted values.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float</dt><dd><p>A float representing the mean absolute scaled error between
 <cite>actuals</cite> and <cite>predicteds</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -432,18 +651,24 @@ based on the past value.</p>
 <p>The one sided errors are the maximum of <cite>actuals - predicteds</cite> and 0 if
 <cite>lower</cite> is true. Otherwise, they are the maximum of <cite>predicteds - actuals</cite>
 and 0.</p>
-<dl class="simple">
-<dt>actuals: list</dt><dd><p>The actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: list</strong></dt><dd><p>The actual values.</p>
 </dd>
-<dt>predicteds: list</dt><dd><p>The predicted values.</p>
+<dt><strong>predicteds: list</strong></dt><dd><p>The predicted values.</p>
 </dd>
-<dt>lower: bool</dt><dd><p>A boolean indicating the type of errors computed. If True, the under
+<dt><strong>lower: bool</strong></dt><dd><p>A boolean indicating the type of errors computed. If True, the under
 predictions are calculated. Otherwise, the over prediction are
 calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list containing the one sided errors.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -459,19 +684,25 @@ the actual value and <cite>p[i]</cite> is the predicted value for period <cite>i
 baseline errors are the errors from a model that predicts the current
 value based on the past value. The one sided variant only considers under
 or over predictions, with the other errors being set to 0.</p>
-<dl class="simple">
-<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
-<dt>predicteds: np.array</dt><dd><p>A numpy array representing the predicted values.</p>
+<dt><strong>predicteds: np.array</strong></dt><dd><p>A numpy array representing the predicted values.</p>
 </dd>
-<dt>lower: bool</dt><dd><p>A boolean indicating the type of errors computed. If True, the under
+<dt><strong>lower: bool</strong></dt><dd><p>A boolean indicating the type of errors computed. If True, the under
 predictions are calculated. Otherwise, the over prediction are
 calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float</dt><dd><p>A float representing the one-sided mean absolute scaled error between
 <cite>actuals</cite> and <cite>predicteds</cite> based on <cite>lower</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -480,16 +711,22 @@ calculated.</p>
 <dt id="MemoryAutoScaling.utils.get_over_pred_vals">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_over_pred_vals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">over_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_over_pred_vals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_over_pred_vals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the proportion and average value of <cite>over_preds</cite>.</p>
-<dl class="simple">
-<dt>over_preds: np.array</dt><dd><p>A numpy array containing the over predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>over_preds: np.array</strong></dt><dd><p>A numpy array containing the over predictions.</p>
 </dd>
-<dt>pred_count: int</dt><dd><p>An integer representing the number of predictions.</p>
+<dt><strong>pred_count: int</strong></dt><dd><p>An integer representing the number of predictions.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float, float</dt><dd><p>A float representing the proportion of predictions that were over
 predictions and a float representing the magnitude of the average
 over prediction.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -500,17 +737,23 @@ over prediction.</p>
 <dd><p>Retrieves statistics of over predictions of predicteds vs actuals.</p>
 <p>The proportion and standardized average of over predictions are
 calculated.</p>
-<dl class="simple">
-<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
-<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dt><strong>predicteds: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float, float, float</dt><dd><p>A float representing the one-sided mean absolute scaled error for
 over predictions. A float representing the proportion of predictions
 that were over predictions and a float representing the magnitude of
 the average over prediction, standardized by the average prediction.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -522,14 +765,20 @@ the average over prediction, standardized by the average prediction.</p>
 <p>The under predictions are the predicted values minus the actual values
 divided by the predicted values for the predictions that are greater than
 the actuals.</p>
-<dl class="simple">
-<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
-<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dt><strong>predicteds: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list containing the under predictions.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -538,22 +787,28 @@ the actuals.</p>
 <dt id="MemoryAutoScaling.utils.get_total_spare_during_window">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_total_spare_during_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allocated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_total_spare_during_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_total_spare_during_window" title="Permalink to this definition">¶</a></dt>
 <dd><p>The total amount of spare resource during [<cite>win_start</cite>, <cite>win_end</cite>).</p>
-<dl class="simple">
-<dt>allocated: float</dt><dd><p>A float representing the amount of the resource allocated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>allocated: float</strong></dt><dd><p>A float representing the amount of the resource allocated.</p>
 </dd>
-<dt>used: np.array</dt><dd><p>A numpy array representing a time series of the amount of the resource
+<dt><strong>used: np.array</strong></dt><dd><p>A numpy array representing a time series of the amount of the resource
 used at each time point.</p>
 </dd>
-<dt>win_start: int</dt><dd><p>An integer representing the start index for the window of interest.</p>
+<dt><strong>win_start: int</strong></dt><dd><p>An integer representing the start index for the window of interest.</p>
 </dd>
-<dt>win_end: int</dt><dd><p>An integer representing the end index for the window of interest.</p>
+<dt><strong>win_end: int</strong></dt><dd><p>An integer representing the end index for the window of interest.</p>
 </dd>
-<dt>agg_window: int</dt><dd><p>The aggregation period applied to the data.</p>
+<dt><strong>agg_window: int</strong></dt><dd><p>The aggregation period applied to the data.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float</dt><dd><p>A float representing the total amount of the resource that is unused
 during the window defined by [<cite>win_start</cite>, <cite>win_end</cite>).</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -562,15 +817,21 @@ during the window defined by [<cite>win_start</cite>, <cite>win_end</cite>).</p>
 <dt id="MemoryAutoScaling.utils.get_trace_stats">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_trace_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_trace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_trace_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_trace_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates high-level summary statistics for <cite>data_trace</cite>.</p>
-<dl class="simple">
-<dt>data_trace: np.array</dt><dd><p>A numpy array representing the data trace for which the statistics
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_trace: np.array</strong></dt><dd><p>A numpy array representing the data trace for which the statistics
 are calculated.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>A dictionary containing high-level summary statistics for <cite>data_trace</cite>.
 The keys are strings representing the name of the statistic and the
 values are the corresponding statistical value for <cite>data_trace</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -583,19 +844,13 @@ values are the corresponding statistical value for <cite>data_trace</cite>.</p>
 which identifies the training dataset of <cite>data_trace</cite>. And an index of
 <cite>data_trace</cite> is calculated based on <cite>test_prop</cite> which identifies the
 testing dataset of <cite>data_trace</cite>.</p>
-<dl class="simple">
-<dt>data_trace: np.array</dt><dd><p>A numpy array representing the data trace.</p>
-</dd>
-<dt>train_prop: float</dt><dd><p>A float in the range [0, 1] representing the proportion of data
-in the training set.</p>
-</dd>
-<dt>test_prop: float</dt><dd><p>A float in the range [0, 1] representing the proportion of data
-in the testing set.</p>
-</dd>
-</dl>
-<dl class="simple">
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
 <dt>int, int</dt><dd><p>Two integers representing the indices of <cite>data_trace</cite> that identify
 the end of the training and testing sets, respectively.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -604,16 +859,22 @@ the end of the training and testing sets, respectively.</p>
 <dt id="MemoryAutoScaling.utils.get_under_pred_vals">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_under_pred_vals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">under_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_under_pred_vals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_under_pred_vals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the proportion and maximum value of <cite>under_preds</cite>.</p>
-<dl class="simple">
-<dt>under_preds: np.array</dt><dd><p>A numpy array containing the under predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>under_preds: np.array</strong></dt><dd><p>A numpy array containing the under predictions.</p>
 </dd>
-<dt>pred_count: int</dt><dd><p>An integer representing the number of predictions.</p>
+<dt><strong>pred_count: int</strong></dt><dd><p>An integer representing the number of predictions.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float, float</dt><dd><p>A float representing the proportion of predictions that were under
 predictions and a float representing the magnitude of the maximum
 under prediction.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -623,17 +884,23 @@ under prediction.</p>
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_under_prediction_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_under_prediction_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_under_prediction_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves statistics of under predictions of predicteds vs actuals.</p>
 <p>The proportion and maximum of under predictions are calculated.</p>
-<dl class="simple">
-<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
-<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dt><strong>predicteds: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>float, float, float</dt><dd><p>A float representing the one-sided mean absolute scaled error for
 under predictions. A float representing the proportion of predictions
 that were under predictions and a float representing the magnitude of
 the maximum under prediction, standardized by the average prediction.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -645,14 +912,20 @@ the maximum under prediction, standardized by the average prediction.</p>
 <p>The under predictions are the actual values minus the predicted values
 divided by the predicted values for the predictions that are less than
 the actuals.</p>
-<dl class="simple">
-<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actuals: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
-<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+<dt><strong>predicteds: np.array</strong></dt><dd><p>A numpy array representing the actual values.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>list</dt><dd><p>A list containing the under predictions.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -662,16 +935,22 @@ the actuals.</p>
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">impute_for_time_series</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impute_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#impute_for_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.impute_for_time_series" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs imputation on <cite>time_series</cite> using <cite>impute_val</cite>.</p>
 <p>All NaN values in <cite>time_series</cite> are replaced by <cite>impute_val</cite>.</p>
-<dl class="simple">
-<dt>time_series: np.array</dt><dd><p>A numpy array representing the time series for which imputation
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>time_series: np.array</strong></dt><dd><p>A numpy array representing the time series for which imputation
 is performed.</p>
 </dd>
-<dt>impute_val: float</dt><dd><p>The value used for imputation.</p>
+<dt><strong>impute_val: float</strong></dt><dd><p>The value used for imputation.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>np.array</dt><dd><p>The numpy array obtained from <cite>time_series</cite> after replacing each NaN
 value with <cite>impute_val</cite>.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -683,27 +962,39 @@ value with <cite>impute_val</cite>.</p>
 <p>The time series in <cite>time_series_list</cite> are written to <cite>output_file</cite> with
 one line per list element. Each line is a comma separated list of values
 corresponding to the observations for the time series.</p>
-<dl class="simple">
-<dt>time_series_list: list</dt><dd><p>A list of numpy arrays corresponding to the time series being written.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>time_series_list: list</strong></dt><dd><p>A list of numpy arrays corresponding to the time series being written.</p>
 </dd>
-<dt>output_file: str</dt><dd><p>A string representing the name of the file being written to.</p>
+<dt><strong>output_file: str</strong></dt><dd><p>A string representing the name of the file being written to.</p>
 </dd>
 </dl>
-<p>None</p>
-<p>The contents of <cite>time_series_list</cite> are written to <cite>output_file</cite>. If the
-file already exists it is overwritten. Otherwise, the file is created.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="MemoryAutoScaling.utils.perform_coin_toss">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">perform_coin_toss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#perform_coin_toss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.perform_coin_toss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a coin toss with probability <cite>prob</cite> of heads.</p>
-<dl class="simple">
-<dt>prob: float</dt><dd><p>A number between 0 and 1 representing the probability of heads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>prob: float</strong></dt><dd><p>A number between 0 and 1 representing the probability of heads.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>int</dt><dd><p>Either 0 or 1 where 0 represents tails and 1 represents heads.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -714,14 +1005,20 @@ file already exists it is overwritten. Otherwise, the file is created.</p>
 <dd><p>Processes <cite>model_results_df</cite>.</p>
 <p><cite>model_results_df</cite> is processed by renaming columns in order to compare
 the model results against other model results.</p>
-<dl class="simple">
-<dt>model_results_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the results of the modeling process
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_results_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the results of the modeling process
 for each trace.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>The pandas DataFrame obtained from <cite>model_results_df</cite> after
 processing.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -730,17 +1027,23 @@ processing.</p>
 <dt id="MemoryAutoScaling.utils.rename_aggregate_stats">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">rename_aggregate_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agg_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#rename_aggregate_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.rename_aggregate_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Renames the statistics in <cite>agg_stats</cite> based on <cite>ts_name</cite>.</p>
-<dl class="simple">
-<dt>agg_stats: dict</dt><dd><p>A dictionary containing the aggregate stats to be renamed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>agg_stats: dict</strong></dt><dd><p>A dictionary containing the aggregate stats to be renamed.</p>
 </dd>
-<dt>ts_name: str</dt><dd><p>A string representing the name of the time series.</p>
+<dt><strong>ts_name: str</strong></dt><dd><p>A string representing the name of the time series.</p>
 </dd>
-<dt>is_max: bool</dt><dd><p>A boolean value indicating whether the time series records the
+<dt><strong>is_max: bool</strong></dt><dd><p>A boolean value indicating whether the time series records the
 maximum or not. The default value is True.</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>dict</dt><dd><p>The dictionary obtained from <cite>agg_stats</cite> after renaming.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -748,75 +1051,50 @@ maximum or not. The default value is True.</p>
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">MemoryAutoScaling</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Code Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parallel.html">Parallelization Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="specs.html">Specifications</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Utility Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="specs.html" title="previous chapter">Specifications</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="specs.html" class="btn btn-neutral float-left" title="Specifications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2021, Matt Buckley.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/utils.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>
