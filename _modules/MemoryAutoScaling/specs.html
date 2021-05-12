@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MemoryAutoScaling.specs &#8212; MemoryAutoScaling  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for MemoryAutoScaling.specs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module holds specification parameters for the Google Memory Auto</span>
+<span class="sd">Scaling project. These are a set of parameters used throughout the project.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+
+
+<span class="n">TRACE_ID_COL</span> <span class="o">=</span> <span class="s2">&quot;collection_id&quot;</span>
+<span class="n">START_INTERVAL_COL</span> <span class="o">=</span> <span class="s2">&quot;start_time&quot;</span>
+<span class="n">END_INTERVAL_COL</span> <span class="o">=</span> <span class="s2">&quot;end_time&quot;</span>
+<span class="n">TOTAL_MEM_COL</span> <span class="o">=</span> <span class="s2">&quot;assigned_memory&quot;</span>
+<span class="n">AVG_CPU_COL</span> <span class="o">=</span> <span class="s2">&quot;average_usage.cpus&quot;</span>
+<span class="n">MAX_CPU_COL</span> <span class="o">=</span> <span class="s2">&quot;maximum_usage.cpus&quot;</span>
+<span class="n">AVG_MEM_COL</span> <span class="o">=</span> <span class="s2">&quot;average_usage.memory&quot;</span>
+<span class="n">MAX_MEM_COL</span> <span class="o">=</span> <span class="s2">&quot;maximum_usage.memory&quot;</span>
+<span class="n">MAX_MEM_TS</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_ts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MAX_MEM_COL</span><span class="p">)</span>
+<span class="n">MAX_CPU_TS</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_ts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MAX_CPU_COL</span><span class="p">)</span>
+<span class="n">LAGS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">MODELS_COUNT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">HARVEST_WEIGHT</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">EPS</span> <span class="o">=</span> <span class="mf">0.00001</span>
+
+<span class="n">MULTI_VAR_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="n">MAX_MEM_TS</span><span class="p">,</span> <span class="n">MAX_CPU_TS</span><span class="p">]</span>
+
+<span class="n">RAW_TIME_SERIES_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="n">MAX_MEM_COL</span><span class="p">,</span> <span class="n">AVG_MEM_COL</span><span class="p">,</span> <span class="n">MAX_CPU_COL</span><span class="p">,</span> <span class="n">AVG_CPU_COL</span><span class="p">]</span>
+<span class="n">RAW_TIME_SERIES_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Maximum Memory&quot;</span><span class="p">,</span> <span class="s2">&quot;Average Memory&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;Maximum CPU&quot;</span><span class="p">,</span> <span class="s2">&quot;Average CPU&quot;</span><span class="p">]</span>
+
+<span class="n">MAX_STATS_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">]</span>
+<span class="n">AVG_STATS_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="s2">&quot;range&quot;</span><span class="p">]</span>
+
+<span class="n">MODELING_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="s2">&quot;train_mase&quot;</span><span class="p">,</span> <span class="s2">&quot;test_mase&quot;</span><span class="p">,</span> <span class="s2">&quot;under_mase&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;prop_under_preds&quot;</span><span class="p">,</span> <span class="s2">&quot;max_under_pred&quot;</span><span class="p">,</span> <span class="s2">&quot;over_mase&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;prop_over_preds&quot;</span><span class="p">,</span> <span class="s2">&quot;avg_over_pred&quot;</span><span class="p">,</span> <span class="s2">&quot;total_spare&quot;</span><span class="p">]</span>
+<span class="n">BUFFER_PCTS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="n">RESULTS_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">MODELING_COLS</span> <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s2">&quot;params&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_target_variable"><a class="viewcode-back" href="../../specs.html#MemoryAutoScaling.specs.get_target_variable">[docs]</a><span class="k">def</span> <span class="nf">get_target_variable</span><span class="p">(</span><span class="n">max_mem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the target variable based on `max_mem`.</span>
+
+<span class="sd">    If `max_mem` is True, Maximum Memory Usage is the target variable.</span>
+<span class="sd">    Otherwise, it is Maximum CPU Usage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_mem: bool</span>
+<span class="sd">        A boolean value indicating whether maximum memory usage is the target</span>
+<span class="sd">        variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A string representing the name of the target variable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">MAX_MEM_TS</span> <span class="k">if</span> <span class="n">max_mem</span> <span class="k">else</span> <span class="n">MAX_CPU_TS</span></div>
+
+
+<div class="viewcode-block" id="get_input_and_output_target"><a class="viewcode-back" href="../../specs.html#MemoryAutoScaling.specs.get_input_and_output_target">[docs]</a><span class="k">def</span> <span class="nf">get_input_and_output_target</span><span class="p">(</span><span class="n">max_mem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the input and output target variables based on `max_mem`.</span>
+
+<span class="sd">    The input target variable is the name of the target variable in the raw</span>
+<span class="sd">    trace data. The output target variable is the name of the target variable</span>
+<span class="sd">    after pre-processing and is used in the modeling procedure. If `max_mem`</span>
+<span class="sd">    is True, Maximum Memory Usage is used as the target variable. Otherwise,</span>
+<span class="sd">    the target variable is Maximum CPU Usage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_mem: bool</span>
+<span class="sd">        A boolean value indicating whether maximum memory usage is the target</span>
+<span class="sd">        variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str, str</span>
+<span class="sd">        Two strings representing the input and output target variables,</span>
+<span class="sd">        respectively.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">max_mem</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MAX_MEM_COL</span><span class="p">,</span> <span class="n">MAX_MEM_TS</span>
+    <span class="k">return</span> <span class="n">MAX_CPU_COL</span><span class="p">,</span> <span class="n">MAX_CPU_TS</span></div>
+
+
+<div class="viewcode-block" id="get_causal_cols"><a class="viewcode-back" href="../../specs.html#MemoryAutoScaling.specs.get_causal_cols">[docs]</a><span class="k">def</span> <span class="nf">get_causal_cols</span><span class="p">(</span><span class="n">target_variable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the columns used to calculate causation against `target_variable`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    target_variable: str</span>
+<span class="sd">        The name of the target variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of strings representing the columns for which causation</span>
+<span class="sd">        p-values will be calculated against `target_variable`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_causal_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">RAW_TIME_SERIES_COLS</span>
+                       <span class="k">if</span> <span class="n">col_name</span> <span class="o">!=</span> <span class="n">target_variable</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_ts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">raw_causal_cols</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_trace_columns"><a class="viewcode-back" href="../../specs.html#MemoryAutoScaling.specs.get_trace_columns">[docs]</a><span class="k">def</span> <span class="nf">get_trace_columns</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;The columns in a trace dataframe.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of strings representing the names of the columns in a</span>
+<span class="sd">        trace dataframe.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_name</span><span class="p">,</span> <span class="n">stat_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">ts_name</span><span class="p">,</span> <span class="n">stat_name</span>
+                <span class="ow">in</span> <span class="n">product</span><span class="p">([</span><span class="n">MAX_MEM_COL</span><span class="p">,</span> <span class="n">MAX_CPU_COL</span><span class="p">],</span> <span class="n">MAX_STATS_COLS</span><span class="p">)]</span>
+    <span class="n">avg_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_name</span><span class="p">,</span> <span class="n">stat_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">ts_name</span><span class="p">,</span> <span class="n">stat_name</span>
+                <span class="ow">in</span> <span class="n">product</span><span class="p">([</span><span class="n">AVG_MEM_COL</span><span class="p">,</span> <span class="n">AVG_CPU_COL</span><span class="p">],</span> <span class="n">AVG_STATS_COLS</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">max_cols</span> <span class="o">+</span> <span class="n">avg_cols</span></div>
+
+
+<div class="viewcode-block" id="get_lagged_trace_columns"><a class="viewcode-back" href="../../specs.html#MemoryAutoScaling.specs.get_lagged_trace_columns">[docs]</a><span class="k">def</span> <span class="nf">get_lagged_trace_columns</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">exclude_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The column names for lagged data in a trace dataframe.</span>
+
+<span class="sd">    Column names are generated for each lag in `lags`. Any columns specified</span>
+<span class="sd">    in `exclude_cols` are excluded. If exclude_cols is None, no columns are</span>
+<span class="sd">    excluded.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lags: list</span>
+<span class="sd">        A list of integers representing the lags for the columns.</span>
+<span class="sd">    exclude_cols: list</span>
+<span class="sd">        A list of the columns to exclude. The default value is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of strings representing the names of the lagged columns in a</span>
+<span class="sd">        trace dataframe.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">excluded_columns</span> <span class="o">=</span> <span class="n">exclude_cols</span> <span class="k">if</span> <span class="n">exclude_cols</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_lag_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">lag</span><span class="p">,</span> <span class="n">col_name</span>
+            <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">get_trace_columns</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">col_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_columns</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">MemoryAutoScaling</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Code Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Matt Buckley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

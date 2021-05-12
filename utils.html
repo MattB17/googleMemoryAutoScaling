@@ -31,8 +31,720 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="utility-functions">
-<h1>Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-MemoryAutoScaling.utils">
+<span id="utility-functions"></span><h1>Utility Functions<a class="headerlink" href="#module-MemoryAutoScaling.utils" title="Permalink to this headline">¶</a></h1>
+<p>A set of utility functions used throughout the memory auto scaling code.</p>
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.aggregate_time_series">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">aggregate_time_series</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#aggregate_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.aggregate_time_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Max aggregates <cite>time_series</cite> at the period <cite>window_length</cite>.</p>
+<p>The aggregation computes the maximum, standard deviation, average, median,
+and range of <cite>time_series</cite> for each interval of length <cite>window_length</cite>.</p>
+<dl class="simple">
+<dt>time_series: np.array</dt><dd><p>A numpy array representing the time series to be aggregated.</p>
+</dd>
+<dt>window_length: int</dt><dd><p>An integer denoting the aggregation interval. That is, every
+<cite>window_length</cite> time periods of <cite>time_series</cite> are aggregated.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>A dictionary with the aggregate statistics for <cite>time_series</cite>. Each
+key is a string representing the statistic name and the corresponding
+value is a list representing the aggregated values of the statistic.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.append_aggregate_stats_for_time_series">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">append_aggregate_stats_for_time_series</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#append_aggregate_stats_for_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.append_aggregate_stats_for_time_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends aggregate stats for <cite>ts_name</cite> in <cite>trace_df</cite> to <cite>append_dict</cite>.</p>
+<p>The aggregate statistics for <cite>ts_name</cite> are calculated based on
+<cite>window_length</cite> and combined with the data in <cite>append_dict</cite>.</p>
+<dl class="simple">
+<dt>trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the trace data.</p>
+</dd>
+<dt>ts_name: str</dt><dd><p>A string representing the name of the time series.</p>
+</dd>
+<dt>append_dict: dict</dt><dd><p>The dictionary to which the aggregate stats are appended.</p>
+</dd>
+<dt>window_length: int</dt><dd><p>An integer representing the aggregation window.</p>
+</dd>
+<dt>is_max: bool</dt><dd><p>A boolean value indicating whether the time series records the
+maximum or not. The default value is True.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>The dictionary obtained from <cite>append_dict</cite> after adding the
+aggregate statistics for <cite>ts_name</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.build_trace_aggregate_df">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">build_trace_aggregate_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#build_trace_aggregate_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.build_trace_aggregate_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds an aggregated dataframe from <cite>raw_trace_df</cite> using <cite>window_len</cite>.</p>
+<dl class="simple">
+<dt>raw_trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the raw data for the trace.</p>
+</dd>
+<dt>window_len: int</dt><dd><p>The aggregation window for the trace. Data will be aggregated every
+<cite>window_len</cite> time periods.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>A pandas DataFrame containing the aggregated measures for the trace
+data specified in <cite>raw_trace_df</cite> using <cite>window_len</cite> as the aggregation
+period.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.build_trace_data_from_trace_df">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">build_trace_data_from_trace_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace_usage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#build_trace_data_from_trace_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.build_trace_data_from_trace_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds data for a <cite>Trace</cite> object from <cite>raw_trace_df</cite>.</p>
+<p>The DataFrame containing the data for a <cite>Trace</cite> is built. This is done
+by first replacing NaN values with 0 and then computing the aggregated
+statistics for <cite>raw_trace_df</cite> based on <cite>agg_window</cite>. The aggregated
+quantities are reported as percentages based on the raw usage data from
+<cite>trace_usage</cite></p>
+<dl class="simple">
+<dt>trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the raw data for the trace.</p>
+</dd>
+<dt>agg_window: int</dt><dd><p>An integer representing the aggregation period.</p>
+</dd>
+<dt>trace_usage: TraceUsage</dt><dd><p>A <cite>TraceUsage</cite> object containing the usage data for the trace.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The DataFrame obtained from <cite>raw_trace_df</cite> after removing NaN values
+and aggregating data according to <cite>agg_window</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_evaluation_metrics">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_evaluation_metrics</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_spare</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_evaluation_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_evaluation_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the evaluation metrics for the training and testing sets.</p>
+<p>The evaluation metrics are the mean absolute scaled error for the training
+and testing sets, the one-sided mean absolute scaled error for under
+predictions, the proportion of under predictions, the magnitude of the
+maximum under prediction, the one-sided mean absolute scaled error for
+over predictions, the proportion of over predictions, the magnitude of
+the average over prediction, and the total spare amount of the resource
+over the testing preiod.</p>
+<dl class="simple">
+<dt>y_train: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+training set.</p>
+</dd>
+<dt>preds_train: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+training set.</p>
+</dd>
+<dt>y_test: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+testing set.</p>
+</dd>
+<dt>preds_test: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+testing set.</p>
+</dd>
+<dt>total_spare: float</dt><dd><p>A float representing the total spare amount of the resource over the
+test period.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing the evaluation metrics. Keys are strings
+representing the names of the evaluation metric and the corresponding
+value is a float.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_harvest_stats">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_harvest_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avail_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_pct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_harvest_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_harvest_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the harvest statistics of predicted versus actual values.</p>
+<p>The harvest statistics are the amount of spare resources harvested and
+the number of violations. A violation occurs when the predicted value
+from <cite>predicted_vals</cite> multiplied by <cite>1 + buffer_pct</cite> is still less than
+the actual value. Otherwise, the resource is considered to be harvested
+based on this predicted value. The amount harvested is the difference
+between <cite>avail_val</cite> and the predictions (after adding the buffer) summed
+over all time points in which the predicted value is greater than or
+equal to the actual value.</p>
+<dl class="simple">
+<dt>avail_val: float</dt><dd><p>A float representing the amount of the resource allocated to the
+trace for its duration.</p>
+</dd>
+<dt>actual_ts: np.array</dt><dd><p>A numpy array of actual values for the trace, representing the
+percent of the available resource used at each time point.</p>
+</dd>
+<dt>predicted_ts: np.array</dt><dd><p>A numpy array of predicted values for the trace, representing the
+percent of the available resource predicted to be used at each
+time point.</p>
+</dd>
+<dt>buffer_pct: float</dt><dd><p>A float representing the percentage of each prediction to be used as
+a buffer. Thus, the effective prediction for each time period is the
+original prediction multiplied by <cite>1 + buffer_pct</cite>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float, int</dt><dd><p>A float representing the amount harvested and an integer representing
+the number of violations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_max_allocated">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_max_allocated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_max_allocated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_max_allocated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculatate the maximum allocated amount over the life of the trace.</p>
+<dl class="simple">
+<dt>raw_trace_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the data for the trace.</p>
+</dd>
+<dt>resource_col: str</dt><dd><p>A string representing the name of the resource for which the maximum
+allocated amount is being calculated.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>A float representing the maximum allocated amount of <cite>resource_col</cite>
+over the life of the trace.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_split_thresholds">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_split_thresholds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_split_thresholds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_split_thresholds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the split thresholds for <cite>data</cite>.</p>
+<p>If <cite>tuning</cite> is True, the split thresholds for <cite>data</cite> mark the end of
+the training and validation sets, respectively. Otherwise, the split
+thresholds mark the end of the training + validation and testing sets,
+respectively.</p>
+<dl class="simple">
+<dt>data: pd.DataFrame</dt><dd><p>A pandas DataFrame representing the data to be split.</p>
+</dd>
+<dt>train_prop: float</dt><dd><p>A float representing the proportion of the training set.</p>
+</dd>
+<dt>val_prop: float</dt><dd><p>A float representing the proportion of the testing set.</p>
+</dd>
+<dt>tuning: bool</dt><dd><p>A boolean value indicating whether the split is for tuning or
+testing.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>int, int</dt><dd><p>Two thresholds representing the endpoint of the two subsets. If
+<cite>tuning</cite> is true these thresholds represent the end of the training
+and validation sets, respectively. Otherwise, they represent the end
+of the training + validation and testing sets, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_train_and_test_mase">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_train_and_test_mase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_train_and_test_mase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_train_and_test_mase" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mean absolute scaled error for the training and testing sets.</p>
+<dl class="simple">
+<dt>y_train: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+training set.</p>
+</dd>
+<dt>preds_train: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+training set.</p>
+</dd>
+<dt>y_test: np.array</dt><dd><p>A numpy array representing actual values of the target for the
+testing set.</p>
+</dd>
+<dt>preds_test: np.array</dt><dd><p>A numpy array representing predicted values of the target for the
+testing set.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float, float</dt><dd><p>Two floats representing the mean absolute scaled errors for the
+training and testing sets, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_utilization_percent">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_utilization_percent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alloced_amt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usage_ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_utilization_percent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_utilization_percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the percent utilization for a trace.</p>
+<p>The percent utilization is the total amount used over the life of the
+trace, <cite>usage_ts</cite>, divided by the total amount allocated, <cite>alloced_amt</cite>,
+over the life of the trace.</p>
+<dl class="simple">
+<dt>alloced_amt: float</dt><dd><p>A float representing the amount of the resource allocated to the
+trace at any given time point.</p>
+</dd>
+<dt>usage_ts: np.array</dt><dd><p>A numpy array representring the absolute value of utilization at each
+time point for the trace.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>A float representing the percent utilization over the life of the
+trace.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.cap_predictions_at_1">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">cap_predictions_at_1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicted_vals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#cap_predictions_at_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.cap_predictions_at_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Caps each value of <cite>predicted_vals</cite> at 1.</p>
+<p>That is, if any value of <cite>predicted_vals</cite> is greater than 1 then
+it is reset to 1. Otherwise, it is left unchanged.</p>
+<dl class="simple">
+<dt>predicted_vals: np.array</dt><dd><p>A numpy array containing the predicted values to be capped.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>The numpy array obtained from <cite>predicted_vals</cite> after all of the
+predictions have been capped at 1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.cap_train_and_test_predictions">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">cap_train_and_test_predictions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_preds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#cap_train_and_test_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.cap_train_and_test_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Caps the training and testing predictions.</p>
+<p>Caps both the values of <cite>train_preds</cite> and <cite>test_preds</cite> at 1.</p>
+<dl class="simple">
+<dt>train_preds: np.array</dt><dd><p>A numpy array representing the predictions for the train set.</p>
+</dd>
+<dt>test_preds: np.array</dt><dd><p>A numpy array representing the predictions for the test set.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array, np.array</dt><dd><p>Two numpy arrays representing the predictions for the training and
+testing sets, repectively, both capped at 1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.compute_usage_percents_for_trace">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">compute_usage_percents_for_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace_usage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#compute_usage_percents_for_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.compute_usage_percents_for_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the usage percentages for <cite>raw_trace_df</cite>.</p>
+<p>The usage percentages are calculated by dividing the resource usage
+columns by the assigned resource amount. The resources of interest are
+memory and CPU. The usage statistics consist of average and maximum usage
+of each resource.</p>
+<dl class="simple">
+<dt>raw_trace_df: pd.DataFrame</dt><dd><p>The pandas DataFrame for which the memory percentages are computed.</p>
+</dd>
+<dt>trace_usage: TraceUsage</dt><dd><p>A <cite>TraceUsage</cite> object containing the usage data for the trace.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>A pandas DataFrame obtained from <cite>raw_trace_df</cite> after modifying the
+resource usage statistics to report percentages.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.extract_time_series_from_trace">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">extract_time_series_from_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#extract_time_series_from_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.extract_time_series_from_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the time series for <cite>series_name</cite> from <cite>trace_data</cite>.</p>
+<p>Any NaN values in the time series are converted to 0.</p>
+<dl class="simple">
+<dt>trace_data: pd.DataFrame</dt><dd><p>A DataFrame representing the data for the trace.</p>
+</dd>
+<dt>series_name: str</dt><dd><p>A string representing the name of the data representing the time
+series.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing the time series for <cite>series_name</cite> extracted
+from <cite>trace_data</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_cumulative_sum_of_trace">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_cumulative_sum_of_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_trace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_cumulative_sum_of_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_cumulative_sum_of_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the cumulative sum of <cite>data_trace</cite>.</p>
+<p>That is, a new data trace is generated that is the same length as
+<cite>data_trace</cite> and for which at each time point the observation of the
+trace is equal to the cumulative sum of <cite>data_trace</cite> up to that time
+point.</p>
+<dl class="simple">
+<dt>data_trace: np.array</dt><dd><p>A numpy array representing the data trace from which the cumulative
+sum is computed.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array having the same length as <cite>data_trace</cite> and for which
+the observation at each time point is the cumulative sum of the
+observations of <cite>data_trace</cite> up to that time point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_differenced_trace">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_differenced_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_differenced_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_differenced_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the result of differencing <cite>data_trace</cite> <cite>diff_level</cite> times.</p>
+<dl class="simple">
+<dt>data_trace: np.array</dt><dd><p>A numpy array representing the trace to be differenced.</p>
+</dd>
+<dt>diff_level: int</dt><dd><p>An integer representing the degree of differencing applied to
+<cite>data_trace</cite>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>The numpy array obtained from <cite>data_trace</cite> after applying differencing
+at a degree of <cite>diff_level</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_mean_absolute_scaled_error">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_mean_absolute_scaled_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_mean_absolute_scaled_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_mean_absolute_scaled_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mean absolute scaled error of <cite>predicteds</cite> vs <cite>actuals</cite>.</p>
+<p>The mean absolute scaled error is calculated as the mean of the scaled
+errors. The scaled errors are the prediction errors scaled by the average
+baseline error. The prediction errors are <cite>|a[i] - p[i]|</cite> where <cite>a[i]</cite> is
+the actual value and <cite>p[i]</cite> is the predicted value for period <cite>i</cite>. The
+baseline errors are the errors from a model that predicts the current value
+based on the past value.</p>
+<dl class="simple">
+<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+<dt>predicteds: np.array</dt><dd><p>A numpy array representing the predicted values.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>A float representing the mean absolute scaled error between
+<cite>actuals</cite> and <cite>predicteds</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_one_sided_errors">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_one_sided_errors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_one_sided_errors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_one_sided_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the one sided error of <cite>actuals</cite> vs <cite>predicted</cite> based on <cite>lower</cite>.</p>
+<p>The one sided errors are the maximum of <cite>actuals - predicteds</cite> and 0 if
+<cite>lower</cite> is true. Otherwise, they are the maximum of <cite>predicteds - actuals</cite>
+and 0.</p>
+<dl class="simple">
+<dt>actuals: list</dt><dd><p>The actual values.</p>
+</dd>
+<dt>predicteds: list</dt><dd><p>The predicted values.</p>
+</dd>
+<dt>lower: bool</dt><dd><p>A boolean indicating the type of errors computed. If True, the under
+predictions are calculated. Otherwise, the over prediction are
+calculated.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list containing the one sided errors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_one_sided_mean_absolute_scaled_error">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_one_sided_mean_absolute_scaled_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_one_sided_mean_absolute_scaled_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_one_sided_mean_absolute_scaled_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>The one-sided mean absolute scaled error of <cite>predicteds</cite> vs <cite>actuals</cite>.</p>
+<p>The mean absolute scaled error is calculated as the mean of the scaled
+errors. The scaled errors are the prediction errors scaled by the average
+baseline error. The prediction errors are <cite>|a[i] - p[i]|</cite> where <cite>a[i]</cite> is
+the actual value and <cite>p[i]</cite> is the predicted value for period <cite>i</cite>. The
+baseline errors are the errors from a model that predicts the current
+value based on the past value. The one sided variant only considers under
+or over predictions, with the other errors being set to 0.</p>
+<dl class="simple">
+<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+<dt>predicteds: np.array</dt><dd><p>A numpy array representing the predicted values.</p>
+</dd>
+<dt>lower: bool</dt><dd><p>A boolean indicating the type of errors computed. If True, the under
+predictions are calculated. Otherwise, the over prediction are
+calculated.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>A float representing the one-sided mean absolute scaled error between
+<cite>actuals</cite> and <cite>predicteds</cite> based on <cite>lower</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_over_pred_vals">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_over_pred_vals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">over_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_over_pred_vals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_over_pred_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the proportion and average value of <cite>over_preds</cite>.</p>
+<dl class="simple">
+<dt>over_preds: np.array</dt><dd><p>A numpy array containing the over predictions.</p>
+</dd>
+<dt>pred_count: int</dt><dd><p>An integer representing the number of predictions.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float, float</dt><dd><p>A float representing the proportion of predictions that were over
+predictions and a float representing the magnitude of the average
+over prediction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_over_prediction_stats">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_over_prediction_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_over_prediction_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_over_prediction_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves statistics of over predictions of predicteds vs actuals.</p>
+<p>The proportion and standardized average of over predictions are
+calculated.</p>
+<dl class="simple">
+<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float, float, float</dt><dd><p>A float representing the one-sided mean absolute scaled error for
+over predictions. A float representing the proportion of predictions
+that were over predictions and a float representing the magnitude of
+the average over prediction, standardized by the average prediction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_over_predictions">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_over_predictions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_over_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_over_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the over predictions of <cite>predicteds</cite> vs <cite>actuals</cite>.</p>
+<p>The under predictions are the predicted values minus the actual values
+divided by the predicted values for the predictions that are greater than
+the actuals.</p>
+<dl class="simple">
+<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list containing the under predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_total_spare_during_window">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_total_spare_during_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allocated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_total_spare_during_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_total_spare_during_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total amount of spare resource during [<cite>win_start</cite>, <cite>win_end</cite>).</p>
+<dl class="simple">
+<dt>allocated: float</dt><dd><p>A float representing the amount of the resource allocated.</p>
+</dd>
+<dt>used: np.array</dt><dd><p>A numpy array representing a time series of the amount of the resource
+used at each time point.</p>
+</dd>
+<dt>win_start: int</dt><dd><p>An integer representing the start index for the window of interest.</p>
+</dd>
+<dt>win_end: int</dt><dd><p>An integer representing the end index for the window of interest.</p>
+</dd>
+<dt>agg_window: int</dt><dd><p>The aggregation period applied to the data.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of the resource that is unused
+during the window defined by [<cite>win_start</cite>, <cite>win_end</cite>).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_trace_stats">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_trace_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_trace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_trace_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_trace_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates high-level summary statistics for <cite>data_trace</cite>.</p>
+<dl class="simple">
+<dt>data_trace: np.array</dt><dd><p>A numpy array representing the data trace for which the statistics
+are calculated.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing high-level summary statistics for <cite>data_trace</cite>.
+The keys are strings representing the name of the statistic and the
+values are the corresponding statistical value for <cite>data_trace</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_train_test_thresholds">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_train_test_thresholds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_train_test_thresholds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_train_test_thresholds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the index identifying the end of the train and test sets.</p>
+<p>That is, an index of <cite>data_trace</cite> is calculated based on <cite>train_prop</cite>
+which identifies the training dataset of <cite>data_trace</cite>. And an index of
+<cite>data_trace</cite> is calculated based on <cite>test_prop</cite> which identifies the
+testing dataset of <cite>data_trace</cite>.</p>
+<dl class="simple">
+<dt>data_trace: np.array</dt><dd><p>A numpy array representing the data trace.</p>
+</dd>
+<dt>train_prop: float</dt><dd><p>A float in the range [0, 1] representing the proportion of data
+in the training set.</p>
+</dd>
+<dt>test_prop: float</dt><dd><p>A float in the range [0, 1] representing the proportion of data
+in the testing set.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>int, int</dt><dd><p>Two integers representing the indices of <cite>data_trace</cite> that identify
+the end of the training and testing sets, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_under_pred_vals">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_under_pred_vals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">under_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_under_pred_vals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_under_pred_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the proportion and maximum value of <cite>under_preds</cite>.</p>
+<dl class="simple">
+<dt>under_preds: np.array</dt><dd><p>A numpy array containing the under predictions.</p>
+</dd>
+<dt>pred_count: int</dt><dd><p>An integer representing the number of predictions.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float, float</dt><dd><p>A float representing the proportion of predictions that were under
+predictions and a float representing the magnitude of the maximum
+under prediction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_under_prediction_stats">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_under_prediction_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_under_prediction_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_under_prediction_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves statistics of under predictions of predicteds vs actuals.</p>
+<p>The proportion and maximum of under predictions are calculated.</p>
+<dl class="simple">
+<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float, float, float</dt><dd><p>A float representing the one-sided mean absolute scaled error for
+under predictions. A float representing the proportion of predictions
+that were under predictions and a float representing the magnitude of
+the maximum under prediction, standardized by the average prediction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.get_under_predictions">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">get_under_predictions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicteds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#get_under_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.get_under_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the under predictions of <cite>predicteds</cite> vs <cite>actuals</cite>.</p>
+<p>The under predictions are the actual values minus the predicted values
+divided by the predicted values for the predictions that are less than
+the actuals.</p>
+<dl class="simple">
+<dt>actuals: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+<dt>predicteds: np.array</dt><dd><p>A numpy array representing the actual values.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list containing the under predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.impute_for_time_series">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">impute_for_time_series</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impute_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#impute_for_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.impute_for_time_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs imputation on <cite>time_series</cite> using <cite>impute_val</cite>.</p>
+<p>All NaN values in <cite>time_series</cite> are replaced by <cite>impute_val</cite>.</p>
+<dl class="simple">
+<dt>time_series: np.array</dt><dd><p>A numpy array representing the time series for which imputation
+is performed.</p>
+</dd>
+<dt>impute_val: float</dt><dd><p>The value used for imputation.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>The numpy array obtained from <cite>time_series</cite> after replacing each NaN
+value with <cite>impute_val</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.output_time_series_list_to_file">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">output_time_series_list_to_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#output_time_series_list_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.output_time_series_list_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes <cite>time_series_list</cite> to <cite>output_file</cite>.</p>
+<p>The time series in <cite>time_series_list</cite> are written to <cite>output_file</cite> with
+one line per list element. Each line is a comma separated list of values
+corresponding to the observations for the time series.</p>
+<dl class="simple">
+<dt>time_series_list: list</dt><dd><p>A list of numpy arrays corresponding to the time series being written.</p>
+</dd>
+<dt>output_file: str</dt><dd><p>A string representing the name of the file being written to.</p>
+</dd>
+</dl>
+<p>None</p>
+<p>The contents of <cite>time_series_list</cite> are written to <cite>output_file</cite>. If the
+file already exists it is overwritten. Otherwise, the file is created.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.perform_coin_toss">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">perform_coin_toss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#perform_coin_toss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.perform_coin_toss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a coin toss with probability <cite>prob</cite> of heads.</p>
+<dl class="simple">
+<dt>prob: float</dt><dd><p>A number between 0 and 1 representing the probability of heads.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>int</dt><dd><p>Either 0 or 1 where 0 represents tails and 1 represents heads.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.process_model_results_df">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">process_model_results_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#process_model_results_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.process_model_results_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes <cite>model_results_df</cite>.</p>
+<p><cite>model_results_df</cite> is processed by renaming columns in order to compare
+the model results against other model results.</p>
+<dl class="simple">
+<dt>model_results_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the results of the modeling process
+for each trace.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The pandas DataFrame obtained from <cite>model_results_df</cite> after
+processing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.rename_aggregate_stats">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">rename_aggregate_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agg_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#rename_aggregate_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.rename_aggregate_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames the statistics in <cite>agg_stats</cite> based on <cite>ts_name</cite>.</p>
+<dl class="simple">
+<dt>agg_stats: dict</dt><dd><p>A dictionary containing the aggregate stats to be renamed.</p>
+</dd>
+<dt>ts_name: str</dt><dd><p>A string representing the name of the time series.</p>
+</dd>
+<dt>is_max: bool</dt><dd><p>A boolean value indicating whether the time series records the
+maximum or not. The default value is True.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>The dictionary obtained from <cite>agg_stats</cite> after renaming.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

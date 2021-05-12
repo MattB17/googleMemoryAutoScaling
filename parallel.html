@@ -32,8 +32,157 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="parallelization-functions">
-<h1>Parallelization Functions<a class="headerlink" href="#parallelization-functions" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-MemoryAutoScaling.parallel">
+<span id="parallelization-functions"></span><h1>Parallelization Functions<a class="headerlink" href="#module-MemoryAutoScaling.parallel" title="Permalink to this headline">¶</a></h1>
+<p>A set of helper functions used in parallel processing.</p>
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.build_all_traces_from_files">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">build_all_traces_from_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#build_all_traces_from_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.build_all_traces_from_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a list of traces from <cite>trace_files</cite>.</p>
+<p>The traces are built using parallel processing.</p>
+<dl class="simple">
+<dt>trace_files: list</dt><dd><p>A list of strings representing the files from which the traces
+are built.</p>
+</dd>
+<dt>min_length: int</dt><dd><p>An integer representing the minimum number of time points needed
+for a trace to be considered.</p>
+</dd>
+<dt>agg_window: int</dt><dd><p>An integer representing the aggregation window for the trace.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list of <cite>Traces</cite> obtained from the trace files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.build_traces_from_files">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">build_traces_from_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traces_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#build_traces_from_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.build_traces_from_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a list of traces from <cite>trace_files</cite>.</p>
+<dl class="simple">
+<dt>trace_files: list</dt><dd><p>A list of strings representing the files from which the traces
+are built.</p>
+</dd>
+<dt>traces_lst: mp.Manager().list</dt><dd><p>A multiprocessing list to which traces are appended.</p>
+</dd>
+<dt>min_length: int</dt><dd><p>An integer representing the minimum number of time points needed
+for a trace to be considered.</p>
+</dd>
+<dt>agg_window: int</dt><dd><p>An integer representing the aggregation window for the trace.</p>
+</dd>
+</dl>
+<p>None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.get_cores_and_traces_per_core">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">get_cores_and_traces_per_core</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#get_cores_and_traces_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.get_cores_and_traces_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of cores to use and the number of traces per core.</p>
+<p>The number of cores to use is determined based on the system and
+<cite>trace_count</cite>. Then, given the number of cores, the number of
+traces to be processed on each core is calculated based on <cite>trace_count</cite>.</p>
+<dl class="simple">
+<dt>trace_count: int</dt><dd><p>An integer representing the number of total traces to be processed.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>int, int</dt><dd><p>Two integers representing the number of cores to use and the number
+of traces to be handled by each core, respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.get_multivariate_model_results">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">get_multivariate_model_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spare</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_vars</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#get_multivariate_model_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.get_multivariate_model_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the model results for <cite>model_vars</cite>.</p>
+<p>A separate <cite>ModelResults</cite> object is built for each variable in
+<cite>model_vars</cite> based on the actual and predicted values in the training
+and test sets.</p>
+<dl class="simple">
+<dt>model_params: tuple</dt><dd><p>A tuple specifying the parameters of the trained model.</p>
+</dd>
+<dt>train_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the target data for the training set.</p>
+</dd>
+<dt>train_preds: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the predictions for the training set.</p>
+</dd>
+<dt>test_df: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the target data for the testing set.</p>
+</dd>
+<dt>test_preds: pd.DataFrame</dt><dd><p>A pandas DataFrame containing the predictions for the testing set.</p>
+</dd>
+<dt>spare: float</dt><dd><p>A float representing the total spare amount of the target variable
+over the test period.</p>
+</dd>
+<dt>model_vars: list</dt><dd><p>A list of strings with the names of the variables being modeled.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>A dictionary of model results. The keys are the variable names
+specified in <cite>model_vars</cite> and the corresponding value is a
+<cite>ModelResults</cite> object corresponding to the results for that variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.get_traces_for_core">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">get_traces_for_core</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traces_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">core_num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#get_traces_for_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.get_traces_for_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the traces from <cite>traces</cite> for the core specified by <cite>core_num</cite>.</p>
+<p>Subsets <cite>traces</cite> to a list of length <cite>traces_per_core</cite> to get a list of
+traces to be processed on the core specified by <cite>core_num</cite>.</p>
+<dl class="simple">
+<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects.</p>
+</dd>
+<dt>traces_per_core: int</dt><dd><p>An integer specifying the number of traces to be processed by
+each core.</p>
+</dd>
+<dt>core_num: int</dt><dd><p>An integer representing the specific core processing the subsetted
+traces.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list representing the subset of <cite>Trace</cite> objects in <cite>traces</cite> that
+will be processed on the core specified by <cite>core_num</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.initialize_and_join_processes">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">initialize_and_join_processes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#initialize_and_join_processes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.initialize_and_join_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes and joins all the processes in <cite>procs</cite>.</p>
+<dl class="simple">
+<dt>procs: list</dt><dd><p>A list of <cite>mp.Process</cite> objects representing the processes
+to be initialized and joined.</p>
+</dd>
+</dl>
+<p>None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.parallel.perform_trace_modelling">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.parallel.</span></code><code class="sig-name descname"><span class="pre">perform_trace_modelling</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/parallel.html#perform_trace_modelling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.parallel.perform_trace_modelling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the modelling procedure on <cite>traces</cite> according to <cite>model_func</cite>.</p>
+<dl class="simple">
+<dt>traces: list</dt><dd><p>A list of <cite>Trace</cite> objects to be modelled.</p>
+</dd>
+<dt>model_func: function</dt><dd><p>A function specifying how modelling should be carried out for a
+collection of traces. The function takes a list of traces to be
+processed, a dictionary to store modeling results, and the set of
+arguments specified in <cite>model_args</cite>.</p>
+</dd>
+<dt>model_args: tuple</dt><dd><p>A tuple containing the arguments used for <cite>model_func</cite>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dict</dt><dd><p>A dictionary of lists in which the keys are strings representing the
+id of a trace and the values correspond to model results for the
+trace.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

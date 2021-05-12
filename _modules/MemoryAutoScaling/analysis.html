@@ -1,0 +1,1915 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MemoryAutoScaling.analysis &#8212; MemoryAutoScaling  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for MemoryAutoScaling.analysis</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A set of helper functions used in the analysis process.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.Analysis</span> <span class="kn">import</span> <span class="n">ModelResults</span><span class="p">,</span> <span class="n">HarvestStats</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.DataHandling</span> <span class="kn">import</span> <span class="n">TraceHandler</span>
+
+
+<div class="viewcode-block" id="get_granger_pvalues_at_lag"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_granger_pvalues_at_lag">[docs]</a><span class="k">def</span> <span class="nf">get_granger_pvalues_at_lag</span><span class="p">(</span><span class="n">granger_dict</span><span class="p">,</span> <span class="n">lag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieves the pvalues from `granger_dict` at `lag`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    granger_dict: dict</span>
+<span class="sd">        A dictionarity containing the results of a Granger test for causality.</span>
+<span class="sd">    lag: int</span>
+<span class="sd">        An integer representing the lag used for the causality test.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of pvalues from the granger causality test recorded in</span>
+<span class="sd">        `granger_dict` at the lag `lag`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">granger_dict</span> <span class="o">=</span> <span class="n">granger_dict</span><span class="p">[</span><span class="n">lag</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">granger_dict</span><span class="p">[</span><span class="s1">&#39;ssr_ftest&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">granger_dict</span><span class="p">[</span><span class="s1">&#39;ssr_chi2test&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">granger_dict</span><span class="p">[</span><span class="s1">&#39;lrtest&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">granger_dict</span><span class="p">[</span><span class="s1">&#39;params_ftest&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="get_granger_col_names_for_lag"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_granger_col_names_for_lag">[docs]</a><span class="k">def</span> <span class="nf">get_granger_col_names_for_lag</span><span class="p">(</span><span class="n">lag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The set of granger column names for `lag`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lag: int</span>
+<span class="sd">        An integer representing the time lag of interest.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of strings representing the column names for the granger</span>
+<span class="sd">        causality test at a lag of `lag`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">test_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ssr_ftest&#39;</span><span class="p">,</span> <span class="s1">&#39;ssr_chi2test&#39;</span><span class="p">,</span> <span class="s1">&#39;lrtest&#39;</span><span class="p">,</span> <span class="s1">&#39;params_ftest&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_name</span><span class="p">,</span> <span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">test_name</span> <span class="ow">in</span> <span class="n">test_names</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_all_granger_col_names"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_all_granger_col_names">[docs]</a><span class="k">def</span> <span class="nf">get_all_granger_col_names</span><span class="p">(</span><span class="n">causal_cols</span><span class="p">,</span> <span class="n">causal_lags</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets all granger column names for `causal_cols` and `causal_lags`.</span>
+
+<span class="sd">    That is there is a column for each combination of `causal_cols`,</span>
+<span class="sd">    `causal_lags`, and each statistical test.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    causal_cols: list</span>
+<span class="sd">        A list of strings representing the columns for which a test was</span>
+<span class="sd">        carried out to determine if the given column is causally related</span>
+<span class="sd">        to the target variable.</span>
+<span class="sd">    causal_lags: list</span>
+<span class="sd">        A list of integers representing the lags tested for causality.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of strings representing all granger column names for</span>
+<span class="sd">        `causal_cols` and `causal_lags`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">causal_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_granger_col_names_for_lag</span><span class="p">(</span><span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">causal_lags</span><span class="p">]</span>
+    <span class="n">causal_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">lag_list</span> <span class="ow">in</span> <span class="n">causal_lst</span>
+                  <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">lag_list</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;causal_</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">causal_tup</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">causal_tup</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">causal_tup</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">causal_cols</span><span class="p">,</span> <span class="n">causal_lst</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="build_models_from_params_list"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.build_models_from_params_list">[docs]</a><span class="k">def</span> <span class="nf">build_models_from_params_list</span><span class="p">(</span><span class="n">trace_model</span><span class="p">,</span> <span class="n">params_lst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds `trace_model` objects from the params in `params_lst`.</span>
+
+<span class="sd">    A separate `trace_model` object is built for each set of params</span>
+<span class="sd">    in `params_lst`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_model: TraceModel.class</span>
+<span class="sd">        A reference to a `TraceModel` class representing the models being</span>
+<span class="sd">        created.</span>
+<span class="sd">    params_lst: list</span>
+<span class="sd">        A list of dictionaries in which each dictionary represents the set of</span>
+<span class="sd">        named parameters used to initialize a `trace_model`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of `trace_model` objects instantiated from the parameters</span>
+<span class="sd">        in `params_lst`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">trace_model</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_lst</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_univariate_modelling_input_params"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.read_univariate_modelling_input_params">[docs]</a><span class="k">def</span> <span class="nf">read_univariate_modelling_input_params</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Reads the input parameters for modelling from standard input.</span>
+
+<span class="sd">    The input paramters consist of the input directory containing the</span>
+<span class="sd">    trace files, the output directory for modelling results, a string</span>
+<span class="sd">    identifying files to read from the input directory, an integer</span>
+<span class="sd">    representing the minimum length for a trace to be modelled, a float</span>
+<span class="sd">    representing the proportion of data in the training set, an integer</span>
+<span class="sd">    representing for how many successive periods to aggregate data, and</span>
+<span class="sd">    a boolean value indicating the target variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing the input parameters.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;input_dir&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;file_id&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="s2">&quot;min_trace_length&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+            <span class="s2">&quot;train_prop&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+            <span class="s2">&quot;val_prop&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">6</span><span class="p">]),</span>
+            <span class="s2">&quot;aggregation_window&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">]),</span>
+            <span class="s2">&quot;max_mem&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="read_multivariate_modelling_input_params"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.read_multivariate_modelling_input_params">[docs]</a><span class="k">def</span> <span class="nf">read_multivariate_modelling_input_params</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Reads the input parameters for modelling from standard input.</span>
+
+<span class="sd">    The input paramters consist of the input directory containing the</span>
+<span class="sd">    trace files, the output directory for modelling results, a string</span>
+<span class="sd">    identifying files to read from the input directory, an integer</span>
+<span class="sd">    representing the minimum length for a trace to be modelled, a float</span>
+<span class="sd">    representing the proportion of data in the training set, and an integer</span>
+<span class="sd">    representing for how many successive periods to aggregate data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing the input parameters.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;input_dir&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;file_id&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="s2">&quot;min_trace_length&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+            <span class="s2">&quot;train_prop&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+            <span class="s2">&quot;aggregation_window&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">6</span><span class="p">])}</span></div>
+
+
+<div class="viewcode-block" id="get_traces_from_input_params"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_traces_from_input_params">[docs]</a><span class="k">def</span> <span class="nf">get_traces_from_input_params</span><span class="p">(</span><span class="n">input_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the collection of traces based on `input_params`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_params: dict</span>
+<span class="sd">        A dictionary containing the input parameters used to construct the</span>
+<span class="sd">        traces. The dictionary has keys &#39;input_dir&#39;, &#39;file_id&#39;,</span>
+<span class="sd">        &#39;min_trace_length&#39;, and &#39;aggregation_window&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of `Trace` objects constructed based on `input_params`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trace_handler</span> <span class="o">=</span> <span class="n">TraceHandler</span><span class="p">(</span>
+        <span class="n">input_params</span><span class="p">[</span><span class="s1">&#39;input_dir&#39;</span><span class="p">],</span> <span class="n">input_params</span><span class="p">[</span><span class="s1">&#39;file_id&#39;</span><span class="p">],</span>
+        <span class="n">input_params</span><span class="p">[</span><span class="s1">&#39;min_trace_length&#39;</span><span class="p">],</span> <span class="n">input_params</span><span class="p">[</span><span class="s1">&#39;aggregation_window&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">trace_handler</span><span class="o">.</span><span class="n">run_processing_pipeline</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_univariate_model_build_input_params"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_univariate_model_build_input_params">[docs]</a><span class="k">def</span> <span class="nf">get_univariate_model_build_input_params</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Gets the set of parameters to build univariate models for the traces.</span>
+
+<span class="sd">    Reads the input arguments from the system input and uses these to setup</span>
+<span class="sd">    the input parameters for model building. These input parameters are</span>
+<span class="sd">    the collection of traces to be modeled, an output directory for model</span>
+<span class="sd">    results, and the proportion of records in the training set.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing a list of traces, the output directory for</span>
+<span class="sd">        model results, a float representing the proportion of records in the</span>
+<span class="sd">        training set, and a boolean indicating which target variable to use</span>
+<span class="sd">        for modeling.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">read_univariate_modelling_input_params</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;traces&#39;</span><span class="p">:</span> <span class="n">get_traces_from_input_params</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
+            <span class="s1">&#39;output_dir&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;train_prop&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;train_prop&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;val_prop&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;val_prop&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;max_mem&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_mem&#39;</span><span class="p">]}</span></div>
+
+
+<div class="viewcode-block" id="get_multivariate_model_build_input_params"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_multivariate_model_build_input_params">[docs]</a><span class="k">def</span> <span class="nf">get_multivariate_model_build_input_params</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Gets the set of parameters to build multivariate models for the traces.</span>
+
+<span class="sd">    Reads the input arguments from the system input and uses these to setup</span>
+<span class="sd">    the input parameters for model building. These input parameters are</span>
+<span class="sd">    the collection of traces to be modeled, an output directory for model</span>
+<span class="sd">    results, and the proportion of records in the training set.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing the list of traces to be modeled, the output</span>
+<span class="sd">        directory for modeling results, and a float representing the</span>
+<span class="sd">        proportion of records to use in the training set.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">read_multivariate_modelling_input_params</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;traces&quot;</span><span class="p">:</span> <span class="n">get_traces_from_input_params</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
+            <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;train_prop&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;train_prop&#39;</span><span class="p">]}</span></div>
+
+
+<div class="viewcode-block" id="output_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.output_model_results">[docs]</a><span class="k">def</span> <span class="nf">output_model_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">col_list</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Outputs `results` to `file_name` in `output_dir`.</span>
+
+<span class="sd">    The model results are converted to a pandas DataFrame and written to</span>
+<span class="sd">    a csv file in `output_dir` named `file_name`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    results: list</span>
+<span class="sd">        A list of lists containing the model results. Each list corresponds</span>
+<span class="sd">        to the results for a particular trace.</span>
+<span class="sd">    col_list: list</span>
+<span class="sd">        A list of strings representing the column names for the data.</span>
+<span class="sd">    output_dir: str</span>
+<span class="sd">        A string representing the directory to which the results are written.</span>
+<span class="sd">    file_name: str</span>
+<span class="sd">        A string representing the name of the file to which the results are</span>
+<span class="sd">        written.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">results_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">col_list</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+    <span class="n">results_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_col_list_for_params"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_col_list_for_params">[docs]</a><span class="k">def</span> <span class="nf">get_col_list_for_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model_cols</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets a list of columns based on `params` and `model_cols`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params: list</span>
+<span class="sd">        A list of model parameters used to generate the column names.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string representing the name of the model.</span>
+<span class="sd">    model_cols: list</span>
+<span class="sd">        A list of column names for the models.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list consisting of column names generated from `params` and</span>
+<span class="sd">        `model_cols`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_col</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">model_col</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">model_cols</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_col</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">model_col</span> <span class="ow">in</span> <span class="n">model_cols</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="update_with_new_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.update_with_new_model_results">[docs]</a><span class="k">def</span> <span class="nf">update_with_new_model_results</span><span class="p">(</span><span class="n">model_results</span><span class="p">,</span> <span class="n">new_model_results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates `model_results` with `new_model_results`.</span>
+
+<span class="sd">    `new_model_results` is inserted into its appropriate place in the sorted</span>
+<span class="sd">    list `model_results`, based on the ranking metric defined on</span>
+<span class="sd">    `ModelResults` objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results: list</span>
+<span class="sd">        The list of `ModelResults` that is being updated.</span>
+<span class="sd">    new_model_results: ModelResults</span>
+<span class="sd">        A `ModelResults` object representing the most recent model results</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        The list obtained `model_results` inserting `new_model_results`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_results</span><span class="p">)):</span>
+        <span class="n">old_model_results</span> <span class="o">=</span> <span class="n">model_results</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">new_model_results</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_model_results</span><span class="p">):</span>
+            <span class="n">model_results</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">new_model_results</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">model_results</span>
+    <span class="n">model_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_model_results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_results</span></div>
+
+<div class="viewcode-block" id="insert_multivariate_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.insert_multivariate_results">[docs]</a><span class="k">def</span> <span class="nf">insert_multivariate_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span> <span class="n">new_results_dict</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inserts `new_results_dict` into `model_results_dict` at `idx`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        A dictionary containing lists of `ModelResults`. Each key is a string</span>
+<span class="sd">        representing a modeled variable and the corresponding value is a list</span>
+<span class="sd">        of `ModelResults` objects for that variable.</span>
+<span class="sd">    new_results_dict: dict</span>
+<span class="sd">        A dictionary of `ModelResults`. Each key is a string representing a</span>
+<span class="sd">        modeled variable and the corresponding value is an associated</span>
+<span class="sd">        `ModelResults` object.</span>
+<span class="sd">    idx: int</span>
+<span class="sd">        An integer representing the index to which the `ModelResults` of</span>
+<span class="sd">        `new_results_dict` will be inserted into the lists of</span>
+<span class="sd">        `model_results_dict`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `model_results_dict` after inserting</span>
+<span class="sd">        `new_results_dict` at `idx`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">model_results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">model_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">new_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">model_results_dict</span></div>
+
+<div class="viewcode-block" id="append_multivariate_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.append_multivariate_results">[docs]</a><span class="k">def</span> <span class="nf">append_multivariate_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span> <span class="n">new_results_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Appends `new_results_dict` into `model_results_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        A dictionary containing lists of `ModelResults`. Each key is a string</span>
+<span class="sd">        representing a modeled variable and the corresponding value is a list</span>
+<span class="sd">        of `ModelResults` objects for that variable.</span>
+<span class="sd">    new_results_dict: dict</span>
+<span class="sd">        A dictionary of `ModelResults`. Each key is a string representing a</span>
+<span class="sd">        modeled variable and the corresponding value is an associated</span>
+<span class="sd">        `ModelResults` object.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `model_results_dict` after inserting</span>
+<span class="sd">        `new_results_dict` at `idx`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">model_results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">model_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">model_results_dict</span></div>
+
+<div class="viewcode-block" id="update_with_new_multivariate_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.update_with_new_multivariate_model_results">[docs]</a><span class="k">def</span> <span class="nf">update_with_new_multivariate_model_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span>
+                                               <span class="n">new_results_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates `model_results_dict` with the new model results.</span>
+
+<span class="sd">    The `ModelResults` in `new_results_dict` are inserted into the appropriate</span>
+<span class="sd">    place in `model_results_dict`, based on the ranking metric defined on</span>
+<span class="sd">    `ModelResults` objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        The dictionary containing model results that is being updated.</span>
+<span class="sd">    new_results_dict: dict</span>
+<span class="sd">        A dictionary of new model results. The keys are strings representing</span>
+<span class="sd">        the target variables being modeled. The corresponding value is a</span>
+<span class="sd">        `ModelResults` object for that variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `model_results_dict` after possibly</span>
+<span class="sd">        extending or inserting the `ModelResults` from `new_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_model_results</span> <span class="o">=</span> <span class="n">new_results_dict</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_TS</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_TS</span><span class="p">])):</span>
+        <span class="n">old_model_results</span> <span class="o">=</span>  <span class="n">model_results_dict</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_TS</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">new_model_results</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_model_results</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">insert_multivariate_results</span><span class="p">(</span>
+                <span class="n">model_results_dict</span><span class="p">,</span> <span class="n">new_results_dict</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">append_multivariate_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span> <span class="n">new_results_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="truncate_list"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.truncate_list">[docs]</a><span class="k">def</span> <span class="nf">truncate_list</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Truncates `lst` if it is longer than `cutoff`.</span>
+
+<span class="sd">    The size of `lst` is reduced to `cutoff` if it is longer than `cutoff`.</span>
+<span class="sd">    Otherwise, it is unchanged.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst: list</span>
+<span class="sd">        The list being truncated.</span>
+<span class="sd">    cutoff: int</span>
+<span class="sd">        An integer representing the maximum length for `lst`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        The list resulting from truncating `lst` with `cutoff`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lst</span><span class="p">[:</span><span class="n">cutoff</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lst</span></div>
+
+
+<div class="viewcode-block" id="truncate_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.truncate_dict">[docs]</a><span class="k">def</span> <span class="nf">truncate_dict</span><span class="p">(</span><span class="n">raw_dict</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Truncates each list of `raw_dict` if it is longer than `cutoff`.</span>
+
+<span class="sd">    The size of each list in `raw_dict` is reduced to `cutoff` if it is longer</span>
+<span class="sd">    than `cutoff`. Otherwise, it is unchanged.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    raw_dict: dict</span>
+<span class="sd">        The dictionary being truncated.</span>
+<span class="sd">    cutoff: int</span>
+<span class="sd">        An integer representing the maximum length for the lists of `raw_dict`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary resulting from truncating each list of `raw_dict` to a</span>
+<span class="sd">        length of `cutoff`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">raw_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">raw_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">truncate_list</span><span class="p">(</span><span class="n">raw_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">],</span> <span class="n">cutoff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">raw_dict</span></div>
+
+
+<div class="viewcode-block" id="handle_results_for_model"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.handle_results_for_model">[docs]</a><span class="k">def</span> <span class="nf">handle_results_for_model</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handles the model results for `model` built on `trace`.</span>
+
+<span class="sd">    `trace` is modeled using `model` and the results are added to</span>
+<span class="sd">    `model_results` if it has fewer than `cutoff` entries or if the results</span>
+<span class="sd">    for the model are better than the results of at least one model contained</span>
+<span class="sd">    in `model_results`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object being modeled.</span>
+<span class="sd">    model: TraceModel</span>
+<span class="sd">        A `TraceModel` to be fit to `trace`.</span>
+<span class="sd">    model_results: list</span>
+<span class="sd">        A list of `ModelResults` objects for the results of models built on</span>
+<span class="sd">        the trace.</span>
+<span class="sd">    cutoff: int</span>
+<span class="sd">        An integer representing the maximum length of `model_results`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list obtained from `model_results` after handling the results of</span>
+<span class="sd">        modeling `trace` with `model`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_model_results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_model_pipeline_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">model_results</span> <span class="o">=</span> <span class="n">update_with_new_model_results</span><span class="p">(</span>
+        <span class="n">model_results</span><span class="p">,</span> <span class="n">new_model_results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">truncate_list</span><span class="p">(</span><span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="initialize_multivariate_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.initialize_multivariate_results">[docs]</a><span class="k">def</span> <span class="nf">initialize_multivariate_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes the multivariate results from `model_results_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        A dictionary of `ModelResults`. The keys are strings representing</span>
+<span class="sd">        one of the variables being modelled. The corresponding value is a</span>
+<span class="sd">        `ModelResults` object associated with that variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary of model results in which the keys are strings</span>
+<span class="sd">        representing the model variables specified in `model_results_dict`</span>
+<span class="sd">        and the corresponding value is a 1-element list containing the</span>
+<span class="sd">        associate `ModelResults` object from `model_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">model_var</span><span class="p">:</span> <span class="p">[</span><span class="n">model_results</span><span class="p">]</span> <span class="k">for</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">model_results</span>
+            <span class="ow">in</span> <span class="n">model_results_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+
+<div class="viewcode-block" id="handle_results_for_multivariate_model"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.handle_results_for_multivariate_model">[docs]</a><span class="k">def</span> <span class="nf">handle_results_for_multivariate_model</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handles the model results for `model` built on `trace`.</span>
+
+<span class="sd">    `trace` is modeled using `model` and the results are added to</span>
+<span class="sd">    `model_results` if it has fewer than `cutoff` entries or if the results</span>
+<span class="sd">    for the model are better than the results of at least one model contained</span>
+<span class="sd">    in `model_results`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object being modeled.</span>
+<span class="sd">    model: TraceModel</span>
+<span class="sd">        A `TraceModel` to be fit to `trace`.</span>
+<span class="sd">    model_results: dict</span>
+<span class="sd">        A dictionary containing results for modelling done on the trace.</span>
+<span class="sd">    cutoff: int</span>
+<span class="sd">        An integer representing the maximum length of `results`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary obtained from `model_results` after handling the results</span>
+<span class="sd">        of modeling `trace` with `model`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_model_results_dict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_model_pipeline_for_trace</span><span class="p">(</span>
+        <span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_results</span> <span class="o">==</span> <span class="p">{}:</span>
+        <span class="n">model_results</span> <span class="o">=</span> <span class="n">initialize_multivariate_results</span><span class="p">(</span><span class="n">new_model_results_dict</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model_results</span> <span class="o">=</span> <span class="n">update_with_new_multivariate_model_results</span><span class="p">(</span>
+            <span class="n">model_results</span><span class="p">,</span> <span class="n">new_model_results_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">truncate_dict</span><span class="p">(</span><span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="update_model_results_for_trace"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.update_model_results_for_trace">[docs]</a><span class="k">def</span> <span class="nf">update_model_results_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates `model_results` for `model` built on `trace`.</span>
+
+<span class="sd">    `trace` is modeled using `model` and the results are added to</span>
+<span class="sd">    `model_results` if it has fewer than `cutoff` entries or if the results</span>
+<span class="sd">    for the model are better than the results of at least one model contained</span>
+<span class="sd">    in `model_results`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model: TraceModel</span>
+<span class="sd">        A `TraceModel` to be fit to `trace`.</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object being modeled.</span>
+<span class="sd">    trace_results: list</span>
+<span class="sd">        A list containing results for modelling done on the trace.</span>
+<span class="sd">    cutoff: int</span>
+<span class="sd">        An integer representing the maximum length of `trace_results`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list obtained from `model_results` after handling the results of</span>
+<span class="sd">        modeling `trace` with `model`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">handle_results_for_model</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model_results</span></div>
+
+<div class="viewcode-block" id="update_multivariate_model_results_for_trace"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.update_multivariate_model_results_for_trace">[docs]</a><span class="k">def</span> <span class="nf">update_multivariate_model_results_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+                                                <span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates `model_results` for `model` built on `trace`.</span>
+
+<span class="sd">    `trace` is modeled using `model` and the results are added to</span>
+<span class="sd">    `model_results` if it has fewer than `cutoff` entries or if the results</span>
+<span class="sd">    for the model are better than the results of at least one model contained</span>
+<span class="sd">    in `model_results`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model: TraceModel</span>
+<span class="sd">        A `TraceModel` to be fit to `trace`.</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object being modeled.</span>
+<span class="sd">    model_results: dict</span>
+<span class="sd">        A dictionary containing results for modelling done on the trace.</span>
+<span class="sd">    cutoff: int</span>
+<span class="sd">        An integer representing the maximum length of `results`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `model_results` after handling the</span>
+<span class="sd">        results of modeling `trace` with `model`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">handle_results_for_multivariate_model</span><span class="p">(</span>
+            <span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_results</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model_results</span></div>
+
+
+<div class="viewcode-block" id="pad_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.pad_model_results">[docs]</a><span class="k">def</span> <span class="nf">pad_model_results</span><span class="p">(</span><span class="n">model_results_lst</span><span class="p">,</span> <span class="n">pad_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pads `model_results_lst` with null `ModelResults` to length `pad_len`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_lst: list</span>
+<span class="sd">        The list of `ModelResults` objects being padded.</span>
+<span class="sd">    pad_len: int</span>
+<span class="sd">        An integer representing the length to which `model_results_lst`</span>
+<span class="sd">        should be padded.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        The list obtained from `model_results_lst` after padding with null</span>
+<span class="sd">        `ModelResults` objects up to length `pad_len`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_results_lst</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">pad_len</span><span class="p">:</span>
+        <span class="n">model_results_lst</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ModelResults</span><span class="o">.</span><span class="n">build_null_model_results</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span>
+                              <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_results_lst</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">model_results_lst</span></div>
+
+
+<div class="viewcode-block" id="pad_model_results_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.pad_model_results_dict">[docs]</a><span class="k">def</span> <span class="nf">pad_model_results_dict</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span> <span class="n">pad_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pads `models_results_dict` with null `ModelResults` to `pad_len`.</span>
+
+<span class="sd">    Each list of `model_results_dict` is padded with null `ModelResults`</span>
+<span class="sd">    objects up to `pad_len`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        A dictionary of `ModelResults`. They keys are strings representing the</span>
+<span class="sd">        names of the target variables and the corresponding value is a list of</span>
+<span class="sd">        `ModelResults` for that variable which will be padded to `pad_len`.</span>
+<span class="sd">    pad_len: int</span>
+<span class="sd">        An integer representing the length to which each list of</span>
+<span class="sd">        `model_results_dict` will be padded.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `model_results_dict` after padding each</span>
+<span class="sd">        list with null `ModelResults` up to `pad_len`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">model_results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">model_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_model_results</span><span class="p">(</span>
+            <span class="n">model_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">],</span> <span class="n">pad_len</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_results_dict</span></div>
+
+
+<div class="viewcode-block" id="compute_best_results_for_trace"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.compute_best_results_for_trace">[docs]</a><span class="k">def</span> <span class="nf">compute_best_results_for_trace</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span>
+                                   <span class="n">models_count</span><span class="p">,</span> <span class="n">fixed_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets `ModelResults` for the best models of `models` for `trace`.</span>
+
+<span class="sd">    The best models of `models` are the `models_count` models with the lowest</span>
+<span class="sd">    test MASE when built on `trace`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_type: TraceModel.class</span>
+<span class="sd">        A reference to a `TraceModel` class representing the types of the</span>
+<span class="sd">        models being fit to `trace`.</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object being modeled.</span>
+<span class="sd">    models: list</span>
+<span class="sd">        A list of `TraceModel` objects representing the models being fit</span>
+<span class="sd">        to `trace` and from which the best models are chosen.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of models to include in the results.</span>
+<span class="sd">    fixed_params: dict</span>
+<span class="sd">        A dictionary of model parameters representing the parameters that are</span>
+<span class="sd">        common to each model being fit to `trace`, given by `models`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list consisting of the ID of `trace` followed by the results for the</span>
+<span class="sd">        `models_count` best models from `models` fit to `trace`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">best_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+        <span class="n">best_results</span> <span class="o">=</span> <span class="n">update_model_results_for_trace</span><span class="p">(</span>
+            <span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">best_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">)</span>
+    <span class="n">test_results</span> <span class="o">=</span> <span class="n">get_test_results_from_val_results_list</span><span class="p">(</span>
+        <span class="n">model_type</span><span class="p">,</span> <span class="n">best_results</span><span class="p">,</span> <span class="n">fixed_params</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pad_model_results</span><span class="p">(</span><span class="n">test_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="compute_best_multivariate_results_for_trace"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.compute_best_multivariate_results_for_trace">[docs]</a><span class="k">def</span> <span class="nf">compute_best_multivariate_results_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">models_count</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets `ModelResults` for the best models of `models` for `trace`.</span>
+
+<span class="sd">    The best multivariate models in `models` are the `models_count` models</span>
+<span class="sd">    with the lowest test MASE when built on `trace`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object being modeled.</span>
+<span class="sd">    models: list</span>
+<span class="sd">        A list of `TraceModel` objects representing the models being fit</span>
+<span class="sd">        to `trace` and from which the best models are chosen.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of models to include in the results.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary of model results. The keys are strings representing the</span>
+<span class="sd">        names of the variables being modeled. The corresponding value is a</span>
+<span class="sd">        list of `ModelResults` objects representing model results for `trace`</span>
+<span class="sd">        on the associated variable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">best_results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+        <span class="n">best_results_dict</span> <span class="o">=</span> <span class="n">update_multivariate_model_results_for_trace</span><span class="p">(</span>
+            <span class="n">trace</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">best_results_dict</span><span class="p">,</span> <span class="n">models_count</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pad_model_results_dict</span><span class="p">(</span><span class="n">best_results_dict</span><span class="p">,</span> <span class="n">models_count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_best_model_results_for_traces"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_best_model_results_for_traces">[docs]</a><span class="k">def</span> <span class="nf">get_best_model_results_for_traces</span><span class="p">(</span><span class="n">trace_model</span><span class="p">,</span> <span class="n">model_params</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span>
+                                      <span class="n">result_dict</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span>
+                                      <span class="n">fixed_model_params</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the `models_count` best model results for the traces of `traces`.</span>
+
+<span class="sd">    For each trace in `traces` a `trace_model` object is built for each set of</span>
+<span class="sd">    model parameters in `model_params` and the results of the best</span>
+<span class="sd">    `models_count` models are saved in `result_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_model: TraceModel.class</span>
+<span class="sd">        A `TraceModel` class specifying the model to be built.</span>
+<span class="sd">    model_params: list</span>
+<span class="sd">        A list of dictionaries specifying the model parameters for each model</span>
+<span class="sd">        to be built.</span>
+<span class="sd">    traces: list</span>
+<span class="sd">        A list of `Trace` objects specifying the traces to which models are</span>
+<span class="sd">        fit.</span>
+<span class="sd">    result_dict: dict</span>
+<span class="sd">        The dictionary to which the model results for each trace are saved.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of model results to save. The</span>
+<span class="sd">        results for the `models_count` best models for each trace will be</span>
+<span class="sd">        saved.</span>
+<span class="sd">    fixed_model_params: dict</span>
+<span class="sd">        A dictionary of model parameters representing the parameters that are</span>
+<span class="sd">        common to each model being fit to `trace`.</span>
+<span class="sd">    verbose: bool</span>
+<span class="sd">        A boolean indicating whether to run in verbose mode. The default</span>
+<span class="sd">        value is True, in which case progress is printed to the screen.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="n">build_models_from_params_list</span><span class="p">(</span><span class="n">trace_model</span><span class="p">,</span> <span class="n">model_params</span><span class="p">)</span>
+    <span class="n">trace_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">traces</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">):</span>
+        <span class="n">model_results</span> <span class="o">=</span> <span class="n">compute_best_results_for_trace</span><span class="p">(</span>
+            <span class="n">trace_model</span><span class="p">,</span> <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">models</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">fixed_model_params</span><span class="p">)</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_trace_id</span><span class="p">()]</span> <span class="o">=</span> <span class="n">model_results</span>
+        <span class="n">log_modeling_progress</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_best_multivariate_model_results_for_traces"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_best_multivariate_model_results_for_traces">[docs]</a><span class="k">def</span> <span class="nf">get_best_multivariate_model_results_for_traces</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">model_params</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span> <span class="n">result_dict</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the `models_count` best model results for the traces of `traces`.</span>
+
+<span class="sd">    For each trace in `traces` a `model` object is built for each set of model</span>
+<span class="sd">    parameters in `model_params` and the results of the best `models_count`</span>
+<span class="sd">    models are saved in `result_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model: TraceModel.class</span>
+<span class="sd">        A `TraceModel` class specifying the model to be built.</span>
+<span class="sd">    model_params: list</span>
+<span class="sd">        A list of dictionaries specifying the model parameters for each model</span>
+<span class="sd">        to be built.</span>
+<span class="sd">    traces: list</span>
+<span class="sd">        A list of `Trace` objects specifying the traces to which models are</span>
+<span class="sd">        fit.</span>
+<span class="sd">    result_dict: dict</span>
+<span class="sd">        The dictionary to which the model results for each trace are saved.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of model results to save. The</span>
+<span class="sd">        results for the `models_count` best models for each trace will be</span>
+<span class="sd">        saved.</span>
+<span class="sd">    verbose: bool</span>
+<span class="sd">        A boolean indicating whether to run in verbose mode. The default</span>
+<span class="sd">        value is True, in which case progress is printed to the screen.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="n">build_models_from_params_list</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_params</span><span class="p">)</span>
+    <span class="n">trace_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">traces</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">):</span>
+        <span class="n">model_results</span> <span class="o">=</span> <span class="n">compute_best_multivariate_results_for_trace</span><span class="p">(</span>
+            <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">models</span><span class="p">,</span> <span class="n">models_count</span><span class="p">)</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_trace_id</span><span class="p">()]</span> <span class="o">=</span> <span class="n">model_results</span>
+        <span class="n">log_modeling_progress</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="log_modeling_progress"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.log_modeling_progress">[docs]</a><span class="k">def</span> <span class="nf">log_modeling_progress</span><span class="p">(</span><span class="n">trace_idx</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Logs the modeling progress if `verbose` is set to True.</span>
+
+<span class="sd">    The model progress prints a message to the screen indicating how many</span>
+<span class="sd">    traces have been modeled by the current process based on `trace_idx`</span>
+<span class="sd">    and `trace_count`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_idx: int</span>
+<span class="sd">        An integer representing the index of the trace that has finished</span>
+<span class="sd">        processing.</span>
+<span class="sd">    trace_count: int</span>
+<span class="sd">        An integer representing the total number of traces to be processed.</span>
+<span class="sd">     verbose: bool</span>
+<span class="sd">        A boolean indicating whether the log will be printed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Process </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2"> of </span><span class="si">{2}</span><span class="s2"> traces modeled&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="n">trace_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="process_model_results_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.process_model_results_dict">[docs]</a><span class="k">def</span> <span class="nf">process_model_results_dict</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Processes `model_results_dict` to a list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        A dictionary containing model results. The keys are strings</span>
+<span class="sd">        representing names of the target variables being modeled and the</span>
+<span class="sd">        corresponding value is a list of `ModelResults` objects associated</span>
+<span class="sd">        with that variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list containing the list representation of each `ModelResults`</span>
+<span class="sd">        object in `model_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_results_lst</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">model_results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">model_results</span> <span class="ow">in</span> <span class="n">model_results_dict</span><span class="p">[</span><span class="n">model_var</span><span class="p">]:</span>
+            <span class="n">model_results_lst</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">model_results</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">model_results_lst</span></div>
+
+<div class="viewcode-block" id="get_results_list_from_trace_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_results_list_from_trace_model_results">[docs]</a><span class="k">def</span> <span class="nf">get_results_list_from_trace_model_results</span><span class="p">(</span><span class="n">trace_model_results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts `trace_model_results` to a results list</span>
+
+<span class="sd">    A results list is a list of lists containing a list for each trace.</span>
+<span class="sd">    These lists consist of the trace id followed by list representations of</span>
+<span class="sd">    the `ModelResults` in `trace_model_results` associated with the trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_model_results: dict</span>
+<span class="sd">        A dictionary in which each key is a string representing the id of a</span>
+<span class="sd">        trace. The corresponding value is a list of `ModelResults`</span>
+<span class="sd">        corresponding to the model results for that trace.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of lists representing the results list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_lst</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">trace_id</span> <span class="ow">in</span> <span class="n">trace_model_results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">trace_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">trace_id</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">model_results</span> <span class="ow">in</span> <span class="n">trace_model_results</span><span class="p">[</span><span class="n">trace_id</span><span class="p">]:</span>
+            <span class="n">trace_lst</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">model_results</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
+        <span class="n">results_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace_lst</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results_lst</span></div>
+
+
+<div class="viewcode-block" id="get_results_list_from_trace_model_dicts"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_results_list_from_trace_model_dicts">[docs]</a><span class="k">def</span> <span class="nf">get_results_list_from_trace_model_dicts</span><span class="p">(</span><span class="n">trace_model_dicts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds a results list from `trace_model_dicts`.</span>
+
+<span class="sd">    The results list is a list of lists in which each list represents the</span>
+<span class="sd">    modelling result for a trace. The list consists of the trace&#39;s ID followed</span>
+<span class="sd">    by a list representation of all of the model results for that trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_model_dicts: dict</span>
+<span class="sd">        A dictionary containing model results for each trace. The keys are</span>
+<span class="sd">        strings representing trace IDs and the corresponding value is a</span>
+<span class="sd">        dictionary of `ModelResults` for the trace. This nested dictionary has</span>
+<span class="sd">        a key for each variable being modeled and the corresponding value is</span>
+<span class="sd">        a list of `ModelResults` objects for that variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of lists representing the results list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_lst</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">trace_id</span> <span class="ow">in</span> <span class="n">trace_model_dicts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">results_lst</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">trace_id</span><span class="p">]</span> <span class="o">+</span> <span class="n">process_model_results_dict</span><span class="p">(</span>
+            <span class="n">trace_model_dicts</span><span class="p">[</span><span class="n">trace_id</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">results_lst</span></div>
+
+
+<div class="viewcode-block" id="process_and_output_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.process_and_output_model_results">[docs]</a><span class="k">def</span> <span class="nf">process_and_output_model_results</span><span class="p">(</span><span class="n">model_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span>
+                                     <span class="n">model_name</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Processes `model_results` and outputs them to `output_dir`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results: dict</span>
+<span class="sd">        A dictionary in which each key is a string representing the id of a</span>
+<span class="sd">        trace. The corresponding value is a list of `ModelResults`</span>
+<span class="sd">        corresponding to the model results for that trace.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of best models kept for each trace.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string specifying the name of the model.</span>
+<span class="sd">    output_dir: str</span>
+<span class="sd">        A string specifying the directory to which the model results will be</span>
+<span class="sd">        output.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Side Effect</span>
+<span class="sd">    -----------</span>
+<span class="sd">    The results in `model_results` are saved to a csv file containing one row</span>
+<span class="sd">    per trace. The file is output to a file named `&lt;name&gt;_results.csv` in</span>
+<span class="sd">    `output_dir`, where `&lt;name&gt;` is `model_name`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">get_results_list_from_trace_model_results</span><span class="p">(</span><span class="n">model_results</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">get_col_list_for_params</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">models_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">model_name</span><span class="p">,</span>
+                                   <span class="n">ModelResults</span><span class="o">.</span><span class="n">get_model_results_cols</span><span class="p">())</span>
+    <span class="n">output_model_results</span><span class="p">(</span>
+        <span class="n">results</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cols</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_results&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="process_and_output_multivariate_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.process_and_output_multivariate_results">[docs]</a><span class="k">def</span> <span class="nf">process_and_output_multivariate_results</span><span class="p">(</span>
+    <span class="n">model_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model_vars</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Processes `model_results` and outputs them to `output_dir`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_results: dict</span>
+<span class="sd">            A dictionary containing model results for each trace. The keys are</span>
+<span class="sd">            strings representing trace IDs and the corresponding value is a</span>
+<span class="sd">            dictionary of `ModelResults` for the trace. This nested dictionary</span>
+<span class="sd">            has a key for each variable being modeled and the corresponding</span>
+<span class="sd">            value is a list of `ModelResults` objects for that variable.</span>
+<span class="sd">        models_count: int</span>
+<span class="sd">            An integer representing the number of best models kept for each trace.</span>
+<span class="sd">        model_name: str</span>
+<span class="sd">            A string specifying the name of the model.</span>
+<span class="sd">        model_vars: list</span>
+<span class="sd">            A list of strings representing the names of the target variables</span>
+<span class="sd">            in the multivariate modeling process.</span>
+<span class="sd">        output_dir: str</span>
+<span class="sd">            A string specifying the directory to which the model results will be</span>
+<span class="sd">            output.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Side Effect</span>
+<span class="sd">        -----------</span>
+<span class="sd">        The results in `model_results` are saved to a csv file containing one row</span>
+<span class="sd">        per trace. The file is output to a file named `&lt;name&gt;_results.csv` in</span>
+<span class="sd">        `output_dir`, where `&lt;name&gt;` is `model_name`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">get_results_list_from_trace_model_dicts</span><span class="p">(</span><span class="n">model_results</span><span class="p">)</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">get_col_list_for_params</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">models_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">model_name</span><span class="p">,</span>
+                                       <span class="n">ModelResults</span><span class="o">.</span><span class="n">get_model_results_cols</span><span class="p">())</span>
+        <span class="n">output_model_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cols</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span>
+                             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_results&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="run_best_models_for_all_traces"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.run_best_models_for_all_traces">[docs]</a><span class="k">def</span> <span class="nf">run_best_models_for_all_traces</span><span class="p">(</span><span class="n">modeling_func</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Models all traces using `modeling_func` with `model_name`.</span>
+
+<span class="sd">    A series of models are run on each trace, and the best `models_count` of</span>
+<span class="sd">    these models for each trace are recorded. `modeling_func` is used to run</span>
+<span class="sd">    the models on a batch of traces and this function is parallelized to cover</span>
+<span class="sd">    all traces. The best models are then retrieved.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modeling_func: function</span>
+<span class="sd">        The function used to perform the modelling on a batch of traces. The</span>
+<span class="sd">        function takes three arguments: a list of `Trace` objects on which the</span>
+<span class="sd">        models are run, a list to which results are saved, and a float</span>
+<span class="sd">        specifying the proportion of data in the training set.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of models to record. The results</span>
+<span class="sd">        for the `models_count` best models for each trace are recorded.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string specifying the name of the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Side Effect</span>
+<span class="sd">    -----------</span>
+<span class="sd">    The results of the modelling procedure is saved to a csv file containing</span>
+<span class="sd">    one row per trace. The file is output to a file named `&lt;name&gt;_results.csv`</span>
+<span class="sd">    where `&lt;name&gt;` is `model_name`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">get_univariate_model_build_input_params</span><span class="p">()</span>
+    <span class="n">model_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;train_prop&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;val_prop&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_mem&#39;</span><span class="p">])</span>
+    <span class="n">model_results</span> <span class="o">=</span> <span class="n">parallel</span><span class="o">.</span><span class="n">perform_trace_modelling</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;traces&#39;</span><span class="p">],</span> <span class="n">modeling_func</span><span class="p">,</span> <span class="n">model_args</span><span class="p">)</span>
+    <span class="n">process_and_output_model_results</span><span class="p">(</span>
+        <span class="n">model_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_univariate_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_univariate_model_results">[docs]</a><span class="k">def</span> <span class="nf">get_univariate_model_results</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">modeling_func</span><span class="p">,</span> <span class="n">model_args</span><span class="p">,</span>
+                                 <span class="n">models_count</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Models `traces` with the univariate model from `modeling_func`.</span>
+
+<span class="sd">    A series of models are run on each trace, and the best `models_count` of</span>
+<span class="sd">    these models for each trace are recorded. `modeling_func` is used to run</span>
+<span class="sd">    the models on a batch of traces and this function is parallelized to cover</span>
+<span class="sd">    all traces. The best models are then retrieved.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    traces: list</span>
+<span class="sd">        A list of `Trace` objects to be modeled.</span>
+<span class="sd">    modeling_func: function</span>
+<span class="sd">        The function used to perform the modelling on a batch of traces. The</span>
+<span class="sd">        function takes three arguments: a list of `Trace` objects on which the</span>
+<span class="sd">        models are run, a list to which results are saved, and a float</span>
+<span class="sd">        specifying the proportion of data in the training set.</span>
+<span class="sd">    model_args: tuple</span>
+<span class="sd">        A tuple containing the arguments used for `model_func`.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of models to record. The results</span>
+<span class="sd">        for the `models_count` best models for each trace are recorded.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string specifying the name of the model.</span>
+<span class="sd">    output_dir: str</span>
+<span class="sd">        A string specifying the directory to which the results will be output.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Side Effect</span>
+<span class="sd">    -----------</span>
+<span class="sd">    The results of the modelling procedure is saved to a csv file containing</span>
+<span class="sd">    one row per trace. The file is output to a file named `&lt;name&gt;_results.csv`</span>
+<span class="sd">    where `&lt;name&gt;` is `model_name`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_results</span> <span class="o">=</span> <span class="n">parallel</span><span class="o">.</span><span class="n">perform_trace_modelling</span><span class="p">(</span>
+        <span class="n">traces</span><span class="p">,</span> <span class="n">modeling_func</span><span class="p">,</span> <span class="n">model_args</span><span class="p">)</span>
+    <span class="n">process_and_output_model_results</span><span class="p">(</span>
+        <span class="n">model_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="run_best_multivariate_models_for_all_traces"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.run_best_multivariate_models_for_all_traces">[docs]</a><span class="k">def</span> <span class="nf">run_best_multivariate_models_for_all_traces</span><span class="p">(</span><span class="n">modeling_func</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span>
+                                                <span class="n">model_name</span><span class="p">,</span> <span class="n">model_vars</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Models all traces using `modeling_func` with `model_name`.</span>
+
+<span class="sd">    A series of multivariate models are run on each trace, and the best</span>
+<span class="sd">    `models_count` of these models for each trace are recorded. `modeling_func`</span>
+<span class="sd">    is used to run the models on a batch of traces and this function is</span>
+<span class="sd">    parallelized to cover all traces. The best models are then retrieved.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modeling_func: function</span>
+<span class="sd">        The function used to perform the modelling on a batch of traces. The</span>
+<span class="sd">        function takes three arguments: a list of `Trace` objects on which the</span>
+<span class="sd">        models are run, a list to which results are saved, and a float</span>
+<span class="sd">        specifying the proportion of data in the training set.</span>
+<span class="sd">    models_count: int</span>
+<span class="sd">        An integer representing the number of models to record. The results</span>
+<span class="sd">        for the `models_count` best models for each trace are recorded.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string specifying the name of the model.</span>
+<span class="sd">    model_vars: list</span>
+<span class="sd">        A list of the variables being modelled.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Side Effect</span>
+<span class="sd">    -----------</span>
+<span class="sd">    The results of the modelling procedure is saved to a csv file containing</span>
+<span class="sd">    one row per trace. The file is output to a file named `&lt;name&gt;_results.csv`</span>
+<span class="sd">    where `&lt;name&gt;` is `model_name`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_params</span> <span class="o">=</span> <span class="n">get_multivariate_model_build_input_params</span><span class="p">()</span>
+    <span class="n">model_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;train_prop&#39;</span><span class="p">],)</span>
+    <span class="n">model_results</span> <span class="o">=</span> <span class="n">parallel</span><span class="o">.</span><span class="n">perform_trace_modelling</span><span class="p">(</span>
+        <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;traces&#39;</span><span class="p">],</span> <span class="n">modeling_func</span><span class="p">,</span> <span class="n">model_args</span><span class="p">)</span>
+    <span class="n">process_and_output_multivariate_results</span><span class="p">(</span>
+        <span class="n">model_results</span><span class="p">,</span> <span class="n">models_count</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span>
+        <span class="n">model_vars</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="build_harvest_stats_dict_from_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.build_harvest_stats_dict_from_model_results">[docs]</a><span class="k">def</span> <span class="nf">build_harvest_stats_dict_from_model_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dictionary of harvest statistics from `model_results_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the model results for a trace.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing `HarvestStats` objects for the harvest</span>
+<span class="sd">        statistics in `model_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">harvest_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">harvest_cols</span> <span class="o">=</span> <span class="n">HarvestStats</span><span class="o">.</span><span class="n">get_harvest_stat_columns</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">buffer_pct</span> <span class="ow">in</span> <span class="n">specs</span><span class="o">.</span><span class="n">BUFFER_PCTS</span><span class="p">:</span>
+        <span class="n">harvest_dict</span><span class="p">[</span><span class="n">buffer_pct</span><span class="p">]</span> <span class="o">=</span> <span class="n">HarvestStats</span><span class="p">(</span>
+            <span class="n">model_results_dict</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">harvest_cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">buffer_pct</span><span class="p">)],</span>
+            <span class="n">model_results_dict</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">harvest_cols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">buffer_pct</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">harvest_dict</span></div>
+
+
+<div class="viewcode-block" id="build_model_results_from_results_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.build_model_results_from_results_dict">[docs]</a><span class="k">def</span> <span class="nf">build_model_results_from_results_dict</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds a `ModelResults` object from `model_results_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the model results for a trace.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ModelResults</span>
+<span class="sd">        The `ModelResults` object obtained from `model_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">harvest_dict</span> <span class="o">=</span> <span class="n">build_harvest_stats_dict_from_model_results</span><span class="p">(</span>
+        <span class="n">model_results_dict</span><span class="p">)</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">model_results_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">]}</span>
+    <span class="k">return</span> <span class="n">ModelResults</span><span class="p">(</span>
+        <span class="n">model_results_dict</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">results_dict</span><span class="p">,</span> <span class="n">harvest_dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="model_results_df_to_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.model_results_df_to_dict">[docs]</a><span class="k">def</span> <span class="nf">model_results_df_to_dict</span><span class="p">(</span><span class="n">model_results_df</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts `model_results_df` to a dictionary representation.</span>
+
+<span class="sd">    The dictionary representation has a key for every trace in</span>
+<span class="sd">    `model_results_df`. The corresponding value is a dictionary with two</span>
+<span class="sd">    key-value pairs: one identifying the model as `model_name` and the other</span>
+<span class="sd">    containing a `ModelResults` object summarizing the model results for that</span>
+<span class="sd">    trace based on the data in `model_results_df`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the model results for all traces for the</span>
+<span class="sd">        model specified by `model_name`.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string representing the name of the model.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary representation of `model_results_df`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">process_model_results_df</span><span class="p">(</span><span class="n">model_results_df</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row_dict</span> <span class="ow">in</span> <span class="n">results_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">):</span>
+        <span class="n">model_results</span> <span class="o">=</span> <span class="n">build_model_results_from_results_dict</span><span class="p">(</span><span class="n">row_dict</span><span class="p">)</span>
+        <span class="n">model_results_dict</span><span class="p">[</span><span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span>
+                                              <span class="s1">&#39;results&#39;</span><span class="p">:</span> <span class="n">model_results</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">model_results_dict</span></div>
+
+
+<div class="viewcode-block" id="get_best_model_dict_for_trace"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_best_model_dict_for_trace">[docs]</a><span class="k">def</span> <span class="nf">get_best_model_dict_for_trace</span><span class="p">(</span><span class="n">best_results_dict</span><span class="p">,</span> <span class="n">row_dict</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the best model dict from `best_results_dict` and `row_dict`.</span>
+
+<span class="sd">    For the trace in `row_dict`, if the trace is not in `best_results_dict`</span>
+<span class="sd">    then the results from `row_dict` are used as the best results for the</span>
+<span class="sd">    trace. Otherwise, the best `ModelResults` for the trace is the better</span>
+<span class="sd">    `ModelResults` object between `best_results_dict` and `row_dict`. The</span>
+<span class="sd">    dictionary has the model name of the best model and the corresponding</span>
+<span class="sd">    `ModelResults` object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    best_results_dict: dict</span>
+<span class="sd">        A dictionary containing the best model results for each trace. The</span>
+<span class="sd">        keys are strings representing trace IDs. The corresponding value is</span>
+<span class="sd">        a dictionary with 2 key-value pairs: one specifying the name of the</span>
+<span class="sd">        best model and the other specifying the `ModelResults` object</span>
+<span class="sd">        associated with the model.</span>
+<span class="sd">    row_dict: dict</span>
+<span class="sd">        A dictionary specifying the model results for a model of type</span>
+<span class="sd">        `model_name` built on a trace.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string specifying the type of model to which the results in row_dict</span>
+<span class="sd">        refer.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary of best results for the trace based on `row_dict` and</span>
+<span class="sd">        `best_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_results</span> <span class="o">=</span> <span class="n">build_model_results_from_results_dict</span><span class="p">(</span><span class="n">row_dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">best_results_dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s1">&#39;results&#39;</span><span class="p">:</span> <span class="n">model_results</span><span class="p">}</span>
+    <span class="n">old_results</span> <span class="o">=</span> <span class="n">best_results_dict</span><span class="p">[</span><span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]][</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">model_results</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_results</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s1">&#39;results&#39;</span><span class="p">:</span> <span class="n">model_results</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">best_results_dict</span><span class="p">[</span><span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="update_best_model_results_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.update_best_model_results_dict">[docs]</a><span class="k">def</span> <span class="nf">update_best_model_results_dict</span><span class="p">(</span><span class="n">best_results_dict</span><span class="p">,</span>
+                                   <span class="n">new_results_df</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates `best_results_dict` with the results from `new_results_df`.</span>
+
+<span class="sd">    For each record in `new_results_df`, the corresponding trace is updated</span>
+<span class="sd">    in `best_results_dict` if the model results in `new_results_df` are better</span>
+<span class="sd">    than the model results in `best_results_dict` for that trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    best_results_dict: dict</span>
+<span class="sd">        A dictionary containing the best model results for each trace. The</span>
+<span class="sd">        keys are strings representing trace IDs. The corresponding value is</span>
+<span class="sd">        a dictionary with 2 key-value pairs: one specifying the name of the</span>
+<span class="sd">        best model and the other specifying the `ModelResults` object</span>
+<span class="sd">        associated with the model.</span>
+<span class="sd">    new_results_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame with new model results which is being used to</span>
+<span class="sd">        update `best_results_dict`.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string representing the name of the model which generated the results</span>
+<span class="sd">        in `new_results_df`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `best_results_dict` after updating based</span>
+<span class="sd">        on the data in `new_results_df`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">process_model_results_df</span><span class="p">(</span><span class="n">new_results_df</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row_dict</span> <span class="ow">in</span> <span class="n">results_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">):</span>
+        <span class="n">best_results_dict</span><span class="p">[</span><span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">get_best_model_dict_for_trace</span><span class="p">(</span>
+            <span class="n">best_results_dict</span><span class="p">,</span> <span class="n">row_dict</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">best_results_dict</span></div>
+
+
+<div class="viewcode-block" id="get_best_model_results_dict_from_results_dfs"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_best_model_results_dict_from_results_dfs">[docs]</a><span class="k">def</span> <span class="nf">get_best_model_results_dict_from_results_dfs</span><span class="p">(</span><span class="n">model_results_dfs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets a dictionary of the best model results from `model_results_dfs`.</span>
+
+<span class="sd">    A dictionary containing the best `ModelResults` object for each trace</span>
+<span class="sd">    is built from the model results dataframes in `model_results_dfs`. The</span>
+<span class="sd">    keys are strings representing trace IDs and the corresponding value is</span>
+<span class="sd">    a dictionary of 2 key-value pairs: specifying the name of the best model</span>
+<span class="sd">    and the associated `ModelResults` for that trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dfs: dict</span>
+<span class="sd">        A dictionary of model results DataFrames where the keys are strings</span>
+<span class="sd">        representing the names of the model to which the DataFrame refers to.</span>
+<span class="sd">        Each dataframe contains the results of the corresponding model fit on</span>
+<span class="sd">        each trace.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary of the best `ModelResults` for each trace obtained from</span>
+<span class="sd">        `model_results_dfs`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model_results_dfs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">best_results_dict</span> <span class="o">=</span> <span class="n">model_results_df_to_dict</span><span class="p">(</span>
+        <span class="n">model_results_dfs</span><span class="p">[</span><span class="n">model_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">model_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">model_names</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">best_results_dict</span> <span class="o">=</span> <span class="n">update_best_model_results_dict</span><span class="p">(</span>
+            <span class="n">best_results_dict</span><span class="p">,</span> <span class="n">model_results_dfs</span><span class="p">[</span><span class="n">model_name</span><span class="p">],</span> <span class="n">model_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">best_results_dict</span></div>
+
+
+<div class="viewcode-block" id="output_best_model_results_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.output_best_model_results_dict">[docs]</a><span class="k">def</span> <span class="nf">output_best_model_results_dict</span><span class="p">(</span><span class="n">best_results_dict</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Outputs `best_results_dict` to a `csv` file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    best_results_dict: dict</span>
+<span class="sd">        A dictionary containing the best model results for each trace. The</span>
+<span class="sd">        keys are strings representing trace IDs. The corresponding value is</span>
+<span class="sd">        a dictionary with 2 key-value pairs: one specifying the name of the</span>
+<span class="sd">        best model and the other specifying the `ModelResults` object</span>
+<span class="sd">        associated with the model.</span>
+<span class="sd">    output_dir: str</span>
+<span class="sd">        A string representing the name of the output directory to which the</span>
+<span class="sd">        results are output.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Side Effect</span>
+<span class="sd">    -----------</span>
+<span class="sd">    A file named `best_model_results.csv` is saved to `output_dir` containing</span>
+<span class="sd">    the results from `best_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">best_results_lst</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="n">trace_id</span><span class="p">,</span> <span class="n">model_dict</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]]</span> <span class="o">+</span> <span class="n">model_dict</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+         <span class="k">for</span> <span class="n">trace_id</span><span class="p">,</span> <span class="n">model_dict</span> <span class="ow">in</span> <span class="n">best_results_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_best&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">col_name</span>
+            <span class="ow">in</span> <span class="n">ModelResults</span><span class="o">.</span><span class="n">get_model_results_cols</span><span class="p">()]</span>
+    <span class="n">output_model_results</span><span class="p">(</span><span class="n">best_results_lst</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cols</span><span class="p">,</span>
+                         <span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;best_model_results&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="output_best_model_results_from_model_results_dfs"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.output_best_model_results_from_model_results_dfs">[docs]</a><span class="k">def</span> <span class="nf">output_best_model_results_from_model_results_dfs</span><span class="p">(</span><span class="n">model_results_dfs</span><span class="p">,</span>
+                                                     <span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Outputs the best model results based on `model_results_dfs`.</span>
+
+<span class="sd">    For each trace, the best `ModelResults` is used across all the model</span>
+<span class="sd">    results DataFrame in `model_results_dfs`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dfs: dict</span>
+<span class="sd">        A dictionary of model results DataFrames where the keys are strings</span>
+<span class="sd">        representing the names of the model to which the DataFrame refers to.</span>
+<span class="sd">        Each dataframe contains the results of the corresponding model fit on</span>
+<span class="sd">        each trace.</span>
+<span class="sd">    output_dir: str</span>
+<span class="sd">        A string representing the name of the output directory to which the</span>
+<span class="sd">        results are output.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Side Effect</span>
+<span class="sd">    -----------</span>
+<span class="sd">    A file named `best_model_results.csv` is saved to `output_dir` containing</span>
+<span class="sd">    the best model results for each trace from `model_results_dfs`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_results_dict</span> <span class="o">=</span> <span class="n">get_best_model_results_dict_from_results_dfs</span><span class="p">(</span>
+        <span class="n">model_results_dfs</span><span class="p">)</span>
+    <span class="n">output_best_model_results_dict</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_percentiles_df_for_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_percentiles_df_for_model_results">[docs]</a><span class="k">def</span> <span class="nf">get_percentiles_df_for_model_results</span><span class="p">(</span><span class="n">model_results_dict</span><span class="p">,</span>
+                                         <span class="n">model_names_lst</span><span class="p">,</span> <span class="n">analysis_col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The percentile dataframe for `analysis_col` in `model_results_dict`.</span>
+
+<span class="sd">    The percentile dataframe is a pandas DataFrame containing the 1, 25, 50,</span>
+<span class="sd">    75, and 99 percentile values for `analysis_col` for each model in</span>
+<span class="sd">    `model_names_lst` based on the data in `model_results_dict`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dict: dict</span>
+<span class="sd">        A dictionary of model results DataFrames where the keys are strings</span>
+<span class="sd">        representing the names of the model to which the DataFrame refers to.</span>
+<span class="sd">        Each dataframe contains the results of the corresponding model fit on</span>
+<span class="sd">        each trace.</span>
+<span class="sd">    model_names_lst: list</span>
+<span class="sd">        A list of strings representing the names of models for which the</span>
+<span class="sd">        corresponding model results dataframe appears in `model_results_dict`.</span>
+<span class="sd">    analysis_col: str</span>
+<span class="sd">        A string representing the name of the column in the model results</span>
+<span class="sd">        dataframes for which the percentiles are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame representing the percentile dataframe for</span>
+<span class="sd">        `analysis_col` based on the data in `model_results_dict`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_lst</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">model_names_lst</span><span class="p">:</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">analysis_col</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plotting</span><span class="o">.</span><span class="n">get_cdf_values</span><span class="p">(</span>
+            <span class="n">model_results_dict</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">results_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">99</span><span class="p">])))</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_lst</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">model_names_lst</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;P25&quot;</span><span class="p">,</span> <span class="s2">&quot;Median&quot;</span><span class="p">,</span> <span class="s2">&quot;P75&quot;</span><span class="p">,</span> <span class="s2">&quot;P99&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="standardize_counts_dict"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.standardize_counts_dict">[docs]</a><span class="k">def</span> <span class="nf">standardize_counts_dict</span><span class="p">(</span><span class="n">counts_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts the numbers in `counts_dict` to percentages.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    counts_dict: dict</span>
+<span class="sd">        A dictionary of counts being standardized.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The dictionary obtained from `counts_dict` after converting each</span>
+<span class="sd">        count to a percentage.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">count_key</span> <span class="ow">in</span> <span class="n">counts_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">counts_dict</span><span class="p">[</span><span class="n">count_key</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">count_key</span> <span class="ow">in</span> <span class="n">counts_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">counts_dict</span><span class="p">[</span><span class="n">count_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">counts_dict</span><span class="p">[</span><span class="n">count_key</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">counts_dict</span></div>
+
+
+<div class="viewcode-block" id="get_stationary_1_diff_count"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_stationary_1_diff_count">[docs]</a><span class="k">def</span> <span class="nf">get_stationary_1_diff_count</span><span class="p">(</span><span class="n">stats_df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The number of stationary traces in `stats_df` after 1 differences.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stats_df: pd.DataFrame</span>
+<span class="sd">        The pandas DataFrame from which the stationary results are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        An integer representing the number of traces that were stationary</span>
+<span class="sd">        after one level of differencing based on data in `stats_df`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">&amp;</span>
+                        <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff&#39;</span><span class="p">]))</span> <span class="o">&amp;</span>
+                        <span class="p">((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">|</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]))])</span></div>
+
+
+<div class="viewcode-block" id="get_stationary_2_diff_count"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_stationary_2_diff_count">[docs]</a><span class="k">def</span> <span class="nf">get_stationary_2_diff_count</span><span class="p">(</span><span class="n">stats_df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The number of stationary traces in `stats_df` after 2 differences.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stats_df: pd.DataFrame</span>
+<span class="sd">        The pandas DataFrame from which the stationary results are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        An integer representing the number of traces that were stationary</span>
+<span class="sd">        after two levels of differencing based on data in `stats_df`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff2&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">&amp;</span>
+                        <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff2&#39;</span><span class="p">]))</span> <span class="o">&amp;</span>
+                        <span class="p">((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">|</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff&#39;</span><span class="p">]))</span> <span class="o">&amp;</span>
+                        <span class="p">((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">|</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]))])</span></div>
+
+
+<div class="viewcode-block" id="get_non_stationary_count"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_non_stationary_count">[docs]</a><span class="k">def</span> <span class="nf">get_non_stationary_count</span><span class="p">(</span><span class="n">stats_df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The number of non-stationary traces in `stats_df`.</span>
+
+<span class="sd">    A trace is deemed non-stationary if it is still not stationary after</span>
+<span class="sd">    2 levels of differencing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stats_df: pd.DataFrame</span>
+<span class="sd">        The pandas DataFrame from which the stationary results are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        An integer representing the number of traces that were not stationary</span>
+<span class="sd">        after two levels of differencing based on data in `stats_df`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff2&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">|</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff2&#39;</span><span class="p">]))</span> <span class="o">&amp;</span>
+                        <span class="p">((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">|</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val_diff&#39;</span><span class="p">]))</span> <span class="o">&amp;</span>
+                        <span class="p">((</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">|</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]))])</span></div>
+
+<div class="viewcode-block" id="stationary_results_from_stats_df"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.stationary_results_from_stats_df">[docs]</a><span class="k">def</span> <span class="nf">stationary_results_from_stats_df</span><span class="p">(</span><span class="n">stats_df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieves results of stationarity tests from `stats_df`.</span>
+
+<span class="sd">    It is assumed that `stats_df` has columns &quot;adf_p_val&quot;, &quot;adf_p_val_diff&quot;,</span>
+<span class="sd">    and &quot;adf_p_val_diff2&quot;. The stationary results report the percent of traces</span>
+<span class="sd">    that are stationary after 0, 1, or 2 levels of differencing, and the traces</span>
+<span class="sd">    that are not stationary after 2 levels of differencing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stats_df: pd.DataFrame</span>
+<span class="sd">        The pandas DataFrame from which the stationary results are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing the stationary results.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;diff_0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats_df</span><span class="p">[</span><span class="n">stats_df</span><span class="p">[</span><span class="s1">&#39;adf_p_val&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">])</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;diff_1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_stationary_1_diff_count</span><span class="p">(</span><span class="n">stats_df</span><span class="p">)</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;diff_2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_stationary_2_diff_count</span><span class="p">(</span><span class="n">stats_df</span><span class="p">)</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_non_stationary_count</span><span class="p">(</span><span class="n">stats_df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">standardize_counts_dict</span><span class="p">(</span><span class="n">results_dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_stationary_results_df"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_stationary_results_df">[docs]</a><span class="k">def</span> <span class="nf">get_stationary_results_df</span><span class="p">(</span><span class="n">stats_dfs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dataframe of stationary results from `stats_dfs`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stats_dfs: dict</span>
+<span class="sd">        A dictionary of pandas DataFrames from which the stationary results</span>
+<span class="sd">        are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing a summary of the stationary results from</span>
+<span class="sd">        `stats_dfs`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;diff_0&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;diff_1&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;diff_2&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;other&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">stats_name</span> <span class="ow">in</span> <span class="n">stats_dfs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stats_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+        <span class="n">stats_dict</span> <span class="o">=</span> <span class="n">stationary_results_from_stats_df</span><span class="p">(</span><span class="n">stats_dfs</span><span class="p">[</span><span class="n">stats_name</span><span class="p">])</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;diff_0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stats_dict</span><span class="p">[</span><span class="s1">&#39;diff_0&#39;</span><span class="p">]))</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;diff_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stats_dict</span><span class="p">[</span><span class="s1">&#39;diff_1&#39;</span><span class="p">]))</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;diff_2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stats_dict</span><span class="p">[</span><span class="s1">&#39;diff_2&#39;</span><span class="p">]))</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stats_dict</span><span class="p">[</span><span class="s1">&#39;other&#39;</span><span class="p">]))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_dict</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Stationary&quot;</span><span class="p">,</span> <span class="s2">&quot;Stationary Diff 1&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Stationary Diff 2&quot;</span><span class="p">,</span> <span class="s2">&quot;Non-Stationary&quot;</span><span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">indices</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="get_total_utilization_across_traces"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_total_utilization_across_traces">[docs]</a><span class="k">def</span> <span class="nf">get_total_utilization_across_traces</span><span class="p">(</span><span class="n">stat_df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets total utilization across the traces in `stat_df`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stat_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the utilization statistics for the</span>
+<span class="sd">        traces.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A string representing the percent utilization across all traces in</span>
+<span class="sd">        `stat_df`, rounded to 2 decimal places.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">utilization_vals</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">impute_for_time_series</span><span class="p">(</span>
+        <span class="n">stat_df</span><span class="p">[</span><span class="s1">&#39;utilization&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">allocated_vals</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">impute_for_time_series</span><span class="p">(</span>
+        <span class="n">stat_df</span><span class="p">[</span><span class="s1">&#39;allocated&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">utilization_vals</span> <span class="o">*</span> <span class="n">allocated_vals</span><span class="p">)</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">allocated_vals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_total_utilization_df"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_total_utilization_df">[docs]</a><span class="k">def</span> <span class="nf">get_total_utilization_df</span><span class="p">(</span><span class="n">stats_dfs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dataframe of total utilization rates from `stats_dfs`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stats_dfs: dict</span>
+<span class="sd">        A dictionary of pandas DataFrames from which the stationary results</span>
+<span class="sd">        are calculated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the total utilization rate for each</span>
+<span class="sd">        DataFrame in `stats_dfs`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_lst</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">stats_name</span> <span class="ow">in</span> <span class="n">stats_dfs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stats_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+        <span class="n">results_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">get_total_utilization_across_traces</span><span class="p">(</span><span class="n">stats_dfs</span><span class="p">[</span><span class="n">stats_name</span><span class="p">]))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Total Utilization&quot;</span><span class="p">:</span> <span class="n">results_lst</span><span class="p">})</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">indices</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="build_model_from_model_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.build_model_from_model_results">[docs]</a><span class="k">def</span> <span class="nf">build_model_from_model_results</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_results</span><span class="p">,</span> <span class="n">other_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds a `model` object from `model_results` and `other_params`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model: TraceModel.class</span>
+<span class="sd">        A reference to a `TraceModel` class representing the model being</span>
+<span class="sd">        created.</span>
+<span class="sd">    model_results: ModelResults</span>
+<span class="sd">        A `ModelResults` object containing the model results used to build</span>
+<span class="sd">        `model`.</span>
+<span class="sd">    other_params: dict</span>
+<span class="sd">        A dictionary of other parameters used to build `model`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TraceModel</span>
+<span class="sd">        A `TraceModel` object of type `model` built from `model_results` and</span>
+<span class="sd">        `other_params`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">model_results</span><span class="o">.</span><span class="n">get_model_params</span><span class="p">(),</span> <span class="o">**</span><span class="n">other_params</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_test_results_from_val_results"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_test_results_from_val_results">[docs]</a><span class="k">def</span> <span class="nf">get_test_results_from_val_results</span><span class="p">(</span><span class="n">trace_model</span><span class="p">,</span> <span class="n">val_results</span><span class="p">,</span>
+                                      <span class="n">other_params</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The test results for `trace` based on the validation model.</span>
+
+<span class="sd">    The validation model is a model of type `trace_model`, which is</span>
+<span class="sd">    constructed based on `val_results` and `other_params`. Once constructed,</span>
+<span class="sd">    the model is run on trace for the test set and the model results are</span>
+<span class="sd">    calculated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_model: TraceModel.class</span>
+<span class="sd">        A reference to a `TraceModel` class representing the model built</span>
+<span class="sd">        from the validation results and evaluated on the test set.</span>
+<span class="sd">    val_results: ModelResults</span>
+<span class="sd">        A `ModelResults` object representing the results of running a model of</span>
+<span class="sd">        type `trace_model` on the validation set of `trace`.</span>
+<span class="sd">    other_params: dict</span>
+<span class="sd">        A dictionary of other parameters used to build `model`.</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object that is being modeled.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ModelResults</span>
+<span class="sd">        A `ModelResults` object representing the results of training a model</span>
+<span class="sd">        of type `trace_model` on `trace` where the model is constructed based</span>
+<span class="sd">        on the validation results.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_for_trace</span> <span class="o">=</span> <span class="n">build_model_from_model_results</span><span class="p">(</span>
+        <span class="n">trace_model</span><span class="p">,</span> <span class="n">val_results</span><span class="p">,</span> <span class="n">other_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_for_trace</span><span class="o">.</span><span class="n">run_model_pipeline_for_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">tuning</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_test_results_from_val_results_list"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_test_results_from_val_results_list">[docs]</a><span class="k">def</span> <span class="nf">get_test_results_from_val_results_list</span><span class="p">(</span><span class="n">trace_model</span><span class="p">,</span> <span class="n">val_results_lst</span><span class="p">,</span>
+                                           <span class="n">other_params</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The test results for `trace` based on the validation models.</span>
+
+<span class="sd">    A validation model is a model of type `trace_model`. There is one</span>
+<span class="sd">    validation model for each `ModelResults` object in `val_results_lst`,</span>
+<span class="sd">    which is constructed based on the `ModelResults` and `other_params`.</span>
+<span class="sd">    Each such model is evaluated on the test set of `trace` to get a new</span>
+<span class="sd">    `ModelResults` object for the test set.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_model: TraceModel.class</span>
+<span class="sd">        A reference to a `TraceModel` class representing the types of models</span>
+<span class="sd">        that will be built from the validation results and evaluated on the</span>
+<span class="sd">        test set.</span>
+<span class="sd">    val_results_lst: list</span>
+<span class="sd">        A list of `ModelResults` objects representing the results of running</span>
+<span class="sd">        models of type `trace_model` on the validation set of `trace`.</span>
+<span class="sd">    other_params: dict</span>
+<span class="sd">        A dictionary of other parameters used to build the models. These</span>
+<span class="sd">        parameters are the same across every model constructed and do not</span>
+<span class="sd">        depend on the validation results.</span>
+<span class="sd">    trace: Trace</span>
+<span class="sd">        The `Trace` object that is being modeled.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of `ModelResults` objects representing the results of</span>
+<span class="sd">        evaluating the validation models of type `trace_model` on the test</span>
+<span class="sd">        set of `trace`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">test_results_lst</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">val_results</span> <span class="ow">in</span> <span class="n">val_results_lst</span><span class="p">:</span>
+        <span class="n">test_results_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_test_results_from_val_results</span><span class="p">(</span>
+            <span class="n">trace_model</span><span class="p">,</span> <span class="n">val_results</span><span class="p">,</span> <span class="n">other_params</span><span class="p">,</span> <span class="n">trace</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">test_results_lst</span></div>
+
+<div class="viewcode-block" id="calculate_prop_harvested_for_model"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.calculate_prop_harvested_for_model">[docs]</a><span class="k">def</span> <span class="nf">calculate_prop_harvested_for_model</span><span class="p">(</span><span class="n">model_results_df</span><span class="p">,</span>
+                                       <span class="n">model_name</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The proportion harvested across all traces with `model_name`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the model results for each trace.</span>
+<span class="sd">    model_name: str</span>
+<span class="sd">        A string representing the name of the model to which the results</span>
+<span class="sd">        apply.</span>
+<span class="sd">    buffer_pct: float</span>
+<span class="sd">        A float representing the buffer percentage applied to predictions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        A float in the range [0, 1] representing the proportion harvested.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">spare_col</span> <span class="o">=</span> <span class="s1">&#39;total_spare_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+    <span class="n">harvest_col</span> <span class="o">=</span> <span class="s1">&#39;prop_harvested_</span><span class="si">{0}</span><span class="s1">_</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">buffer_pct</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+    <span class="n">spare_vals</span> <span class="o">=</span> <span class="n">model_results_df</span><span class="p">[</span><span class="n">spare_col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">harvested_props</span> <span class="o">=</span> <span class="n">model_results_df</span><span class="p">[</span><span class="n">harvest_col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spare_vals</span> <span class="o">*</span> <span class="n">harvested_props</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spare_vals</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_prop_harvested_dict_for_models"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.get_prop_harvested_dict_for_models">[docs]</a><span class="k">def</span> <span class="nf">get_prop_harvested_dict_for_models</span><span class="p">(</span><span class="n">model_results_dfs</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The proportion harvested for each model in `model_results_dfs`.</span>
+
+<span class="sd">    For each model results DataFrame in `model_results_dfs`, the proportion</span>
+<span class="sd">    of total resource harvested across all traces is calculated. The</span>
+<span class="sd">    dictionary has a key as a string representing the model name and the</span>
+<span class="sd">    corresponding value is a float representing the proportion harvested by</span>
+<span class="sd">    that model across all traces.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dfs: dict</span>
+<span class="sd">        A dictionary of model results DataFrames where the keys are strings</span>
+<span class="sd">        representing the model name and the corresponding value is a</span>
+<span class="sd">        DataFrame containing the associated model results.</span>
+<span class="sd">    buffer_pct: float</span>
+<span class="sd">        A float representing the buffer percentage applied to predictions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary of proportion of resources harvested for each model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prop_harvested_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">model_results_dfs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">prop_harvested_dict</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculate_prop_harvested_for_model</span><span class="p">(</span>
+            <span class="n">model_results_dfs</span><span class="p">[</span><span class="n">model_name</span><span class="p">],</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">prop_harvested_dict</span></div>
+
+
+<div class="viewcode-block" id="plot_prop_harvested_by_model"><a class="viewcode-back" href="../../plotting.html#MemoryAutoScaling.analysis.plot_prop_harvested_by_model">[docs]</a><span class="k">def</span> <span class="nf">plot_prop_harvested_by_model</span><span class="p">(</span><span class="n">model_results_dfs</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plots the proportion harvested for each model.</span>
+
+<span class="sd">    `model_results_dfs` contains a DataFrame for each model recording the</span>
+<span class="sd">    model results for each trace for that model, after tuning the parameters</span>
+<span class="sd">    for each trace. The proportion of the resource harvested across all</span>
+<span class="sd">    traces is calculated for each model and plotted.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_results_dfs: dict</span>
+<span class="sd">        A dictionary of model results DataFrames</span>
+<span class="sd">    buffer_pct: float</span>
+<span class="sd">        A float representing the buffer percentage applied to predictions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prop_harvested_dict</span> <span class="o">=</span> <span class="n">get_prop_harvested_dict_for_models</span><span class="p">(</span>
+        <span class="n">model_results_dfs</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Harvested With </span><span class="si">{}</span><span class="s2">% Prediction Buffer&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">buffer_pct</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="n">plotting</span><span class="o">.</span><span class="n">plot_proportions_across_models</span><span class="p">(</span><span class="n">prop_harvested_dict</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">MemoryAutoScaling</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Code Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utility Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Matt Buckley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

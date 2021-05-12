@@ -32,8 +32,94 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="specifications">
-<h1>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-MemoryAutoScaling.specs">
+<span id="specifications"></span><h1>Specifications<a class="headerlink" href="#module-MemoryAutoScaling.specs" title="Permalink to this headline">¶</a></h1>
+<p>This module holds specification parameters for the Google Memory Auto
+Scaling project. These are a set of parameters used throughout the project.</p>
+<dl class="py function">
+<dt id="MemoryAutoScaling.specs.get_causal_cols">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.specs.</span></code><code class="sig-name descname"><span class="pre">get_causal_cols</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/specs.html#get_causal_cols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.specs.get_causal_cols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the columns used to calculate causation against <cite>target_variable</cite>.</p>
+<dl class="simple">
+<dt>target_variable: str</dt><dd><p>The name of the target variable.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list of strings representing the columns for which causation
+p-values will be calculated against <cite>target_variable</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.specs.get_input_and_output_target">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.specs.</span></code><code class="sig-name descname"><span class="pre">get_input_and_output_target</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_mem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/specs.html#get_input_and_output_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.specs.get_input_and_output_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the input and output target variables based on <cite>max_mem</cite>.</p>
+<p>The input target variable is the name of the target variable in the raw
+trace data. The output target variable is the name of the target variable
+after pre-processing and is used in the modeling procedure. If <cite>max_mem</cite>
+is True, Maximum Memory Usage is used as the target variable. Otherwise,
+the target variable is Maximum CPU Usage.</p>
+<dl class="simple">
+<dt>max_mem: bool</dt><dd><p>A boolean value indicating whether maximum memory usage is the target
+variable.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>str, str</dt><dd><p>Two strings representing the input and output target variables,
+respectively.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.specs.get_lagged_trace_columns">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.specs.</span></code><code class="sig-name descname"><span class="pre">get_lagged_trace_columns</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/specs.html#get_lagged_trace_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.specs.get_lagged_trace_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The column names for lagged data in a trace dataframe.</p>
+<p>Column names are generated for each lag in <cite>lags</cite>. Any columns specified
+in <cite>exclude_cols</cite> are excluded. If exclude_cols is None, no columns are
+excluded.</p>
+<dl class="simple">
+<dt>lags: list</dt><dd><p>A list of integers representing the lags for the columns.</p>
+</dd>
+<dt>exclude_cols: list</dt><dd><p>A list of the columns to exclude. The default value is None.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>A list of strings representing the names of the lagged columns in a
+trace dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.specs.get_target_variable">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.specs.</span></code><code class="sig-name descname"><span class="pre">get_target_variable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_mem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/specs.html#get_target_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.specs.get_target_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the target variable based on <cite>max_mem</cite>.</p>
+<p>If <cite>max_mem</cite> is True, Maximum Memory Usage is the target variable.
+Otherwise, it is Maximum CPU Usage.</p>
+<dl class="simple">
+<dt>max_mem: bool</dt><dd><p>A boolean value indicating whether maximum memory usage is the target
+variable.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>str</dt><dd><p>A string representing the name of the target variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.specs.get_trace_columns">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.specs.</span></code><code class="sig-name descname"><span class="pre">get_trace_columns</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/specs.html#get_trace_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.specs.get_trace_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The columns in a trace dataframe.</p>
+<dl class="simple">
+<dt>list</dt><dd><p>A list of strings representing the names of the columns in a
+trace dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
