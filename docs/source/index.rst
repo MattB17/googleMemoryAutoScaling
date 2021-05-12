@@ -11,6 +11,7 @@ Code Contents
 .. toctree::
    :maxdepth: 2
 
+   DataHandling/data_handling
    Evaluation/evaluation
    analysis
    parallel
