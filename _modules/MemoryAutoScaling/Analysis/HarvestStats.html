@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.Analysis.HarvestStats &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Analysis/analysis.html">Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.Analysis.HarvestStats</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.Analysis.HarvestStats</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `HarvestStats` reports harvesting statistics for a trace based on</span>
+<span class="sd">its actual values versus predicted values and a buffer.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">specs</span><span class="p">,</span> <span class="n">utils</span>
+
+
+<div class="viewcode-block" id="HarvestStats"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats">[docs]</a><span class="k">class</span> <span class="nc">HarvestStats</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculates and stores harvest statistics for a trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prop_harvested: float</span>
+<span class="sd">        A float representing the proportion of spare resources harvested.</span>
+<span class="sd">    prop_violations: float</span>
+<span class="sd">        A float representing the proportion of violations. That is, the</span>
+<span class="sd">        proportion of times that the prediction is lower than the actual</span>
+<span class="sd">        value, even after adding the buffer.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _prop_harvested: float</span>
+<span class="sd">        The proportion of spare resources harvested.</span>
+<span class="sd">    _prop_violations: float</span>
+<span class="sd">        The proportion of predictions that result in violations.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_harvested</span><span class="p">,</span> <span class="n">prop_violations</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span> <span class="o">=</span> <span class="n">prop_harvested</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop_violations</span> <span class="o">=</span> <span class="n">prop_violations</span>
+
+<div class="viewcode-block" id="HarvestStats.from_predictions"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats.from_predictions">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_predictions</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">,</span>
+                         <span class="n">target_col</span><span class="p">,</span> <span class="n">pred_start</span><span class="p">,</span> <span class="n">pred_end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Builds a `HarvestStats` object from the predictions for `trace`.</span>
+
+<span class="sd">        `predictions` are a set of predictions of the usage of `target_col`</span>
+<span class="sd">        of `trace`, based on the aggregation window defined by the trace.</span>
+<span class="sd">        The predictions are for the period [`pred_start`, `pred_end`]. A</span>
+<span class="sd">        buffer of `buffer_pct` is applied to each prediction so that the true</span>
+<span class="sd">        predictions are `1 + buffer_pct` multiplied by `predictions`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` object for which the predictions were generated.</span>
+<span class="sd">        predictions: np.array</span>
+<span class="sd">            A numpy array representing the predictions for which the harvest</span>
+<span class="sd">            statistics are calculated.</span>
+<span class="sd">        buffer_pct: float</span>
+<span class="sd">            A float representing the percent buffer to apply to each</span>
+<span class="sd">            prediction. That is each prediction is scaled up by</span>
+<span class="sd">            `1 + buffer_pct`.</span>
+<span class="sd">        target_col: str</span>
+<span class="sd">            A string representing the target time series for which the</span>
+<span class="sd">            predictions were generated.</span>
+<span class="sd">        pred_start: int</span>
+<span class="sd">            An integer representing the index of the time series at which</span>
+<span class="sd">            the predictions start.</span>
+<span class="sd">        pred_end: int</span>
+<span class="sd">            An integer representing the index of the time series at which</span>
+<span class="sd">            the predictions end.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        HarvestStats</span>
+<span class="sd">            The `HarvestStats` object in which the proportion harvested and</span>
+<span class="sd">            the proportion of violations is calculated based on the</span>
+<span class="sd">            predictions for `target_col` of `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">actuals</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_target_time_series</span><span class="p">(</span><span class="n">target_col</span><span class="p">)[</span><span class="n">pred_start</span><span class="p">:</span><span class="n">pred_end</span><span class="p">]</span>
+        <span class="n">allocated_amt</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_amount_allocated_for_target</span><span class="p">(</span><span class="n">target_col</span><span class="p">)</span>
+        <span class="n">harvest_amt</span><span class="p">,</span> <span class="n">num_violations</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">calculate_harvest_stats</span><span class="p">(</span>
+            <span class="n">allocated_amt</span><span class="p">,</span> <span class="n">actuals</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">)</span>
+        <span class="n">total_spare</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_spare_resource_in_window</span><span class="p">(</span>
+            <span class="n">target_col</span><span class="p">,</span> <span class="n">pred_start</span><span class="p">,</span> <span class="n">pred_end</span><span class="p">)</span>
+        <span class="n">harvest_amt</span> <span class="o">*=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_aggregation_window</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">harvest_amt</span> <span class="o">/</span> <span class="n">total_spare</span><span class="p">,</span>
+                   <span class="n">num_violations</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="HarvestStats.build_null_harvest_stats"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats.build_null_harvest_stats">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">build_null_harvest_stats</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Builds a null `HarvestStats` object.</span>
+
+<span class="sd">        A null `HarvestStats` object has null values for both the proportion</span>
+<span class="sd">        harvested and the proportion of violations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        HarvestStats</span>
+<span class="sd">            A null `HarvestStats` object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HarvestStats.get_harvest_stat_columns"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats.get_harvest_stat_columns">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_harvest_stat_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The harvest statistic columns.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of strings representing the names of the harvest</span>
+<span class="sd">            statistics columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;prop_harvested&quot;</span><span class="p">,</span> <span class="s2">&quot;prop_violations&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="HarvestStats.get_harvest_columns_for_buffers"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats.get_harvest_columns_for_buffers">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_harvest_columns_for_buffers</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the harvest statistics columns for all buffer percents.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of strings representing the names of the harvest</span>
+<span class="sd">            statistics columns for all buffer percents.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buffer_harvest_pairs</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span>
+            <span class="n">specs</span><span class="o">.</span><span class="n">BUFFER_PCTS</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_harvest_stat_columns</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">harvest_col</span><span class="p">,</span> <span class="n">buffer_pct</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">buffer_pct</span><span class="p">,</span> <span class="n">harvest_col</span> <span class="ow">in</span> <span class="n">buffer_harvest_pairs</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="HarvestStats.to_list"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats.to_list">[docs]</a>    <span class="k">def</span> <span class="nf">to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A list representation of the harvest statistics.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list containing the harvest statistics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_violations</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="HarvestStats.is_better"><a class="viewcode-back" href="../../../Analysis/harvest_stats.html#MemoryAutoScaling.Analysis.HarvestStats.is_better">[docs]</a>    <span class="k">def</span> <span class="nf">is_better</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_stats</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates if the harvest stats are better than `other_stats`.</span>
+
+<span class="sd">        The current harvest stats are better than `other_stats` in one of 3</span>
+<span class="sd">        scenarios: if the proportion harvested is greater and the proportion</span>
+<span class="sd">        of violations is lower, if the proporition of violations is lower and</span>
+<span class="sd">        the decrease in violations is at least `specs.HARVEST_WEIGHT` times</span>
+<span class="sd">        greater than the decrease in proportion harvested, or if the</span>
+<span class="sd">        proportion harvested is higher and is at least</span>
+<span class="sd">        `1 / specs.HARVEST_WEIGHT` greater than the increase in violations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other_stats: HarvestStats</span>
+<span class="sd">            The `HarvestStats` object to which the current harvest stats are</span>
+<span class="sd">            compared.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the current harvest stats are better than</span>
+<span class="sd">            `other_stats`. Otherwise, False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_harvested</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span> <span class="o">&gt;</span> <span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_harvested</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
