@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Trace Usage Data &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Google Trace" href="trace.html" />
+    <link rel="prev" title="Data Handling" href="data_handling.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_handling.html">Data Handling</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Trace Usage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">Google Trace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace_handler.html">Trace Handler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace_generator.html">Trace Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ml_data_handler.html">ML Data Handler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="data_handling.html">Data Handling</a> &raquo;</li>
+        
+      <li>Trace Usage Data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/DataHandling/trace_usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-MemoryAutoScaling.DataHandling.TraceUsage">
+<span id="trace-usage-data"></span><h1>Trace Usage Data<a class="headerlink" href="#module-MemoryAutoScaling.DataHandling.TraceUsage" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>TraceUsage</cite> class is a container for raw, unaggregated trace
+statistics, which are used to calculate utilization and the amount
+of spare units for both CPU and memory.</p>
+<dl class="py class">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.DataHandling.</span></code><code class="sig-name descname"><span class="pre">TraceUsage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mem_alloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_alloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_mem_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_cpu_ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores raw, unaggregated trace statistics for usage calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mem_alloc: float</strong></dt><dd><p>A float representing the amount of memory allocated to the trace for
+its duration.</p>
+</dd>
+<dt><strong>cpu_alloc: float</strong></dt><dd><p>A float representing the amount of CPU allocated to the trace for its
+duration.</p>
+</dd>
+<dt><strong>avg_mem_ts: np.array</strong></dt><dd><p>A numpy array representing a time series of the average memory usage
+of the trace.</p>
+</dd>
+<dt><strong>avg_cpu_ts: np.array</strong></dt><dd><p>A numpy array representing a time series of the average CPU usage of
+the trace.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>_mem_alloc: float</strong></dt><dd><p>The amount of memory allocated to the trace for its duration.</p>
+</dd>
+<dt><strong>_cpu_alloc: float</strong></dt><dd><p>The amount of CPU allocated to the trace for its duration.</p>
+</dd>
+<dt><strong>_avg_mem_ts: np.array</strong></dt><dd><p>A time series of the average memory usage of the trace.</p>
+</dd>
+<dt><strong>_avg_cpu_ts: np.array</strong></dt><dd><p>A time series of the average CPU usage of the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.from_trace_df">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_trace_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.from_trace_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.from_trace_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a <cite>TraceUsage</cite> object from <cite>trace_df</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame containing the raw trace data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TraceUsage</dt><dd><p>A <cite>TraceUsage</cite> object based on the data in <cite>trace_df</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_allocated_cpu">
+<code class="sig-name descname"><span class="pre">get_allocated_cpu</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_allocated_cpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_allocated_cpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CPU allocated to the trace for its duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the CPU allocated to the trace for
+its duration.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_allocated_mem">
+<code class="sig-name descname"><span class="pre">get_allocated_mem</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_allocated_mem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_allocated_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>The memory allocated to the trace for its duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the memory allocated to the trace for
+its duration.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_avg_cpu_usage">
+<code class="sig-name descname"><span class="pre">get_avg_cpu_usage</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_avg_cpu_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_avg_cpu_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>A time series of average CPU usage for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing a time series of average memory usage
+for the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_avg_mem_usage">
+<code class="sig-name descname"><span class="pre">get_avg_mem_usage</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_avg_mem_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_avg_mem_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>A time series of average memory usage for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing a time series of average memory usage
+for the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_cpu_utilization">
+<code class="sig-name descname"><span class="pre">get_cpu_utilization</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_cpu_utilization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_cpu_utilization" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CPU utilization for the trace.</p>
+<p>The CPU utilization for a time point is the average CPU usage
+for that time point divided by the CPU units allocated in that
+period. The total CPU utilization is the average CPU utilization
+over all time points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing total memory utilization for the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_mem_utilization">
+<code class="sig-name descname"><span class="pre">get_mem_utilization</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_mem_utilization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_mem_utilization" title="Permalink to this definition">¶</a></dt>
+<dd><p>The memory utilization for the trace.</p>
+<p>The memory utilization for a time point is the average memory
+usage for that time point divided by the memory allocated in
+that period. The total memory utilization is the average memory
+utilization over all time points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing total memory utilization for the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_resource_utilization">
+<code class="sig-name descname"><span class="pre">get_resource_utilization</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_resource_utilization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_resource_utilization" title="Permalink to this definition">¶</a></dt>
+<dd><p>The utilization of <cite>resource_col</cite> for the trace.</p>
+<p>The resource utilization for a time point is the average usage of
+<cite>resource_col</cite> for that time point divided by the resource units
+allocated in that period. The total resource utilization is the
+average resource utilization over all time points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>resource_col: str</strong></dt><dd><p>A string identifying the resource for which the utilization is
+calculated, either memory or CPU.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the utilization rate of <cite>resource_col</cite> for
+the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_spare_cpu_in_window">
+<code class="sig-name descname"><span class="pre">get_spare_cpu_in_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">win_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_spare_cpu_in_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_spare_cpu_in_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spare amount of CPU in [<cite>win_start</cite>, <cite>win_end</cite>].</p>
+<p>The spare amount of CPU at a time point is the difference between
+the amount of CPU assigned to the machine and the amount taken by
+the trace at that time point. The spare amount of CPU in the window is
+the sum of the spare amount at each time point in
+[<cite>win_start</cite>, <cite>win_end</cite>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>win_start: int</strong></dt><dd><p>An integer representing the start index of the window.</p>
+</dd>
+<dt><strong>win_end: int</strong></dt><dd><p>An integer representing the end index of the window.</p>
+</dd>
+<dt><strong>agg_window: int</strong></dt><dd><p>The aggregation period for the trace</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of spare CPU on the
+machine in the window, after accounting for the memory consumed
+by the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_spare_mem_in_window">
+<code class="sig-name descname"><span class="pre">get_spare_mem_in_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">win_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_spare_mem_in_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_spare_mem_in_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spare amount of memory in [<cite>win_start</cite>, <cite>win_end</cite>].</p>
+<p>The spare amount of memory at a time point is the difference between
+the amount of memory assigned to the machine and the amount taken by
+the trace at that time point. The spare amount of memory in the window
+is the sum of the spare amount at each time point in
+[<cite>win_start</cite>, <cite>win_end</cite>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>win_start: int</strong></dt><dd><p>An integer representing the start index of the window.</p>
+</dd>
+<dt><strong>win_end: int</strong></dt><dd><p>An integer representing the end index of the window.</p>
+</dd>
+<dt><strong>agg_window: int</strong></dt><dd><p>The aggregation period for the trace</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of spare memory on the
+machine in the window, after accounting for the memory consumed
+by the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_spare_resource_in_window">
+<code class="sig-name descname"><span class="pre">get_spare_resource_in_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">win_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_spare_resource_in_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_spare_resource_in_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total spare amount of <cite>target_col</cite> in [<cite>win_start</cite>, <cite>win_end</cite>].</p>
+<p>The spare amount of the resource at a time point is the difference
+between the amount of CPU assigned to the machine and the amount
+taken by the trace at that time point. The total amount of spare is
+the sum of the spare amount at each time point in
+[<cite>win_start</cite>, <cite>win_end</cite>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target_col: str</strong></dt><dd><p>A string identifying the resource of interest, either memory or
+CPU units.</p>
+</dd>
+<dt><strong>win_start: int</strong></dt><dd><p>An integer representing the start index of the window.</p>
+</dd>
+<dt><strong>win_end: int</strong></dt><dd><p>An integer representing the end index of the window.</p>
+</dd>
+<dt><strong>agg_window: int</strong></dt><dd><p>The aggregation period for the trace</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of spare CPU on the
+machine in the window, after accounting for the memory consumed
+by the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_cpu">
+<code class="sig-name descname"><span class="pre">get_total_allocated_cpu</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_total_allocated_cpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_cpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total CPU units allocated to the trace.</p>
+<p>The total amount of CPU allocated to the trace is the sum of the CPU
+units allocated to the trace at each time point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of CPU units allocated to
+the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_mem">
+<code class="sig-name descname"><span class="pre">get_total_allocated_mem</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_total_allocated_mem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total memory allocated to the trace.</p>
+<p>The total memory allocated to the trace is the sum of the memory
+allocated to the trace at each time point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of memory allocated to the
+trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_resource">
+<code class="sig-name descname"><span class="pre">get_total_allocated_resource</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_total_allocated_resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total allocated amount of <cite>resource_col</cite> for the trace.</p>
+<p>The total amount of <cite>resource_col</cite> allocated to the trace is the sum
+of the amount of <cite>resource_col</cite> allocated to the trace at each time
+point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of <cite>resource_col</cite> allocated
+to the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="trace.html" class="btn btn-neutral float-right" title="Google Trace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data_handling.html" class="btn btn-neutral float-left" title="Data Handling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

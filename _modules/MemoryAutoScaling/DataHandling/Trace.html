@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.DataHandling.Trace &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.DataHandling.Trace</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.DataHandling.Trace</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `Trace` class stores the data associated with a Google trace from</span>
+<span class="sd">the Borg cluster.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">specs</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling.DataHandling.TraceUsage</span> <span class="kn">import</span> <span class="n">TraceUsage</span>
+
+
+<div class="viewcode-block" id="Trace"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace">[docs]</a><span class="k">class</span> <span class="nc">Trace</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Serves as a container for the data relating to a trace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_id: int</span>
+<span class="sd">        The ID for the trace.</span>
+<span class="sd">    start_time: int</span>
+<span class="sd">        The time at which the trace data begins</span>
+<span class="sd">    end_time: int</span>
+<span class="sd">        The time at which the trace data ends</span>
+<span class="sd">    ts_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the time series data for the trace.</span>
+<span class="sd">    trace_usage: TraceUsage</span>
+<span class="sd">        A `TraceUsage` object representing usage information for the trace.</span>
+<span class="sd">    agg_window: int</span>
+<span class="sd">        An integer representing the length of the aggregation window. That is,</span>
+<span class="sd">        for every `agg_window` periods the trace data is aggregated.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _trace_id: int</span>
+<span class="sd">        Represents the id of the trace.</span>
+<span class="sd">    _start_time: int</span>
+<span class="sd">        The time at which the trace data starts.</span>
+<span class="sd">    _end_time: int</span>
+<span class="sd">        The time at which the trace data ends.</span>
+<span class="sd">    _trace_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the time series data for the trace.</span>
+<span class="sd">    _trace_usage: TraceUsage</span>
+<span class="sd">        The usage information for the trace.</span>
+<span class="sd">    _agg_window: int</span>
+<span class="sd">        The aggregation window for the trace.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_id</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span>
+                 <span class="n">ts_df</span><span class="p">,</span> <span class="n">trace_usage</span><span class="p">,</span> <span class="n">agg_window</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trace_id</span> <span class="o">=</span> <span class="n">trace_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span> <span class="o">=</span> <span class="n">start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end_time</span> <span class="o">=</span> <span class="n">end_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trace_df</span> <span class="o">=</span> <span class="n">ts_df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span> <span class="o">=</span> <span class="n">trace_usage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_agg_window</span> <span class="o">=</span> <span class="n">agg_window</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Trace </span><span class="si">{}</span><span class="s2"> created&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace_id</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Trace.from_raw_trace_data"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.from_raw_trace_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_raw_trace_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trace_df</span><span class="p">,</span> <span class="n">agg_window</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a `Trace` from the raw data in `trace_df`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_df: pd.DataFrame</span>
+<span class="sd">            A dataframe representing the raw data extracted for a Borg job.</span>
+<span class="sd">        agg_window: int</span>
+<span class="sd">            An integer representing the aggregation window for the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Trace</span>
+<span class="sd">            The `Trace` represented by trace_df.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trace_df</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">TRACE_ID_COL</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trace_df</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">START_INTERVAL_COL</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">trace_df</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">END_INTERVAL_COL</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">trace_usage</span> <span class="o">=</span> <span class="n">TraceUsage</span><span class="o">.</span><span class="n">from_trace_df</span><span class="p">(</span><span class="n">trace_df</span><span class="p">)</span>
+        <span class="n">ts_df</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">build_trace_data_from_trace_df</span><span class="p">(</span>
+            <span class="n">trace_df</span><span class="p">,</span> <span class="n">agg_window</span><span class="p">,</span> <span class="n">trace_usage</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">trace_id</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">ts_df</span><span class="p">,</span> <span class="n">trace_usage</span><span class="p">,</span> <span class="n">agg_window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trace.get_trace_id"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_trace_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_trace_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The ID of the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            An integer representing the ID of the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_id</span></div>
+
+<div class="viewcode-block" id="Trace.get_start_time"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_start_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time at which the trace starts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            An integer representing the time point marking the start of the</span>
+<span class="sd">            trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span></div>
+
+<div class="viewcode-block" id="Trace.get_end_time"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_end_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_end_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time at which the trace ends.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            An integer representing the time point marking the end of the</span>
+<span class="sd">            trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_time</span></div>
+
+<div class="viewcode-block" id="Trace.get_aggregation_window"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_aggregation_window">[docs]</a>    <span class="k">def</span> <span class="nf">get_aggregation_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The aggregation window used for the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            An integer representing the aggregation window used for the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agg_window</span></div>
+
+<div class="viewcode-block" id="Trace.get_maximum_memory_time_series"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_maximum_memory_time_series">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_memory_time_series</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The maximum memory usage time series for the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            A numpy array representing the time series of maximum memory</span>
+<span class="sd">            usage.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_mem_col</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_ts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_COL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_df</span><span class="p">[</span><span class="n">max_mem_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span></div>
+
+<div class="viewcode-block" id="Trace.get_maximum_cpu_time_series"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_maximum_cpu_time_series">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_cpu_time_series</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The maximum CPU usage time series for the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            A numpy array representing the time series of maximum CPU usage.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_cpu_col</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_ts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_CPU_COL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_df</span><span class="p">[</span><span class="n">max_cpu_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span></div>
+
+<div class="viewcode-block" id="Trace.get_target_time_series"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_target_time_series">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_time_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the time series based on `target_col`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_col: str</span>
+<span class="sd">            A string representing the name of the target variable for which</span>
+<span class="sd">            the time series is retrieved from the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            A numpy array representing the time series of `target_col`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">target_col</span> <span class="ow">in</span> <span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_COL</span><span class="p">,</span> <span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_TS</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_memory_time_series</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_cpu_time_series</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Trace.get_amount_allocated_for_target"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_amount_allocated_for_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_amount_allocated_for_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the availability time series for `target_col`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_col: str</span>
+<span class="sd">            A string representing the name of the target variable for which</span>
+<span class="sd">            the time series is retrieved from the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the amount of resource allocated for</span>
+<span class="sd">            `target_col` for the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">target_col</span> <span class="ow">in</span> <span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_COL</span><span class="p">,</span> <span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_TS</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_allocated_mem</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_allocated_cpu</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Trace.get_spare_resource_in_window"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_spare_resource_in_window">[docs]</a>    <span class="k">def</span> <span class="nf">get_spare_resource_in_window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">,</span> <span class="n">win_start</span><span class="p">,</span> <span class="n">win_end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The spare amount of `target_col` in [`win_start`, `win_end`].</span>
+
+<span class="sd">        The spare amount of `target_col` at a particular time point is the</span>
+<span class="sd">        amount available minus the amount used at that time point. The total</span>
+<span class="sd">        spare for the window is calculated as the sum of these values over all</span>
+<span class="sd">        time points in the window, excluding `win_end`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_col: str</span>
+<span class="sd">            A string identifying the resource of interest, either memory or</span>
+<span class="sd">            CPU units.</span>
+<span class="sd">        win_start: int</span>
+<span class="sd">            An integer representing the start index of the window.</span>
+<span class="sd">        win_end: int</span>
+<span class="sd">            An integer representing the end index of the window.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the total spare amount of `target_col` for</span>
+<span class="sd">            the window.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_spare_resource_in_window</span><span class="p">(</span>
+            <span class="n">target_col</span><span class="p">,</span> <span class="n">win_start</span><span class="p">,</span> <span class="n">win_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agg_window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trace.get_resource_utilization"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_resource_utilization">[docs]</a>    <span class="k">def</span> <span class="nf">get_resource_utilization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The utilization of `target_col` for the trace.</span>
+
+<span class="sd">        The resource utilization for a time point is the average usage of</span>
+<span class="sd">        `target_col` for that time point divided by the resource units</span>
+<span class="sd">        allocated in that period. The total resource utilization is the</span>
+<span class="sd">        average resource utilization over all time points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_col: str</span>
+<span class="sd">            A string identifying the resource for which the utilization is</span>
+<span class="sd">            calculated, either memory or CPU.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the utilization rate of `resource_col` for</span>
+<span class="sd">            the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_resource_utilization</span><span class="p">(</span><span class="n">target_col</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trace.get_total_allocated_resource"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_total_allocated_resource">[docs]</a>    <span class="k">def</span> <span class="nf">get_total_allocated_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The total allocated amount of `resource_col` for the trace.</span>
+
+<span class="sd">        The total amount of `resource_col` allocated to the trace is the sum</span>
+<span class="sd">        of the amount of `resource_col` allocated to the trace at each time</span>
+<span class="sd">        point.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the total amount of `resource_col` allocated</span>
+<span class="sd">            to the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_total_allocated_resource</span><span class="p">(</span><span class="n">target_col</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trace.get_number_of_observations"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_number_of_observations">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_of_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The number of observations of the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            An integer representing the number of observations present</span>
+<span class="sd">            in the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_trace_df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trace.get_trace_df"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_trace_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_trace_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A dataframe for the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the time series for the trace with</span>
+<span class="sd">            one column per series.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_df</span><span class="p">[</span><span class="n">specs</span><span class="o">.</span><span class="n">get_trace_columns</span><span class="p">()]</span></div>
+
+<div class="viewcode-block" id="Trace.get_max_time_series_df"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_max_time_series_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_time_series_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A dataframe of only the maximum usage time series.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the maximum usage time series for</span>
+<span class="sd">            the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_df</span><span class="p">[[</span><span class="n">specs</span><span class="o">.</span><span class="n">MAX_MEM_TS</span><span class="p">,</span> <span class="n">specs</span><span class="o">.</span><span class="n">MAX_CPU_TS</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Trace.output_trace"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.output_trace">[docs]</a>    <span class="k">def</span> <span class="nf">output_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Outputs the trace to a csv file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_dir: str</span>
+<span class="sd">            A string representing the directory to which the trace will be</span>
+<span class="sd">            written to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Side Effect</span>
+<span class="sd">        -----------</span>
+<span class="sd">        Outputs the trace to `output_dir` as a csv file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;trace_df_</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_trace_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agg_window</span><span class="p">)</span>
+        <span class="n">trace_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trace_df</span><span class="p">()</span>
+        <span class="n">trace_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trace.get_lagged_df"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_lagged_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_lagged_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lags</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the lagged dataframe for the trace at lags of `lags`.</span>
+
+<span class="sd">        The lagged dataframe consists of the original columns plus these</span>
+<span class="sd">        same columns after lagging them by a period of time where the lags</span>
+<span class="sd">        are equal to the elements of `lags`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lags: list</span>
+<span class="sd">            A list of integers representing the lags used to generate</span>
+<span class="sd">            the dataframe.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            The lagged DataFrame in which the columns are lagged by the time</span>
+<span class="sd">            periods indicated in `lags`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_lag</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lags</span><span class="p">)</span>
+        <span class="n">trace_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trace_df</span><span class="p">()</span>
+        <span class="n">target_data</span> <span class="o">=</span> <span class="n">trace_df</span><span class="p">[</span><span class="n">max_lag</span><span class="p">:]</span>
+        <span class="n">lagged_dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">lags</span><span class="p">:</span>
+            <span class="n">lagged_data</span> <span class="o">=</span> <span class="n">trace_df</span><span class="p">[(</span><span class="n">max_lag</span> <span class="o">-</span> <span class="n">lag</span><span class="p">):</span><span class="o">-</span><span class="n">lag</span><span class="p">]</span>
+            <span class="n">lagged_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">specs</span><span class="o">.</span><span class="n">get_lagged_trace_columns</span><span class="p">([</span><span class="n">lag</span><span class="p">])</span>
+            <span class="n">lagged_data</span> <span class="o">=</span> <span class="n">lagged_data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">lagged_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lagged_data</span><span class="p">)</span>
+        <span class="n">target_data</span> <span class="o">=</span> <span class="n">target_data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">target_data</span><span class="p">]</span> <span class="o">+</span> <span class="n">lagged_dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes a string representation of the trace.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representing the trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Trace </span><span class="si">{0}</span><span class="s2"> - </span><span class="si">{1}</span><span class="s2"> Observations from </span><span class="si">{2}</span><span class="s2"> to </span><span class="si">{3}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Aggregated every </span><span class="si">{4}</span><span class="s2"> time periods.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_trace_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_number_of_observations</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agg_window</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

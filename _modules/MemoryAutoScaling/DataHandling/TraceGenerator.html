@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MemoryAutoScaling.DataHandling.TraceGenerator &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>MemoryAutoScaling.DataHandling.TraceGenerator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for MemoryAutoScaling.DataHandling.TraceGenerator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The `TraceGenerator` class is used to generate data traces for analysis.</span>
+<span class="sd">It has several methods for generating different classes of traces</span>
+<span class="sd">corresponding to different usage patterns.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">MemoryAutoScaling</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<div class="viewcode-block" id="TraceGenerator"><a class="viewcode-back" href="../../../DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator">[docs]</a><span class="k">class</span> <span class="nc">TraceGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Generates data trace for analysis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trace_length: int</span>
+<span class="sd">        An integer representing the number of time points for the generated</span>
+<span class="sd">        traces.</span>
+<span class="sd">    mu: float</span>
+<span class="sd">        A float representing the average for traces. This is the base average</span>
+<span class="sd">        for all traces and then some amount of noise and or trend is added to</span>
+<span class="sd">        this value.</span>
+<span class="sd">    sigma: float</span>
+<span class="sd">        A float representing the standard deviation for traces. This represents</span>
+<span class="sd">        the base standard deviation of traces before noise or trend are added.</span>
+<span class="sd">    noise_amp: float</span>
+<span class="sd">        A float representing the base standard deviation of noise added to</span>
+<span class="sd">        each trace.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _trace_length: int</span>
+<span class="sd">        The number of time points for generated traces.</span>
+<span class="sd">    _mu: float</span>
+<span class="sd">        The base average for traces.</span>
+<span class="sd">    _sigma: float</span>
+<span class="sd">        The base standard deviation for traces.</span>
+<span class="sd">    _noise_amp: float</span>
+<span class="sd">        The base standard deviation for the noise added to each trace.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_length</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">noise_amp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span> <span class="o">=</span> <span class="n">trace_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_noise_amp</span> <span class="o">=</span> <span class="n">noise_amp</span>
+
+<div class="viewcode-block" id="TraceGenerator.generate_constant_traces"><a class="viewcode-back" href="../../../DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator.generate_constant_traces">[docs]</a>    <span class="k">def</span> <span class="nf">generate_constant_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates `trace_count` constant traces.</span>
+
+<span class="sd">        A constant trace is generated by taking a random constant and</span>
+<span class="sd">        replicating it for the length of the trace. Then for each time point,</span>
+<span class="sd">        a small bit of noise is added from a `N(0, _noise_amp^2)` random</span>
+<span class="sd">        variable. The random constant is sampled from a `N(_mu, _sigma^2)`</span>
+<span class="sd">        random variable. Lastly, we toss a fair coin and if it lands heads</span>
+<span class="sd">        we take the cumulative sum of each time point as the true observation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_count: int</span>
+<span class="sd">            A count of the number of traces to generate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of numpy arrays representing constant traces. The list has</span>
+<span class="sd">            `trace_count` traces.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">constants</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">amp_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">traces</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">):</span>
+            <span class="n">noise_var</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_noise_amp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">amp_factor</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="n">noise_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">perform_coin_toss</span><span class="p">(</span><span class="mf">0.5</span><span class="p">):</span>
+                <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_cumulative_sum_of_trace</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">traces</span></div>
+
+<div class="viewcode-block" id="TraceGenerator.generate_periodic_traces"><a class="viewcode-back" href="../../../DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator.generate_periodic_traces">[docs]</a>    <span class="k">def</span> <span class="nf">generate_periodic_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">,</span> <span class="n">period_avg</span><span class="p">,</span>
+                                 <span class="n">period_std</span><span class="p">,</span> <span class="n">spike_avg</span><span class="p">,</span> <span class="n">spike_std</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates `trace_count` periodic traces.</span>
+
+<span class="sd">        A periodic trace is generated by first taking a random constant and</span>
+<span class="sd">        replicating it for the length of the trace. Then a periodic spike is</span>
+<span class="sd">        added to the trace. The size of the spike is sampled according to a</span>
+<span class="sd">        `N(spike_avg, spike_std^2)` random variable and the period of the</span>
+<span class="sd">        spike is sampled according to a `N(period_avg, period_std^2)` random</span>
+<span class="sd">        variable. Lastly, for each time point, a small bit of noise is added</span>
+<span class="sd">        from a `N(0, _amp^2)` random variable. Lastly, we toss a fair coin and</span>
+<span class="sd">        if it lands heads we take the cumulative sum of each time point as</span>
+<span class="sd">        the true observation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_count: int</span>
+<span class="sd">            The number of periodic traces being generated.</span>
+<span class="sd">        period_avg: float</span>
+<span class="sd">            Represents the average length of the periods. That is, it</span>
+<span class="sd">            represents the average period length across all generated traces.</span>
+<span class="sd">        period_std: float</span>
+<span class="sd">            Represents the standard deviation of period lengths. That is, it</span>
+<span class="sd">            represents the standard deviation of period lengths across all</span>
+<span class="sd">            generated traces.</span>
+<span class="sd">        spike_avg: float</span>
+<span class="sd">            The average size of the periodic components. That is, it</span>
+<span class="sd">            represents the average size of the spikes across all periodic</span>
+<span class="sd">            components added to the generated traces.</span>
+<span class="sd">        spike_std: float</span>
+<span class="sd">            The standard deviation of the periodic components. That is, it</span>
+<span class="sd">            represents the standard deviation of the spikes across all</span>
+<span class="sd">            periodic components added to the generated traces.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of numpy arrays representing periodic traces. The list has</span>
+<span class="sd">            `trace_count` traces.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">constants</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">amp_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">period_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+            <span class="n">period_avg</span><span class="p">,</span> <span class="n">period_std</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">spike_avg</span><span class="p">,</span> <span class="n">spike_std</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">traces</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">):</span>
+            <span class="n">noise_var</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_noise_amp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">amp_factor</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">period_lengths</span><span class="p">[</span><span class="n">idx</span><span class="p">])))</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">period</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">period_comp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+                <span class="n">spikes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span> <span class="o">%</span> <span class="n">period</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">)])</span>
+            <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">period_comp</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="n">noise_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">perform_coin_toss</span><span class="p">(</span><span class="mf">0.5</span><span class="p">):</span>
+                <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_cumulative_sum_of_trace</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">traces</span></div>
+
+<div class="viewcode-block" id="TraceGenerator.generate_unpredictable_traces"><a class="viewcode-back" href="../../../DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator.generate_unpredictable_traces">[docs]</a>    <span class="k">def</span> <span class="nf">generate_unpredictable_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span>
+                                      <span class="n">sigma2</span><span class="p">,</span> <span class="n">mu3</span><span class="p">,</span> <span class="n">sigma3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates `trace_count` unpredictable traces.</span>
+
+<span class="sd">        Unpredictable traces are traces that have no apparent pattern. To</span>
+<span class="sd">        simulate this we generate 3 Gaussian traces for each trace. The</span>
+<span class="sd">        distributions are `N(_mu, _sigma^2)`, `N(mu2, sigma2^2)` and</span>
+<span class="sd">        `N(mu3,  sigma3^2)`. Then for each time point, there are 3 trace</span>
+<span class="sd">        values according to the 3 distributions. These 3 values are sampled</span>
+<span class="sd">        3 times with replacement and multiplied together to get the trace</span>
+<span class="sd">        value for that time point. Lastly, for each time point, a small bit</span>
+<span class="sd">        of noise is added from a `N(0, _amp^2)` random variable. Lastly, we</span>
+<span class="sd">        take the cumulative sum of observations as the actual data value at</span>
+<span class="sd">        each data point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_count: int</span>
+<span class="sd">            The number of unpredictable traces being generated.</span>
+<span class="sd">        mu2: float</span>
+<span class="sd">            The average for the 2nd Gaussian distribution.</span>
+<span class="sd">        sigma2: float</span>
+<span class="sd">            The standard deviation for the 2nd Gaussian distribution.</span>
+<span class="sd">        mu2: float</span>
+<span class="sd">            The average for the 3rd Gaussian distribution.</span>
+<span class="sd">        sigma2: float</span>
+<span class="sd">            The standard deviation for the 3rd Gaussian distribution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of numpy arrays representing unpredictable traces. The</span>
+<span class="sd">            list has `trace_count` traces.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">amp_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">trace_count</span><span class="p">)</span>
+        <span class="n">traces</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">)]</span>
+        <span class="n">avgs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span> <span class="n">mu3</span><span class="p">]</span>
+        <span class="n">sigmas</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span> <span class="n">sigma2</span><span class="p">,</span> <span class="n">sigma3</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_count</span><span class="p">):</span>
+            <span class="n">processes</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">avgs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sigmas</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="n">curr_trace</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">)])</span>
+            <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">):</span>
+                <span class="n">trace_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">processes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">pos</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+                <span class="n">trace_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">trace_vals</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">trace_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">trace_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">trace_vals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="p">((</span><span class="o">-</span><span class="n">val</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+                <span class="n">curr_trace</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">noise_var</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_noise_amp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">amp_factor</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr_trace</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="n">noise_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_length</span><span class="p">)</span>
+            <span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_cumulative_sum_of_trace</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">traces</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,13 +1,11 @@
-Trace Analysis
-==============
+Evaluation
+==========
 
 .. automodule:: MemoryAutoScaling.Evaluation
 
-Contents
---------
-
 .. toctree::
    :maxdepth: 2
+   :caption: Contents
 
    harvest_stats
    model_results

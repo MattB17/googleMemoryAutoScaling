@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ML Data Handler &mdash; MemoryAutoScaling  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Evaluation" href="../Evaluation/evaluation.html" />
+    <link rel="prev" title="Trace Generator" href="trace_generator.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> MemoryAutoScaling
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_handling.html">Data Handling</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="trace_usage.html">Trace Usage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">Google Trace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace_handler.html">Trace Handler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace_generator.html">Trace Generator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ML Data Handler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Evaluation/evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parallel.html">Parallelization Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs.html">Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MemoryAutoScaling</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="data_handling.html">Data Handling</a> &raquo;</li>
+        
+      <li>ML Data Handler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/DataHandling/ml_data_handler.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-MemoryAutoScaling.DataHandling.MLDataHandler">
+<span id="ml-data-handler"></span><h1>ML Data Handler<a class="headerlink" href="#module-MemoryAutoScaling.DataHandling.MLDataHandler" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>MLDataHandler</cite> is a class used to pre-process data so that the data
+can be used for a machine learning model. It is specifically built for
+handling time series data.</p>
+<dl class="py class">
+<dt id="MemoryAutoScaling.DataHandling.MLDataHandler">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.DataHandling.</span></code><code class="sig-name descname"><span class="pre">MLDataHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/MLDataHandler.html#MLDataHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.MLDataHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to pre-process data to be used in a machine learning model.</p>
+<p>The handler is designed for time series data and splits the data so that
+time series models are trained on the first <cite>train_prop</cite> proportion of
+the data and tested on the remaining <cite>1 - train_prop</cite> proportion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>train_prop: float</strong></dt><dd><p>A float in [0, 1] representing the proportion of data used in the
+training set. The default value is 0.6.</p>
+</dd>
+<dt><strong>feature_vars: list</strong></dt><dd><p>A list of strings representing the names of features.</p>
+</dd>
+<dt><strong>target_vars: list</strong></dt><dd><p>A list of strings representing the names of the target variables.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>_train_prop: float</strong></dt><dd><p>The proportion of data to be used in the training set.</p>
+</dd>
+<dt><strong>_feature_vars: list</strong></dt><dd><p>The names of the feature variables.</p>
+</dd>
+<dt><strong>_target_vars: list</strong></dt><dd><p>The names of the target variables.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.MLDataHandler.get_target_variables">
+<code class="sig-name descname"><span class="pre">get_target_variables</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/MLDataHandler.html#MLDataHandler.get_target_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.MLDataHandler.get_target_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>The target variables for the handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>list</dt><dd><p>A list of strings representing the target variables.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.MLDataHandler.get_total_spare_for_target">
+<code class="sig-name descname"><span class="pre">get_total_spare_for_target</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/MLDataHandler.html#MLDataHandler.get_total_spare_for_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.MLDataHandler.get_total_spare_for_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spare amount of the target over the test period for <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> object for which the amount of spare units of the
+target variable are computed over the test period.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the spare is being calculated
+to tune the model or evaluate the model on the test set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the total amount of spare units of the target
+variable over the test period for <cite>trace</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.MLDataHandler.get_train_and_test_sets">
+<code class="sig-name descname"><span class="pre">get_train_and_test_sets</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/MLDataHandler.html#MLDataHandler.get_train_and_test_sets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.MLDataHandler.get_train_and_test_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits <cite>data</cite> into a training and testing set.</p>
+<p>If <cite>tuning</cite> is True, the testing and validation sets are retrieved.
+Otherwise, the testing + validation and testing sets are retrieved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame representing the time series data being split
+into the training and testing sets.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the data will be used for
+tuning.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame, pd.DataFrame</dt><dd><p>Two pandas DataFrames where the first dataframe contains the
+records in the training set and the second contains the records
+in the testing set.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.MLDataHandler.perform_data_split">
+<code class="sig-name descname"><span class="pre">perform_data_split</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/MLDataHandler.html#MLDataHandler.perform_data_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.MLDataHandler.perform_data_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits data into features and targets for the train and test sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the data on which the split is
+performed.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean value indicating whether the data will be used for
+tuning.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.Object, pd.Object, pd.Object, pd.Object</dt><dd><p>Two pandas objects representing the training set values of the
+features and target variables, respectively. The second pair of
+pandas objects represent the same split for the testing set.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.MLDataHandler.split_time_series_data">
+<code class="sig-name descname"><span class="pre">split_time_series_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/MLDataHandler.html#MLDataHandler.split_time_series_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.MLDataHandler.split_time_series_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits <cite>ts_data</cite> into two sets for the modeling process.</p>
+<p>If <cite>tuning</cite> is True, <cite>ts_data</cite> is split into a training and
+validation set. Otherwise, it is split into a training + validation
+and testing set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ts_data: pd.Object</strong></dt><dd><p>A pandas Object representing the data to be split.</p>
+</dd>
+<dt><strong>tuning: bool</strong></dt><dd><p>A boolean indicating whether the split is being done for training.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame, pd.DataFrame</dt><dd><p>Two pandas DataFrames where the first dataframe contains the
+records in the training set and the second contains the records
+in the testing set.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Evaluation/evaluation.html" class="btn btn-neutral float-right" title="Evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="trace_generator.html" class="btn btn-neutral float-left" title="Trace Generator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Matt Buckley
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

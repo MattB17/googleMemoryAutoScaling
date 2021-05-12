@@ -78,7 +78,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="Evaluation/evaluation.html">Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataHandling/data_handling.html">Data Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Evaluation/evaluation.html">Evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parallel.html">Parallelization Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Functions</a></li>
@@ -257,9 +258,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Evaluation/model_results.html#MemoryAutoScaling.Evaluation.ModelResults.from_data">from_data() (MemoryAutoScaling.Evaluation.ModelResults class method)</a>
 </li>
+      <li><a href="Evaluation/harvest_stats.html#MemoryAutoScaling.Evaluation.HarvestStats.from_predictions">from_predictions() (MemoryAutoScaling.Evaluation.HarvestStats class method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Evaluation/harvest_stats.html#MemoryAutoScaling.Evaluation.HarvestStats.from_predictions">from_predictions() (MemoryAutoScaling.Evaluation.HarvestStats class method)</a>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.from_raw_trace_data">from_raw_trace_data() (MemoryAutoScaling.DataHandling.Trace class method)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.from_trace_df">from_trace_df() (MemoryAutoScaling.DataHandling.TraceUsage class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -267,9 +272,27 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator.generate_constant_traces">generate_constant_traces() (MemoryAutoScaling.DataHandling.TraceGenerator method)</a>
+</li>
+      <li><a href="DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator.generate_periodic_traces">generate_periodic_traces() (MemoryAutoScaling.DataHandling.TraceGenerator method)</a>
+</li>
+      <li><a href="DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator.generate_unpredictable_traces">generate_unpredictable_traces() (MemoryAutoScaling.DataHandling.TraceGenerator method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_aggregation_window">get_aggregation_window() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_all_granger_col_names">get_all_granger_col_names() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_all_granger_col_names">[1]</a>
 </li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_allocated_cpu">get_allocated_cpu() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_allocated_mem">get_allocated_mem() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_amount_allocated_for_target">get_amount_allocated_for_target() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
       <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.get_analysis_title">get_analysis_title() (MemoryAutoScaling.Evaluation.TraceAnalyzer method)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_avg_cpu_usage">get_avg_cpu_usage() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_avg_mem_usage">get_avg_mem_usage() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_best_model_dict_for_trace">get_best_model_dict_for_trace() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_best_model_dict_for_trace">[1]</a>
 </li>
@@ -285,9 +308,17 @@
 </li>
       <li><a href="parallel.html#MemoryAutoScaling.parallel.get_cores_and_traces_per_core">get_cores_and_traces_per_core() (in module MemoryAutoScaling.parallel)</a>
 </li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_cpu_utilization">get_cpu_utilization() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_cumulative_sum_of_trace">get_cumulative_sum_of_trace() (in module MemoryAutoScaling.utils)</a>
 </li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_differenced_trace">get_differenced_trace() (in module MemoryAutoScaling.utils)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.get_directory_path">get_directory_path() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_end_time">get_end_time() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.get_file_identifier">get_file_identifier() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_granger_col_names_for_lag">get_granger_col_names_for_lag() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_granger_col_names_for_lag">[1]</a>
 </li>
@@ -299,9 +330,19 @@
 </li>
       <li><a href="specs.html#MemoryAutoScaling.specs.get_input_and_output_target">get_input_and_output_target() (in module MemoryAutoScaling.specs)</a>
 </li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_lagged_df">get_lagged_df() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
       <li><a href="specs.html#MemoryAutoScaling.specs.get_lagged_trace_columns">get_lagged_trace_columns() (in module MemoryAutoScaling.specs)</a>
 </li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_max_time_series_df">get_max_time_series_df() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_maximum_cpu_time_series">get_maximum_cpu_time_series() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_maximum_memory_time_series">get_maximum_memory_time_series() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_mean_absolute_scaled_error">get_mean_absolute_scaled_error() (in module MemoryAutoScaling.utils)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_mem_utilization">get_mem_utilization() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
 </li>
       <li><a href="Evaluation/model_results.html#MemoryAutoScaling.Evaluation.ModelResults.get_model_params">get_model_params() (MemoryAutoScaling.Evaluation.ModelResults method)</a>
 </li>
@@ -314,6 +355,8 @@
       <li><a href="parallel.html#MemoryAutoScaling.parallel.get_multivariate_model_results">get_multivariate_model_results() (in module MemoryAutoScaling.parallel)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_non_stationary_count">get_non_stationary_count() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_non_stationary_count">[1]</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_number_of_observations">get_number_of_observations() (MemoryAutoScaling.DataHandling.Trace method)</a>
 </li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_one_sided_errors">get_one_sided_errors() (in module MemoryAutoScaling.utils)</a>
 </li>
@@ -333,9 +376,27 @@
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_prop_harvested_dict_for_models">get_prop_harvested_dict_for_models() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_prop_harvested_dict_for_models">[1]</a>
 </li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_resource_utilization">get_resource_utilization() (MemoryAutoScaling.DataHandling.Trace method)</a>
+
+      <ul>
+        <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_resource_utilization">(MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      </ul></li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_results_list_from_trace_model_dicts">get_results_list_from_trace_model_dicts() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_results_list_from_trace_model_dicts">[1]</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_results_list_from_trace_model_results">get_results_list_from_trace_model_results() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_results_list_from_trace_model_results">[1]</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_spare_cpu_in_window">get_spare_cpu_in_window() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_spare_mem_in_window">get_spare_mem_in_window() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_spare_resource_in_window">get_spare_resource_in_window() (MemoryAutoScaling.DataHandling.Trace method)</a>
+
+      <ul>
+        <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_spare_resource_in_window">(MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      </ul></li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_start_time">get_start_time() (MemoryAutoScaling.DataHandling.Trace method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_stationary_1_diff_count">get_stationary_1_diff_count() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_stationary_1_diff_count">[1]</a>
 </li>
@@ -343,7 +404,11 @@
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_stationary_results_df">get_stationary_results_df() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_stationary_results_df">[1]</a>
 </li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_target_time_series">get_target_time_series() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
       <li><a href="specs.html#MemoryAutoScaling.specs.get_target_variable">get_target_variable() (in module MemoryAutoScaling.specs)</a>
+</li>
+      <li><a href="DataHandling/ml_data_handler.html#MemoryAutoScaling.DataHandling.MLDataHandler.get_target_variables">get_target_variables() (MemoryAutoScaling.DataHandling.MLDataHandler method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_test_results_from_val_results">get_test_results_from_val_results() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_test_results_from_val_results">[1]</a>
 </li>
@@ -351,7 +416,19 @@
 </li>
       <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.get_tick_interval">get_tick_interval() (MemoryAutoScaling.Evaluation.TraceAnalyzer method)</a>
 </li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_cpu">get_total_allocated_cpu() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_mem">get_total_allocated_mem() (MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_total_allocated_resource">get_total_allocated_resource() (MemoryAutoScaling.DataHandling.Trace method)</a>
+
+      <ul>
+        <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage.get_total_allocated_resource">(MemoryAutoScaling.DataHandling.TraceUsage method)</a>
+</li>
+      </ul></li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_total_spare_during_window">get_total_spare_during_window() (in module MemoryAutoScaling.utils)</a>
+</li>
+      <li><a href="DataHandling/ml_data_handler.html#MemoryAutoScaling.DataHandling.MLDataHandler.get_total_spare_for_target">get_total_spare_for_target() (MemoryAutoScaling.DataHandling.MLDataHandler method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_total_utilization_across_traces">get_total_utilization_across_traces() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_total_utilization_across_traces">[1]</a>
 </li>
@@ -359,11 +436,21 @@
 </li>
       <li><a href="specs.html#MemoryAutoScaling.specs.get_trace_columns">get_trace_columns() (in module MemoryAutoScaling.specs)</a>
 </li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_trace_df">get_trace_df() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.get_trace_files">get_trace_files() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_trace_id">get_trace_id() (MemoryAutoScaling.DataHandling.Trace method)</a>
+</li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_trace_stats">get_trace_stats() (in module MemoryAutoScaling.utils)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.get_traces">get_traces() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
 </li>
       <li><a href="parallel.html#MemoryAutoScaling.parallel.get_traces_for_core">get_traces_for_core() (in module MemoryAutoScaling.parallel)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.get_traces_from_input_params">get_traces_from_input_params() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.get_traces_from_input_params">[1]</a>
+</li>
+      <li><a href="DataHandling/ml_data_handler.html#MemoryAutoScaling.DataHandling.MLDataHandler.get_train_and_test_sets">get_train_and_test_sets() (MemoryAutoScaling.DataHandling.MLDataHandler method)</a>
 </li>
       <li><a href="utils.html#MemoryAutoScaling.utils.get_train_test_thresholds">get_train_test_thresholds() (in module MemoryAutoScaling.utils)</a>
 </li>
@@ -419,6 +506,12 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.load_all_traces_from_time_series_files">load_all_traces_from_time_series_files() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.load_trace_from_time_series_file">load_trace_from_time_series_file() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
+</li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.log_modeling_progress">log_modeling_progress() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.log_modeling_progress">[1]</a>
 </li>
   </ul></td>
@@ -432,6 +525,48 @@
 
       <ul>
         <li><a href="analysis.html#module-MemoryAutoScaling.analysis">module</a>, <a href="plotting.html#module-MemoryAutoScaling.analysis">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    MemoryAutoScaling.DataHandling
+
+      <ul>
+        <li><a href="DataHandling/data_handling.html#module-MemoryAutoScaling.DataHandling">module</a>
+</li>
+      </ul></li>
+      <li>
+    MemoryAutoScaling.DataHandling.MLDataHandler
+
+      <ul>
+        <li><a href="DataHandling/ml_data_handler.html#module-MemoryAutoScaling.DataHandling.MLDataHandler">module</a>
+</li>
+      </ul></li>
+      <li>
+    MemoryAutoScaling.DataHandling.Trace
+
+      <ul>
+        <li><a href="DataHandling/trace.html#module-MemoryAutoScaling.DataHandling.Trace">module</a>
+</li>
+      </ul></li>
+      <li>
+    MemoryAutoScaling.DataHandling.TraceGenerator
+
+      <ul>
+        <li><a href="DataHandling/trace_generator.html#module-MemoryAutoScaling.DataHandling.TraceGenerator">module</a>
+</li>
+      </ul></li>
+      <li>
+    MemoryAutoScaling.DataHandling.TraceHandler
+
+      <ul>
+        <li><a href="DataHandling/trace_handler.html#module-MemoryAutoScaling.DataHandling.TraceHandler">module</a>
+</li>
+      </ul></li>
+      <li>
+    MemoryAutoScaling.DataHandling.TraceUsage
+
+      <ul>
+        <li><a href="DataHandling/trace_usage.html#module-MemoryAutoScaling.DataHandling.TraceUsage">module</a>
 </li>
       </ul></li>
       <li>
@@ -469,6 +604,8 @@
         <li><a href="parallel.html#module-MemoryAutoScaling.parallel">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     MemoryAutoScaling.specs
 
@@ -476,8 +613,6 @@
         <li><a href="specs.html#module-MemoryAutoScaling.specs">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     MemoryAutoScaling.utils
 
@@ -485,6 +620,8 @@
         <li><a href="utils.html#module-MemoryAutoScaling.utils">module</a>
 </li>
       </ul></li>
+      <li><a href="DataHandling/ml_data_handler.html#MemoryAutoScaling.DataHandling.MLDataHandler">MLDataHandler (class in MemoryAutoScaling.DataHandling)</a>
+</li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.model_results_df_to_dict">model_results_df_to_dict() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.model_results_df_to_dict">[1]</a>
 </li>
       <li><a href="Evaluation/model_results.html#MemoryAutoScaling.Evaluation.ModelResults">ModelResults (class in MemoryAutoScaling.Evaluation)</a>
@@ -494,6 +631,18 @@
 
       <ul>
         <li><a href="analysis.html#module-MemoryAutoScaling.analysis">MemoryAutoScaling.analysis</a>, <a href="plotting.html#module-MemoryAutoScaling.analysis">[1]</a>
+</li>
+        <li><a href="DataHandling/data_handling.html#module-MemoryAutoScaling.DataHandling">MemoryAutoScaling.DataHandling</a>
+</li>
+        <li><a href="DataHandling/ml_data_handler.html#module-MemoryAutoScaling.DataHandling.MLDataHandler">MemoryAutoScaling.DataHandling.MLDataHandler</a>
+</li>
+        <li><a href="DataHandling/trace.html#module-MemoryAutoScaling.DataHandling.Trace">MemoryAutoScaling.DataHandling.Trace</a>
+</li>
+        <li><a href="DataHandling/trace_generator.html#module-MemoryAutoScaling.DataHandling.TraceGenerator">MemoryAutoScaling.DataHandling.TraceGenerator</a>
+</li>
+        <li><a href="DataHandling/trace_handler.html#module-MemoryAutoScaling.DataHandling.TraceHandler">MemoryAutoScaling.DataHandling.TraceHandler</a>
+</li>
+        <li><a href="DataHandling/trace_usage.html#module-MemoryAutoScaling.DataHandling.TraceUsage">MemoryAutoScaling.DataHandling.TraceUsage</a>
 </li>
         <li><a href="Evaluation/evaluation.html#module-MemoryAutoScaling.Evaluation">MemoryAutoScaling.Evaluation</a>
 </li>
@@ -520,11 +669,15 @@
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.output_best_model_results_from_model_results_dfs">output_best_model_results_from_model_results_dfs() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.output_best_model_results_from_model_results_dfs">[1]</a>
 </li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.output_data_traces">output_data_traces() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.output_model_results">output_model_results() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.output_model_results">[1]</a>
 </li>
       <li><a href="utils.html#MemoryAutoScaling.utils.output_time_series_list_to_file">output_time_series_list_to_file() (in module MemoryAutoScaling.utils)</a>
+</li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.output_trace">output_trace() (MemoryAutoScaling.DataHandling.Trace method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -537,6 +690,8 @@
       <li><a href="analysis.html#MemoryAutoScaling.analysis.pad_model_results_dict">pad_model_results_dict() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.pad_model_results_dict">[1]</a>
 </li>
       <li><a href="utils.html#MemoryAutoScaling.utils.perform_coin_toss">perform_coin_toss() (in module MemoryAutoScaling.utils)</a>
+</li>
+      <li><a href="DataHandling/ml_data_handler.html#MemoryAutoScaling.DataHandling.MLDataHandler.perform_data_split">perform_data_split() (MemoryAutoScaling.DataHandling.MLDataHandler method)</a>
 </li>
       <li><a href="parallel.html#MemoryAutoScaling.parallel.perform_trace_modelling">perform_trace_modelling() (in module MemoryAutoScaling.parallel)</a>
 </li>
@@ -553,6 +708,8 @@
       <li><a href="analysis.html#MemoryAutoScaling.analysis.plot_prop_harvested_by_model">plot_prop_harvested_by_model() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.plot_prop_harvested_by_model">[1]</a>
 </li>
       <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.plot_trace">plot_trace() (MemoryAutoScaling.Evaluation.TraceAnalyzer method)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.process_all_trace_files">process_all_trace_files() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.process_and_output_model_results">process_and_output_model_results() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.process_and_output_model_results">[1]</a>
 </li>
@@ -572,13 +729,15 @@
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.read_univariate_modelling_input_params">read_univariate_modelling_input_params() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.read_univariate_modelling_input_params">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="utils.html#MemoryAutoScaling.utils.rename_aggregate_stats">rename_aggregate_stats() (in module MemoryAutoScaling.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.run_best_models_for_all_traces">run_best_models_for_all_traces() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.run_best_models_for_all_traces">[1]</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.run_best_multivariate_models_for_all_traces">run_best_multivariate_models_for_all_traces() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.run_best_multivariate_models_for_all_traces">[1]</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.run_processing_pipeline">run_processing_pipeline() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -590,9 +749,11 @@
 </li>
       <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.set_plot_color">set_plot_color() (MemoryAutoScaling.Evaluation.TraceAnalyzer method)</a>
 </li>
+      <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.set_tick_interval">set_tick_interval() (MemoryAutoScaling.Evaluation.TraceAnalyzer method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.set_tick_interval">set_tick_interval() (MemoryAutoScaling.Evaluation.TraceAnalyzer method)</a>
+      <li><a href="DataHandling/ml_data_handler.html#MemoryAutoScaling.DataHandling.MLDataHandler.split_time_series_data">split_time_series_data() (MemoryAutoScaling.DataHandling.MLDataHandler method)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.standardize_counts_dict">standardize_counts_dict() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.standardize_counts_dict">[1]</a>
 </li>
@@ -614,9 +775,17 @@
         <li><a href="Evaluation/model_results.html#MemoryAutoScaling.Evaluation.ModelResults.to_list">(MemoryAutoScaling.Evaluation.ModelResults method)</a>
 </li>
       </ul></li>
+      <li><a href="DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace">Trace (class in MemoryAutoScaling.DataHandling)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer">TraceAnalyzer (class in MemoryAutoScaling.Evaluation)</a>
+</li>
+      <li><a href="DataHandling/trace_generator.html#MemoryAutoScaling.DataHandling.TraceGenerator">TraceGenerator (class in MemoryAutoScaling.DataHandling)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler">TraceHandler (class in MemoryAutoScaling.DataHandling)</a>
+</li>
+      <li><a href="DataHandling/trace_usage.html#MemoryAutoScaling.DataHandling.TraceUsage">TraceUsage (class in MemoryAutoScaling.DataHandling)</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.truncate_dict">truncate_dict() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.truncate_dict">[1]</a>
 </li>
@@ -630,10 +799,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.update_best_model_results_dict">update_best_model_results_dict() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.update_best_model_results_dict">[1]</a>
 </li>
-      <li><a href="analysis.html#MemoryAutoScaling.analysis.update_model_results_for_trace">update_model_results_for_trace() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.update_model_results_for_trace">[1]</a>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.update_directory_path">update_directory_path() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
+</li>
+      <li><a href="DataHandling/trace_handler.html#MemoryAutoScaling.DataHandling.TraceHandler.update_file_identifier">update_file_identifier() (MemoryAutoScaling.DataHandling.TraceHandler method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="analysis.html#MemoryAutoScaling.analysis.update_model_results_for_trace">update_model_results_for_trace() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.update_model_results_for_trace">[1]</a>
+</li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.update_multivariate_model_results_for_trace">update_multivariate_model_results_for_trace() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.update_multivariate_model_results_for_trace">[1]</a>
 </li>
       <li><a href="analysis.html#MemoryAutoScaling.analysis.update_with_new_model_results">update_with_new_model_results() (in module MemoryAutoScaling.analysis)</a>, <a href="plotting.html#MemoryAutoScaling.analysis.update_with_new_model_results">[1]</a>
