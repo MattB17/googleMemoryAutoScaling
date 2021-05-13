@@ -4,7 +4,7 @@ Trace Usage Modelling
 .. automodule:: MemoryAutoScaling.Models
 
 .. toctree::
-   :maxdepth:
+   :maxdepth: 2
    :caption: Contents
 
    trace_model

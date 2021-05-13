@@ -1,7 +1,7 @@
 Moving Average Model
 ====================
 
-.. automodule:: MemoryAutoScaling.Models.TraceMovingAverage
+.. automodule:: MemoryAutoScaling.Models.Sequential.TraceMovingAverage
 
-.. autoclass:: MemoryAutoScaling.Models.TraceMovingAverage
+.. autoclass:: MemoryAutoScaling.Models.Sequential.TraceMovingAverage
    :members:
