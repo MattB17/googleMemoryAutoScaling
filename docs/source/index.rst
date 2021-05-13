@@ -13,7 +13,7 @@ Code Contents
 
    DataHandling/data_handling
    Evaluation/evaluation
-   ML/ml
+   Models/models
    analysis
    parallel
    plotting
