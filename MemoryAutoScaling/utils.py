@@ -267,12 +267,14 @@ def get_trace_stats(data_trace):
         values are the corresponding statistical value for `data_trace`.
 
     """
-    max_val = np.max(data_trace)
-    return {"avg": np.mean(data_trace),
-            "std": np.std(data_trace),
-            "median": np.median(data_trace),
-            "max": np.max(data_trace),
-            "range": max_val - np.min(data_trace)}
+    if len(data_trace) > 0:
+        max_val = np.max(data_trace)
+        return {"avg": np.mean(data_trace),
+                "std": np.std(data_trace),
+                "median": np.median(data_trace),
+                "max": max_val,
+                "range": max_val - np.min(data_trace)}
+    return {}
 
 
 def perform_coin_toss(prob):
