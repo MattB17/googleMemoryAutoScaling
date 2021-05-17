@@ -371,6 +371,28 @@ in the trace.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.Trace.get_resource_usage">
+<code class="sig-name descname"><span class="pre">get_resource_usage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/Trace.html#Trace.get_resource_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.Trace.get_resource_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>The usage time series of <cite>resource_col</cite> for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target_col: str</strong></dt><dd><p>A string identifying the resource for which the usage data is
+retrieved.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing usage rates of <cite>resource_col</cite> for the
+trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="MemoryAutoScaling.DataHandling.Trace.get_resource_utilization">
 <code class="sig-name descname"><span class="pre">get_resource_utilization</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/Trace.html#Trace.get_resource_utilization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.Trace.get_resource_utilization" title="Permalink to this definition">¶</a></dt>
 <dd><p>The utilization of <cite>target_col</cite> for the trace.</p>

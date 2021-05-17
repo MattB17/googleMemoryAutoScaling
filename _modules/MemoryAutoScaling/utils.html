@@ -418,12 +418,14 @@
 <span class="sd">        values are the corresponding statistical value for `data_trace`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;avg&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
-            <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
-            <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
-            <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
-            <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="n">max_val</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)}</span></div>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;avg&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
+                <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
+                <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">data_trace</span><span class="p">),</span>
+                <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">max_val</span><span class="p">,</span>
+                <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="n">max_val</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data_trace</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
 
 
 <div class="viewcode-block" id="perform_coin_toss"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.perform_coin_toss">[docs]</a><span class="k">def</span> <span class="nf">perform_coin_toss</span><span class="p">(</span><span class="n">prob</span><span class="p">):</span>

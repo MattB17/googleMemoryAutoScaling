@@ -1360,6 +1360,28 @@ traces is calculated for each model and plotted.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="MemoryAutoScaling.analysis.plot_usage_vs_allocated">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">plot_usage_vs_allocated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_mem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#plot_usage_vs_allocated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.plot_usage_vs_allocated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the used vs allocated values of the resource for <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trace: Trace</strong></dt><dd><p>The <cite>Trace</cite> for which the usage data is plotted.</p>
+</dd>
+<dt><strong>is_mem: bool</strong></dt><dd><p>A boolean value indicating whether memory is the target resource.
+If true, memory is the target resource, otherwise it is CPU.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="MemoryAutoScaling.analysis.process_and_output_model_results">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.analysis.</span></code><code class="sig-name descname"><span class="pre">process_and_output_model_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/analysis.html#process_and_output_model_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.analysis.process_and_output_model_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes <cite>model_results</cite> and outputs them to <cite>output_dir</cite>.</p>

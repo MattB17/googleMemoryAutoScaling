@@ -391,6 +391,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_resource_utilization</span><span class="p">(</span><span class="n">target_col</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Trace.get_resource_usage"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_resource_usage">[docs]</a>    <span class="k">def</span> <span class="nf">get_resource_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The usage time series of `resource_col` for the trace.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_col: str</span>
+<span class="sd">            A string identifying the resource for which the usage data is</span>
+<span class="sd">            retrieved.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            A numpy array representing usage rates of `resource_col` for the</span>
+<span class="sd">            trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_usage</span><span class="o">.</span><span class="n">get_resource_usage</span><span class="p">(</span><span class="n">target_col</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Trace.get_total_allocated_resource"><a class="viewcode-back" href="../../../DataHandling/trace.html#MemoryAutoScaling.DataHandling.Trace.get_total_allocated_resource">[docs]</a>    <span class="k">def</span> <span class="nf">get_total_allocated_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_col</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The total allocated amount of `resource_col` for the trace.</span>
 
