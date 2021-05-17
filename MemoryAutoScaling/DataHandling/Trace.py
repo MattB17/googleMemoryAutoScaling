@@ -240,6 +240,24 @@ class Trace:
         """
         return self._trace_usage.get_resource_utilization(target_col)
 
+    def get_resource_usage(self, target_col):
+        """The usage time series of `resource_col` for the trace.
+
+        Parameters
+        ----------
+        target_col: str
+            A string identifying the resource for which the usage data is
+            retrieved.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing usage rates of `resource_col` for the
+            trace.
+
+        """
+        return self._trace_usage.get_resource_usage(target_col)
+
     def get_total_allocated_resource(self, target_col):
         """The total allocated amount of `resource_col` for the trace.
 

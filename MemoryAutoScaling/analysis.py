@@ -1808,3 +1808,26 @@ def plot_prop_harvested_by_model(model_results_dfs, buffer_pct):
     title = "Harvested With {}% Prediction Buffer".format(
         int(buffer_pct * 100))
     plotting.plot_proportions_across_models(prop_harvested_dict, title)
+
+
+def plot_usage_vs_allocated(trace, is_mem=True):
+    """Plots the used vs allocated values of the resource for `trace`.
+
+    Parameters
+    ----------
+    trace: Trace
+        The `Trace` for which the usage data is plotted.
+    is_mem: bool
+        A boolean value indicating whether memory is the target resource.
+        If true, memory is the target resource, otherwise it is CPU.
+
+    Returns
+    -------
+    None
+
+    """
+    resource_col = specs.MAX_MEM_COL if is_mem else specs.MAX_CPU_COL
+    allocated_amt = trace.get_amount_allocated_for_target(resource_col)
+    usage_ts = trace.get_resource_usage(resource_col)
+    resource_name = "Memory" if is_mem else "CPU"
+    plotting.plot_usage_vs_allocated(usage_ts, allocated_amt, resource_name)

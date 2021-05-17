@@ -269,7 +269,6 @@ class TraceAnalyzer:
             len(data_trace), self._tick_interval,
             "{} Trace And 1 Level Differencing".format(self._analysis_title))
 
-
     def calculate_statistics(self, data_trace):
         """Calculates statistics for `data_trace`.
 

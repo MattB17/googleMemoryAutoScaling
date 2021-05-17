@@ -268,6 +268,26 @@ class TraceUsage:
             return self.get_mem_utilization()
         return self.get_cpu_utilization()
 
+    def get_resource_usage(self, resource_col):
+        """The usage time series of `resource_col` for the trace.
+
+        Parameters
+        ----------
+        resource_col: str
+            A string identifying the resource for which the usage data is
+            retrieved.
+
+        Returns
+        -------
+        np.array
+            A numpy array representing usage rates of `resource_col` for the
+            trace.
+
+        """
+        if resource_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
+            return self._avg_mem_ts
+        return self._avg_cpu_ts
+
     def get_total_allocated_mem(self):
         """The total memory allocated to the trace.
 

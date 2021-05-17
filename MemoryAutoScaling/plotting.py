@@ -275,3 +275,30 @@ def plot_proportions_across_models(model_props, prop_name):
     plt.ylabel("Prop {}".format(prop_name))
     plt.title("Proportion {} Across Models".format(prop_name))
     plt.show()
+
+
+def plot_usage_vs_allocated(usage_ts, alloced_amt, usage_name):
+    """Plots `usage_ts` and `alloced_amt` for each time point.
+
+    Parameters
+    ----------
+    usage_ts: np.array
+        A numpy array representing a time series of usage data.
+    alloced_amt: float
+        A float representing the amount allocated.
+    usage_name: str
+        A string representing the name for the usage data in the plot.
+
+    Returns
+    -------
+    None
+
+    """
+    plt.figure(figsize=(20, 10))
+    time_points = np.array(range(1, len(usage_ts) + 1))
+    allocated_ts = np.array([alloced_amt for _ in range(len(usage_ts))])
+    plt.plot(time_points, allocated_ts, color="red", label="Allocated Amount")
+    plt.plot(time_points, usage_ts, color="blue",
+             label="{} Usage".format(usage_name))
+    plt.legend()
+    plt.show()
