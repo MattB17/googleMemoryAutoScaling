@@ -19,12 +19,12 @@ class TraceUsage:
     cpu_alloc: float
         A float representing the amount of CPU allocated to the trace for its
         duration.
-    avg_mem_ts: np.array
-        A numpy array representing a time series of the average memory usage
-        of the trace.
-    avg_cpu_ts: np.array
-        A numpy array representing a time series of the average CPU usage of
-        the trace.
+    mem_usage_ts: np.array
+        A numpy array representing a time series of the memory usage of the
+        trace.
+    cpu_usage_ts: np.array
+        A numpy array representing a time series of the CPU usage of the
+        trace.
 
     Attributes
     ----------
@@ -32,17 +32,17 @@ class TraceUsage:
         The amount of memory allocated to the trace for its duration.
     _cpu_alloc: float
         The amount of CPU allocated to the trace for its duration.
-    _avg_mem_ts: np.array
-        A time series of the average memory usage of the trace.
-    _avg_cpu_ts: np.array
-        A time series of the average CPU usage of the trace.
+    _mem_usage_ts: np.array
+        A time series of the memory usage of the trace.
+    _cpu_usage_ts: np.array
+        A time series of the CPU usage of the trace.
 
     """
-    def __init__(self, mem_alloc, cpu_alloc, avg_mem_ts, avg_cpu_ts):
+    def __init__(self, mem_alloc, cpu_alloc, mem_usage_ts, cpu_usage_ts):
         self._mem_alloc = mem_alloc
         self._cpu_alloc = cpu_alloc
-        self._avg_mem_ts = avg_mem_ts
-        self._avg_cpu_ts = avg_cpu_ts
+        self._mem_usage_ts = mem_usage_ts
+        self._cpu_usage_ts = cpu_usage_ts
 
     @classmethod
     def from_trace_df(cls, trace_df):
@@ -63,9 +63,9 @@ class TraceUsage:
             trace_df, specs.TOTAL_MEM_COL)
         cpu_allocated = utils.calculate_max_allocated(
             trace_df, specs.MAX_CPU_COL)
-        avg_mem = trace_df[specs.AVG_MEM_COL].replace(np.nan, 0).values
-        avg_cpu = trace_df[specs.AVG_CPU_COL].replace(np.nan, 0).values
-        return cls(mem_allocated, cpu_allocated, avg_mem, avg_cpu)
+        mem_ts = trace_df[specs.AVG_MEM_COL].replace(np.nan, 0).values
+        cpu_ts = trace_df[specs.MAX_CPU_COL].replace(np.nan, 0).values
+        return cls(mem_allocated, cpu_allocated, mem_ts, cpu_ts)
 
     def get_allocated_mem(self):
         """The memory allocated to the trace for its duration.
@@ -91,29 +91,29 @@ class TraceUsage:
         """
         return self._cpu_alloc
 
-    def get_avg_mem_usage(self):
-        """A time series of average memory usage for the trace.
+    def get_mem_usage(self):
+        """A time series of memory usage for the trace.
 
         Returns
         -------
         np.array
-            A numpy array representing a time series of average memory usage
-            for the trace.
+            A numpy array representing a time series of memory usage for the
+            trace.
 
         """
-        return self._avg_mem_ts
+        return self._mem_usage_ts
 
-    def get_avg_cpu_usage(self):
-        """A time series of average CPU usage for the trace.
+    def get_cpu_usage(self):
+        """A time series of CPU usage for the trace.
 
         Returns
         -------
         np.array
-            A numpy array representing a time series of average memory usage
-            for the trace.
+            A numpy array representing a time series of CPU usage for the
+            trace.
 
         """
-        return self._avg_cpu_ts
+        return self._cpu_usage_ts
 
     def get_spare_mem_in_window(self, win_start, win_end, agg_window):
         """The spare amount of memory in [`win_start`, `win_end`].
@@ -143,7 +143,8 @@ class TraceUsage:
 
         """
         return utils.get_total_spare_during_window(
-            self._mem_alloc, self._avg_mem_ts, win_start, win_end, agg_window)
+            self._mem_alloc, self._mem_usage_ts,
+            win_start, win_end, agg_window)
 
     def get_spare_cpu_in_window(self, win_start, win_end, agg_window):
         """The spare amount of CPU in [`win_start`, `win_end`].
@@ -173,7 +174,8 @@ class TraceUsage:
 
         """
         return utils.get_total_spare_during_window(
-            self._cpu_alloc, self._avg_cpu_ts, win_start, win_end, agg_window)
+            self._cpu_alloc, self._cpu_usage_ts,
+            win_start, win_end, agg_window)
 
     def get_spare_resource_in_window(self, target_col, win_start,
                                      win_end, agg_window):
@@ -224,7 +226,7 @@ class TraceUsage:
 
         """
         return utils.calculate_utilization_percent(
-            self._mem_alloc, self._avg_mem_ts)
+            self._mem_alloc, self._mem_usage_ts)
 
     def get_cpu_utilization(self):
         """The CPU utilization for the trace.
@@ -241,7 +243,7 @@ class TraceUsage:
 
         """
         return utils.calculate_utilization_percent(
-            self._cpu_alloc, self._avg_cpu_ts)
+            self._cpu_alloc, self._cpu_usage_ts)
 
     def get_resource_utilization(self, resource_col):
         """The utilization of `resource_col` for the trace.
@@ -285,8 +287,8 @@ class TraceUsage:
 
         """
         if resource_col in [specs.MAX_MEM_COL, specs.MAX_MEM_TS]:
-            return self._avg_mem_ts
-        return self._avg_cpu_ts
+            return self._mem_usage_ts
+        return self._cpu_usage_ts
 
     def get_total_allocated_mem(self):
         """The total memory allocated to the trace.
@@ -301,7 +303,7 @@ class TraceUsage:
             trace.
 
         """
-        return self._mem_alloc * len(self._avg_mem_ts)
+        return self._mem_alloc * len(self._mem_usage_ts)
 
     def get_total_allocated_cpu(self):
         """The total CPU units allocated to the trace.
@@ -316,7 +318,7 @@ class TraceUsage:
             the trace.
 
         """
-        return self._cpu_alloc * len(self._avg_cpu_ts)
+        return self._cpu_alloc * len(self._cpu_usage_ts)
 
     def get_total_allocated_resource(self, resource_col):
         """The total allocated amount of `resource_col` for the trace.
