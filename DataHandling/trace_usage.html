@@ -168,7 +168,7 @@ statistics, which are used to calculate utilization and the amount
 of spare units for both CPU and memory.</p>
 <dl class="py class">
 <dt id="MemoryAutoScaling.DataHandling.TraceUsage">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.DataHandling.</span></code><code class="sig-name descname"><span class="pre">TraceUsage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mem_alloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_alloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_mem_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_cpu_ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.DataHandling.</span></code><code class="sig-name descname"><span class="pre">TraceUsage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mem_alloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_alloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mem_usage_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_usage_ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores raw, unaggregated trace statistics for usage calculations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -179,11 +179,11 @@ its duration.</p>
 <dt><strong>cpu_alloc: float</strong></dt><dd><p>A float representing the amount of CPU allocated to the trace for its
 duration.</p>
 </dd>
-<dt><strong>avg_mem_ts: np.array</strong></dt><dd><p>A numpy array representing a time series of the average memory usage
-of the trace.</p>
+<dt><strong>mem_usage_ts: np.array</strong></dt><dd><p>A numpy array representing a time series of the memory usage of the
+trace.</p>
 </dd>
-<dt><strong>avg_cpu_ts: np.array</strong></dt><dd><p>A numpy array representing a time series of the average CPU usage of
-the trace.</p>
+<dt><strong>cpu_usage_ts: np.array</strong></dt><dd><p>A numpy array representing a time series of the CPU usage of the
+trace.</p>
 </dd>
 </dl>
 </dd>
@@ -193,9 +193,9 @@ the trace.</p>
 </dd>
 <dt><strong>_cpu_alloc: float</strong></dt><dd><p>The amount of CPU allocated to the trace for its duration.</p>
 </dd>
-<dt><strong>_avg_mem_ts: np.array</strong></dt><dd><p>A time series of the average memory usage of the trace.</p>
+<dt><strong>_mem_usage_ts: np.array</strong></dt><dd><p>A time series of the memory usage of the trace.</p>
 </dd>
-<dt><strong>_avg_cpu_ts: np.array</strong></dt><dd><p>A time series of the average CPU usage of the trace.</p>
+<dt><strong>_cpu_usage_ts: np.array</strong></dt><dd><p>A time series of the CPU usage of the trace.</p>
 </dd>
 </dl>
 </dd>
@@ -260,29 +260,14 @@ its duration.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_avg_cpu_usage">
-<code class="sig-name descname"><span class="pre">get_avg_cpu_usage</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_avg_cpu_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_avg_cpu_usage" title="Permalink to this definition">¶</a></dt>
-<dd><p>A time series of average CPU usage for the trace.</p>
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_cpu_usage">
+<code class="sig-name descname"><span class="pre">get_cpu_usage</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_cpu_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_cpu_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>A time series of CPU usage for the trace.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl class="simple">
-<dt>np.array</dt><dd><p>A numpy array representing a time series of average memory usage
-for the trace.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_avg_mem_usage">
-<code class="sig-name descname"><span class="pre">get_avg_mem_usage</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_avg_mem_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_avg_mem_usage" title="Permalink to this definition">¶</a></dt>
-<dd><p>A time series of average memory usage for the trace.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
-<dt>np.array</dt><dd><p>A numpy array representing a time series of average memory usage
-for the trace.</p>
+<dt>np.array</dt><dd><p>A numpy array representing a time series of CPU usage for the
+trace.</p>
 </dd>
 </dl>
 </dd>
@@ -301,6 +286,21 @@ over all time points.</p>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl class="simple">
 <dt>float</dt><dd><p>A float representing total memory utilization for the trace.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="MemoryAutoScaling.DataHandling.TraceUsage.get_mem_usage">
+<code class="sig-name descname"><span class="pre">get_mem_usage</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/MemoryAutoScaling/DataHandling/TraceUsage.html#TraceUsage.get_mem_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.DataHandling.TraceUsage.get_mem_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>A time series of memory usage for the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing a time series of memory usage for the
+trace.</p>
 </dd>
 </dl>
 </dd>
