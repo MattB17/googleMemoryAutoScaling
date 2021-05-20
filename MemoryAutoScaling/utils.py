@@ -346,6 +346,33 @@ def impute_for_time_series(time_series, impute_val):
     return time_series
 
 
+def clean_resource_time_series(raw_trace_df, resource_col):
+    """Cleans `resource_col` in `raw_trace_df`.
+
+    The values of `resource_col` in `raw_trace_df` corresponding to NaN or
+    infinity are set to 0.
+
+    Parameters
+    ----------
+    raw_trace_df: pd.DataFrame
+        A pandas DataFrame containing the data for the trace.
+    resource_col: str
+        A string representing the name of the resource for which the time
+        series is cleaned.
+
+    Returns
+    -------
+    np.array
+        A numpy array corresponding to the values of `resource_col` in
+        `raw_trace_df` after it has been cleaned.
+
+    """
+    resource_ts = raw_trace_df[resource_col].values
+    resource_ts[np.isnan(resource_ts)] = 0
+    resource_ts[np.isinf(resource_ts)] = 0
+    return resource_ts
+
+
 def calculate_max_allocated(raw_trace_df, resource_col):
     """Calculatate the maximum allocated amount over the life of the trace.
 
@@ -364,10 +391,34 @@ def calculate_max_allocated(raw_trace_df, resource_col):
         over the life of the trace.
 
     """
-    alloc_ts = raw_trace_df[resource_col].values
-    alloc_ts[np.isnan(alloc_ts)] = 0
-    alloc_ts[np.isinf(alloc_ts)] = 0
+    alloc_ts = clean_resource_time_series(raw_trace_df, resource_col)
     return np.max(alloc_ts)
+
+def calculate_allocated_from_percentile(raw_trace_df, resource_col, p):
+    """Calculates the allocated amount of `resource_col` based on `p`.
+
+    The amount of `resource_col` allocated for the trace is calculated as
+    the `p`th percentile of the values `resource_col` in `raw_trace_df`.
+
+    Parameters
+    ----------
+    raw_trace_df: pd.DataFrame
+        A pandas DataFrame containing the data for the trace.
+    resource_col: str
+        A string representing the name of the resource for which the `p`th
+        percentile is calculated.
+    p: float
+        A float representing the percentile used to determine the amount
+        allocated.
+
+    Returns
+    -------
+    float
+        A float representing the `p`th percentile value of `resource_col`.
+
+    """
+    alloc_ts = clean_resource_time_series(raw_trace_df, resource_col)
+    return np.percentile(alloc_ts, p)
 
 
 def build_trace_data_from_trace_df(raw_trace_df, agg_window, trace_usage):
