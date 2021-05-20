@@ -269,6 +269,34 @@ and aggregating data according to <cite>agg_window</cite>.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="MemoryAutoScaling.utils.calculate_allocated_from_percentile">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_allocated_from_percentile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_allocated_from_percentile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_allocated_from_percentile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the allocated amount of <cite>resource_col</cite> based on <cite>p</cite>.</p>
+<p>The amount of <cite>resource_col</cite> allocated for the trace is calculated as
+the <cite>p`th percentile of the values `resource_col</cite> in <cite>raw_trace_df</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>raw_trace_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the data for the trace.</p>
+</dd>
+<dt><strong>resource_col: str</strong></dt><dd><p>A string representing the name of the resource for which the <a href="#id1"><span class="problematic" id="id2">`</span></a>p`th
+percentile is calculated.</p>
+</dd>
+<dt><strong>p: float</strong></dt><dd><p>A float representing the percentile used to determine the amount
+allocated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>A float representing the <cite>p`th percentile value of `resource_col</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="MemoryAutoScaling.utils.calculate_evaluation_metrics">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">calculate_evaluation_metrics</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preds_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_spare</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#calculate_evaluation_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.calculate_evaluation_metrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the evaluation metrics for the training and testing sets.</p>
@@ -509,6 +537,32 @@ predictions have been capped at 1.</p>
 <dd class="field-even"><dl class="simple">
 <dt>np.array, np.array</dt><dd><p>Two numpy arrays representing the predictions for the training and
 testing sets, repectively, both capped at 1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="MemoryAutoScaling.utils.clean_resource_time_series">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">clean_resource_time_series</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_trace_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#clean_resource_time_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.clean_resource_time_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans <cite>resource_col</cite> in <cite>raw_trace_df</cite>.</p>
+<p>The values of <cite>resource_col</cite> in <cite>raw_trace_df</cite> corresponding to NaN or
+infinity are set to 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>raw_trace_df: pd.DataFrame</strong></dt><dd><p>A pandas DataFrame containing the data for the trace.</p>
+</dd>
+<dt><strong>resource_col: str</strong></dt><dd><p>A string representing the name of the resource for which the time
+series is cleaned.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array corresponding to the values of <cite>resource_col</cite> in
+<cite>raw_trace_df</cite> after it has been cleaned.</p>
 </dd>
 </dl>
 </dd>

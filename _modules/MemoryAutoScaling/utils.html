@@ -497,6 +497,33 @@
     <span class="k">return</span> <span class="n">time_series</span></div>
 
 
+<div class="viewcode-block" id="clean_resource_time_series"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.clean_resource_time_series">[docs]</a><span class="k">def</span> <span class="nf">clean_resource_time_series</span><span class="p">(</span><span class="n">raw_trace_df</span><span class="p">,</span> <span class="n">resource_col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleans `resource_col` in `raw_trace_df`.</span>
+
+<span class="sd">    The values of `resource_col` in `raw_trace_df` corresponding to NaN or</span>
+<span class="sd">    infinity are set to 0.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    raw_trace_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the data for the trace.</span>
+<span class="sd">    resource_col: str</span>
+<span class="sd">        A string representing the name of the resource for which the time</span>
+<span class="sd">        series is cleaned.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">        A numpy array corresponding to the values of `resource_col` in</span>
+<span class="sd">        `raw_trace_df` after it has been cleaned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">resource_ts</span> <span class="o">=</span> <span class="n">raw_trace_df</span><span class="p">[</span><span class="n">resource_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">resource_ts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">resource_ts</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">resource_ts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">resource_ts</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">resource_ts</span></div>
+
+
 <div class="viewcode-block" id="calculate_max_allocated"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.calculate_max_allocated">[docs]</a><span class="k">def</span> <span class="nf">calculate_max_allocated</span><span class="p">(</span><span class="n">raw_trace_df</span><span class="p">,</span> <span class="n">resource_col</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculatate the maximum allocated amount over the life of the trace.</span>
 
@@ -515,10 +542,34 @@
 <span class="sd">        over the life of the trace.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">alloc_ts</span> <span class="o">=</span> <span class="n">raw_trace_df</span><span class="p">[</span><span class="n">resource_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">alloc_ts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">alloc_ts</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">alloc_ts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">alloc_ts</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">alloc_ts</span> <span class="o">=</span> <span class="n">clean_resource_time_series</span><span class="p">(</span><span class="n">raw_trace_df</span><span class="p">,</span> <span class="n">resource_col</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">alloc_ts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="calculate_allocated_from_percentile"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.calculate_allocated_from_percentile">[docs]</a><span class="k">def</span> <span class="nf">calculate_allocated_from_percentile</span><span class="p">(</span><span class="n">raw_trace_df</span><span class="p">,</span> <span class="n">resource_col</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates the allocated amount of `resource_col` based on `p`.</span>
+
+<span class="sd">    The amount of `resource_col` allocated for the trace is calculated as</span>
+<span class="sd">    the `p`th percentile of the values `resource_col` in `raw_trace_df`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    raw_trace_df: pd.DataFrame</span>
+<span class="sd">        A pandas DataFrame containing the data for the trace.</span>
+<span class="sd">    resource_col: str</span>
+<span class="sd">        A string representing the name of the resource for which the `p`th</span>
+<span class="sd">        percentile is calculated.</span>
+<span class="sd">    p: float</span>
+<span class="sd">        A float representing the percentile used to determine the amount</span>
+<span class="sd">        allocated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        A float representing the `p`th percentile value of `resource_col`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">alloc_ts</span> <span class="o">=</span> <span class="n">clean_resource_time_series</span><span class="p">(</span><span class="n">raw_trace_df</span><span class="p">,</span> <span class="n">resource_col</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">alloc_ts</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="build_trace_data_from_trace_df"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.build_trace_data_from_trace_df">[docs]</a><span class="k">def</span> <span class="nf">build_trace_data_from_trace_df</span><span class="p">(</span><span class="n">raw_trace_df</span><span class="p">,</span> <span class="n">agg_window</span><span class="p">,</span> <span class="n">trace_usage</span><span class="p">):</span>
