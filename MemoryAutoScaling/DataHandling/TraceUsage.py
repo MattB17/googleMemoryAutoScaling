@@ -63,8 +63,10 @@ class TraceUsage:
             trace_df, specs.TOTAL_MEM_COL)
         cpu_allocated = utils.calculate_allocated_from_percentile(
             trace_df, specs.MAX_CPU_COL, 99.9)
-        mem_ts = trace_df[specs.AVG_MEM_COL].replace(np.nan, 0).values
-        cpu_ts = trace_df[specs.AVG_CPU_COL].replace(np.nan, 0).values
+        mem_ts = utils.cap_and_clean_values(
+            trace_df, specs.AVG_MEM_COL, mem_allocated)
+        cpu_ts = utils.cap_and_clean_values(
+            trace_df, specs.MAX_CPU_COL, cpu_allocated)
         return cls(mem_allocated, cpu_allocated, mem_ts, cpu_ts)
 
     def get_allocated_mem(self):

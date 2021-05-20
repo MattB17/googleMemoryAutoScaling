@@ -30,6 +30,28 @@ def cap_predictions_at_1(predicted_vals):
     """
     return np.minimum(predicted_vals, 1.0)
 
+def cap_and_clean_values(data_df, data_col, cap_val):
+    """Cleans and caps the values of `data_col` in `data_df` using `cap_val`.
+
+    Parameters
+    ----------
+    data_df: pd.DataFrame
+        The pandas DataFrame containing the data.
+    data_col: str
+        A string representing the name of the column containing the data.
+    cap_val: float
+        The value used to cap the values of `data_col`.
+
+    Returns
+    -------
+    np.array
+        A numpy array representing the values of `data_col` from `data_df`
+        after they have been cleaned and capped at `cap_val`.
+
+    """
+    data_vals = data_df[data_col].replace(np.nan, 0).values
+    return np.minimum(data_vals, cap_val)
+
 
 def cap_train_and_test_predictions(train_preds, test_preds):
     """Caps the training and testing predictions.
