@@ -66,7 +66,7 @@ class TraceUsage:
         mem_ts = utils.cap_and_clean_values(
             trace_df, specs.AVG_MEM_COL, mem_allocated)
         cpu_ts = utils.cap_and_clean_values(
-            trace_df, specs.MAX_CPU_COL, cpu_allocated)
+            trace_df, specs.AVG_CPU_COL, cpu_allocated)
         return cls(mem_allocated, cpu_allocated, mem_ts, cpu_ts)
 
     def get_allocated_mem(self):
