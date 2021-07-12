@@ -186,6 +186,6 @@ class ModelResults:
             `other_model_results`. Otherwise, False
 
         """
-        lowest_buffer_pct = min(specs.BUFFER_PCTS)
-        return self._harvest_stats_dict[lowest_buffer_pct].is_better(
-            other_model_results._harvest_stats_dict[lowest_buffer_pct])
+        buffer_pct = specs.TUNING_BUFFER_PCT
+        return self._harvest_stats_dict[buffer_pct].is_better(
+            other_model_results._harvest_stats_dict[buffer_pct])

@@ -302,3 +302,31 @@ def plot_usage_vs_allocated(usage_ts, alloced_amt, usage_name):
              label="{} Usage".format(usage_name))
     plt.legend()
     plt.show()
+
+
+def plot_usage_correlation_cdf(corr_vals, aggregation_window):
+    """Plots a CDF of the usage correlations in `corr_vals`.
+
+    Plots a cumulative distribution function of the correlation between
+    maximum memory usage and maximum CPU usage across all traces as
+    given by `corr_vals`.
+
+    Parameters
+    ----------
+    corr_vals: array
+        An array of the correlations values used to build the CDF.
+    aggregation_window: str
+        A string identifying the aggregation window
+
+    Returns
+    -------
+    None
+
+    """
+    plt.figure(figsize=(20, 10))
+    x_vals, cdf = get_cdf_values(corr_vals)
+    plt.plot(x_vals, cdf, linewidth=3.0)
+    plt.title("CDF of Correlation maximum usage - {} aggregation")
+    plt.ylabel("Percentiles")
+    plt.xlabel("Correlations")
+    plt.show()

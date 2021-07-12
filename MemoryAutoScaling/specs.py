@@ -34,6 +34,7 @@ MODELING_COLS = ["params", "train_mase", "test_mase", "under_mase",
                  "prop_under_preds", "max_under_pred", "over_mase",
                  "prop_over_preds", "avg_over_pred", "total_spare"]
 BUFFER_PCTS = [0.0, 0.25, 0.5, 0.75, 1.0]
+TUNING_BUFFER_PCT = BUFFER_PCTS[1]
 RESULTS_COLS = [col for col in MODELING_COLS if col != "params"]
 
 

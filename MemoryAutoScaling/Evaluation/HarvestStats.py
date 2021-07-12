@@ -137,6 +137,21 @@ class HarvestStats:
         """
         return [self._prop_harvested, self._prop_violations]
 
+    def is_null(self):
+        """Determines if the harvest stats are null.
+
+        The harvest stats are null if either the proportion harvested or the
+        proportion of violations is null.
+
+        Returns
+        -------
+        bool
+            True if the harvest stats are null. Otherwise, False.
+
+        """
+        return (np.isnan(self._prop_harvested) or
+                np.isnan(self._prop_violations))
+
     def is_better(self, other_stats):
         """Indicates if the harvest stats are better than `other_stats`.
 
@@ -161,8 +176,8 @@ class HarvestStats:
             `other_stats`. Otherwise, False.
 
         """
-        if np.isnan(other_stats._prop_harvested):
+        if other_stats.is_null():
             return True
-        if np.isnan(self._prop_harvested):
+        if self.is_null():
             return False
         return self._prop_harvested > other_stats._prop_harvested
