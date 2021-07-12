@@ -314,7 +314,7 @@ class TraceAnalyzer:
         except:
             return np.nan
 
-    def get_memory_and_cpu_correlation(trace):
+    def get_memory_and_cpu_correlation(self, trace):
         """The correlation between memory and CPU usage of `trace`.
 
         Parameters
