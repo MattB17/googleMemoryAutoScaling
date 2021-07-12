@@ -36,6 +36,7 @@ MODELING_COLS = ["params", "train_mase", "test_mase", "under_mase",
 BUFFER_PCTS = [0.0, 0.25, 0.5, 0.75, 1.0]
 TUNING_BUFFER_PCT = BUFFER_PCTS[1]
 RESULTS_COLS = [col for col in MODELING_COLS if col != "params"]
+VIOLATIONS_WEIGHT = 3
 
 
 def get_target_variable(max_mem):

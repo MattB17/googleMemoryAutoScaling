@@ -180,4 +180,11 @@ class HarvestStats:
             return True
         if self.is_null():
             return False
-        return self._prop_harvested > other_stats._prop_harvested
+        w = specs.VIOLATIONS_WEIGHT
+        better_harvest = self._prop_harvested > other_stats._prop_harvested
+        better_viol = self._prop_violations < other_stats._prop_violations
+        harvest_diff = self._prop_harvested - other_stats._prop_harvested
+        viol_diff = self._prop_violations - other_stats._prop_violations
+        if better_harvest:
+            return better_viol or (viol_diff < w * harvest_diff)
+        return better_viol and (viol_diff < w * harvest_diff)
