@@ -337,9 +337,9 @@
 <span class="sd">            `other_model_results`. Otherwise, False</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">lowest_buffer_pct</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">specs</span><span class="o">.</span><span class="n">BUFFER_PCTS</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_harvest_stats_dict</span><span class="p">[</span><span class="n">lowest_buffer_pct</span><span class="p">]</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span>
-            <span class="n">other_model_results</span><span class="o">.</span><span class="n">_harvest_stats_dict</span><span class="p">[</span><span class="n">lowest_buffer_pct</span><span class="p">])</span></div></div>
+        <span class="n">buffer_pct</span> <span class="o">=</span> <span class="n">specs</span><span class="o">.</span><span class="n">TUNING_BUFFER_PCT</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_harvest_stats_dict</span><span class="p">[</span><span class="n">buffer_pct</span><span class="p">]</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span>
+            <span class="n">other_model_results</span><span class="o">.</span><span class="n">_harvest_stats_dict</span><span class="p">[</span><span class="n">buffer_pct</span><span class="p">])</span></div></div>
 </pre></div>
 
            </div>

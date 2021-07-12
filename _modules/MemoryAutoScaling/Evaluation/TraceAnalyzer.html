@@ -465,6 +465,24 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
+<div class="viewcode-block" id="TraceAnalyzer.get_memory_and_cpu_correlation"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.get_memory_and_cpu_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">get_memory_and_cpu_correlation</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The correlation between memory and CPU usage of `trace`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace: Trace</span>
+<span class="sd">            The `Trace` for which the correlation is calculated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A float representing the correlation between memory and CPU usage</span>
+<span class="sd">            of `trace`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">get_maximum_memory_time_series</span><span class="p">(),</span>
+                           <span class="n">trace</span><span class="o">.</span><span class="n">get_maximum_cpu_time_series</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="TraceAnalyzer.test_for_causality"><a class="viewcode-back" href="../../../Evaluation/trace_analyzer.html#MemoryAutoScaling.Evaluation.TraceAnalyzer.test_for_causality">[docs]</a>    <span class="k">def</span> <span class="nf">test_for_causality</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_data</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span> <span class="n">lags</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Tests for causality in `trace_data` between `col_names`.</span>
 
