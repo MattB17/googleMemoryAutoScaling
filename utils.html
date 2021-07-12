@@ -497,6 +497,31 @@ trace.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="MemoryAutoScaling.utils.cap_and_clean_values">
+<code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">cap_and_clean_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#cap_and_clean_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.cap_and_clean_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans and caps the values of <cite>data_col</cite> in <cite>data_df</cite> using <cite>cap_val</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data_df: pd.DataFrame</strong></dt><dd><p>The pandas DataFrame containing the data.</p>
+</dd>
+<dt><strong>data_col: str</strong></dt><dd><p>A string representing the name of the column containing the data.</p>
+</dd>
+<dt><strong>cap_val: float</strong></dt><dd><p>The value used to cap the values of <cite>data_col</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.array</dt><dd><p>A numpy array representing the values of <cite>data_col</cite> from <cite>data_df</cite>
+after they have been cleaned and capped at <cite>cap_val</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="MemoryAutoScaling.utils.cap_predictions_at_1">
 <code class="sig-prename descclassname"><span class="pre">MemoryAutoScaling.utils.</span></code><code class="sig-name descname"><span class="pre">cap_predictions_at_1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicted_vals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MemoryAutoScaling/utils.html#cap_predictions_at_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#MemoryAutoScaling.utils.cap_predictions_at_1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Caps each value of <cite>predicted_vals</cite> at 1.</p>

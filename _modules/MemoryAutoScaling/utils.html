@@ -181,6 +181,28 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">predicted_vals</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="cap_and_clean_values"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.cap_and_clean_values">[docs]</a><span class="k">def</span> <span class="nf">cap_and_clean_values</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span> <span class="n">data_col</span><span class="p">,</span> <span class="n">cap_val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleans and caps the values of `data_col` in `data_df` using `cap_val`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_df: pd.DataFrame</span>
+<span class="sd">        The pandas DataFrame containing the data.</span>
+<span class="sd">    data_col: str</span>
+<span class="sd">        A string representing the name of the column containing the data.</span>
+<span class="sd">    cap_val: float</span>
+<span class="sd">        The value used to cap the values of `data_col`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">        A numpy array representing the values of `data_col` from `data_df`</span>
+<span class="sd">        after they have been cleaned and capped at `cap_val`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_vals</span> <span class="o">=</span> <span class="n">data_df</span><span class="p">[</span><span class="n">data_col</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">data_vals</span><span class="p">,</span> <span class="n">cap_val</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="cap_train_and_test_predictions"><a class="viewcode-back" href="../../utils.html#MemoryAutoScaling.utils.cap_train_and_test_predictions">[docs]</a><span class="k">def</span> <span class="nf">cap_train_and_test_predictions</span><span class="p">(</span><span class="n">train_preds</span><span class="p">,</span> <span class="n">test_preds</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Caps the training and testing predictions.</span>
