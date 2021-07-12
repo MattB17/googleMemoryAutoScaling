@@ -17,6 +17,7 @@ def run_trace_stats(traces, results_lst, causal_lags,
         trace_ts = trace.get_target_time_series(output_target)
         utilization = trace.get_resource_utilization(output_target)
         allocated = trace.get_total_allocated_resource(output_target)
+        usage_corr = analyzer.get_memory_and_cpu_correlation(trace)
         p_val = analyzer.test_for_stationarity(trace_ts)
         p_val_diff = analyzer.test_for_stationarity(
             utils.get_differenced_trace(trace_ts, 1))
@@ -24,8 +25,9 @@ def run_trace_stats(traces, results_lst, causal_lags,
             utils.get_differenced_trace(trace_ts, 2))
         trace_df = trace.get_lagged_df(specs.LAGS)
         corr_series = trace_df.corr()[output_target]
-        trace_stats = ([trace.get_trace_id(), utilization, allocated, p_val,
-                        p_val_diff, p_val_diff2] + list(corr_series))
+        trace_stats = ([trace.get_trace_id(), utilization, allocated,
+                        usage_corr, p_val, p_val_diff, p_val_diff2] +
+                       list(corr_series))
         for causal_col in causal_cols:
             try:
                 granger = analyzer.test_for_causality(
@@ -69,7 +71,8 @@ if __name__ == "__main__":
     parallel.initialize_and_join_processes(procs)
 
     stat_df = pd.DataFrame(list(stat_results))
-    stat_cols = ["id", "utilization", "allocated", "adf_p_val",
+    stat_cols = ["id", "utilization", "allocated",
+                 "usage_correlation", "adf_p_val",
                  "adf_p_val_diff", "adf_p_val_diff2"]
     stat_cols += ["corr_{}".format(col_name) for col_name in
                   specs.get_trace_columns() +

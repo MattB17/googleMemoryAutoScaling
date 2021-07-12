@@ -314,6 +314,24 @@ class TraceAnalyzer:
         except:
             return np.nan
 
+    def get_memory_and_cpu_correlation(trace):
+        """The correlation between memory and CPU usage of `trace`.
+
+        Parameters
+        ----------
+        trace: Trace
+            The `Trace` for which the correlation is calculated.
+
+        Returns
+        -------
+        float
+            A float representing the correlation between memory and CPU usage
+            of `trace`.
+
+        """
+        return np.corrcoef(trace.get_maximum_memory_time_series(),
+                           trace.get_maximum_cpu_time_series())[0][1]
+
     def test_for_causality(self, trace_data, col_names, lags):
         """Tests for causality in `trace_data` between `col_names`.
 
