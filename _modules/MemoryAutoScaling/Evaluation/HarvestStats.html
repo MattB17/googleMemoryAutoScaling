@@ -331,7 +331,14 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_null</span><span class="p">():</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span> <span class="o">&gt;</span> <span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_harvested</span></div></div>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">specs</span><span class="o">.</span><span class="n">VIOLATIONS_WEIGHT</span>
+        <span class="n">better_harvest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span> <span class="o">&gt;</span> <span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_harvested</span>
+        <span class="n">better_viol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_violations</span> <span class="o">&lt;</span> <span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_violations</span>
+        <span class="n">harvest_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_harvested</span> <span class="o">-</span> <span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_harvested</span>
+        <span class="n">viol_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_violations</span> <span class="o">-</span> <span class="n">other_stats</span><span class="o">.</span><span class="n">_prop_violations</span>
+        <span class="k">if</span> <span class="n">better_harvest</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">better_viol</span> <span class="ow">or</span> <span class="p">(</span><span class="n">viol_diff</span> <span class="o">&lt;</span> <span class="n">w</span> <span class="o">*</span> <span class="n">harvest_diff</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">better_viol</span> <span class="ow">and</span> <span class="p">(</span><span class="n">viol_diff</span> <span class="o">&lt;</span> <span class="n">w</span> <span class="o">*</span> <span class="n">harvest_diff</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
