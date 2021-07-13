@@ -326,7 +326,8 @@ def plot_usage_correlation_cdf(corr_vals, aggregation_window):
     plt.figure(figsize=(20, 10))
     x_vals, cdf = get_cdf_values(corr_vals)
     plt.plot(x_vals, cdf, linewidth=3.0)
-    plt.title("CDF of Correlation maximum usage - {} aggregation")
+    plt.title("CDF of Correlation maximum usage - {} aggregation".format(
+        aggregation_window))
     plt.ylabel("Percentiles")
     plt.xlabel("Correlations")
     plt.show()
